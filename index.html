@@ -330,6 +330,18 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .dlg-ok.dlg-warnung:hover{background:#d96f0a;border-color:#d96f0a}
 .pr-hinw{margin-top:7px;padding:7px 9px;font-size:.72rem;line-height:1.45;color:var(--navy);background:var(--navy-faint);border-left:3px solid var(--sblue);border-radius:0 3px 3px 0}
 .pr-stand{margin-top:6px;font-size:.72rem;color:var(--muted)}
+/* Eingabefelder im Dialog - bisher trug er nur Berichte, jetzt auch das
+   Formular fuer einen neuen Jahrgang. */
+.dlg-feld{display:block;font-size:.7rem;font-weight:600;color:var(--navy);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px}
+.dlg-feld input{display:block;width:100%;margin-top:4px;padding:6px 8px;
+  font-family:inherit;font-size:.82rem;font-weight:400;letter-spacing:normal;
+  text-transform:none;color:var(--text);background:var(--surface);
+  border:1.5px solid var(--border);border-radius:4px}
+.dlg-feld input:focus{border-color:var(--navy);outline:none}
+.dlg-haken{display:flex;align-items:flex-start;gap:7px;font-size:.79rem;
+  color:var(--text);margin-bottom:4px;cursor:pointer}
+.dlg-haken input{margin-top:2px;flex:none}
 .pr-fehler{font-size:.79rem;line-height:1.55;color:var(--text)}
 .export-btn{display:flex;align-items:center;gap:7px;padding:6px 12px;font-family:inherit;font-size:.78rem;font-weight:600;color:#ffffff;background:var(--navy);border:1.5px solid var(--navy);border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s}
 .export-btn:hover{background:var(--navy-light);border-color:var(--navy-light)}
@@ -694,6 +706,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
         <button class="ex-item" role="menuitem" onclick="datenLadenKlick()">
           <span class="ex-t">Aus Excel laden</span>
           <span class="ex-d">Erwartet das Blatt &raquo;Ausgaben&laquo; dieses Werkzeugs, ausgegeben ohne Suche und Filter, mit einem vollst&auml;ndigen Jahrgang. Der Jahrgang wird in der Datenbank ersetzt &ndash; vorher entsteht ein Sicherungspunkt</span>
+        </button>
+        <button class="ex-item" role="menuitem" onclick="jahrgangAnlegen()">
+          <span class="ex-t">Jahrgang anlegen</span>
+          <span class="ex-d">Legt ein weiteres Jahr an, auf Wunsch mit den Titeln des gezeigten Jahrgangs. Die Hefte kommen einzeln dazu</span>
         </button>
         <button class="ex-item" id="entfernenBtn" role="menuitem" onclick="jahrgangEntfernen()" disabled>
           <span class="ex-t" id="entfernenText">Jahrgang entfernen</span>
@@ -2216,6 +2232,72 @@ async function jahrgangSchreiben(y, stand, titel){
 // Der Gegenweg zum Laden: ein Jahrgang entsteht beim Import von selbst, ohne
 // diesen Punkt gäbe es keinen Weg zurück – weder für einen abgelaufenen noch
 // für einen versehentlich angelegten.
+// ── Jahrgang anlegen ──
+// Der zweite Weg neben "Aus Excel laden": ein Jahr ohne Hefte, das von Hand
+// gefuellt wird. Die Titel kommen auf Wunsch aus dem gezeigten Jahrgang -
+// Nummer, voller Name und Kennfarbe stehen nicht in der Excel-Tabelle und
+// muessten sonst abgetippt werden.
+function jahrgangAnlegen(){
+  schliesseDaten();
+  if(!bearbFrei()) return;
+  const da = jahrgaenge();
+  const vorlage = DATEN[jahr] ? jahr : da[da.length-1];
+  const zahlen = da.map(Number).filter(n=>!isNaN(n));
+  const vorschlag = String((zahlen.length ? Math.max(...zahlen) : new Date().getFullYear()) + 1);
+  const anzahl = (DATEN[vorlage] ? DATEN[vorlage].titel.length : 0);
+  dialogZeigen('Jahrgang anlegen',
+    `<label class="dlg-feld">Jahr
+       <input type="text" id="njJahr" inputmode="numeric" maxlength="4"
+              value="${escA(vorschlag)}"></label>
+     <label class="dlg-feld">Stand
+       <input type="text" id="njStand" placeholder="Bleibt frei, wenn nichts eingetragen wird"></label>`
+    +(anzahl
+      ? `<label class="dlg-haken"><input type="checkbox" id="njTitel" checked>
+           <span>Die ${anzahl} Titel aus Jahrgang ${escA(vorlage)} übernehmen –
+           mit Nummer, vollem Namen, Kennfarbe und Auflage</span></label>
+         <div class="pr-hinw">Die Auflagen sind zunächst die des Jahrgangs
+           ${escA(vorlage)} und wollen geprüft werden; sie unterscheiden sich
+           von Jahr zu Jahr. Geändert werden sie über den farbigen Titelkopf
+           in der Bearbeiten-Ansicht.</div>`
+      : `<div class="pr-hinw">Der gezeigte Jahrgang führt keine Titel, die zu
+           übernehmen wären.</div>`)
+    +`<div class="pr-stand">Hefte werden nicht übernommen: der Jahrgang
+        entsteht leer und wird über »+ Ausgabe« gefüllt. Ein vollständiger
+        Jahrgang ist über »Aus Excel laden« schneller angelegt.</div>`,
+    'Anlegen', ()=>jahrgangAnlegenAusfuehren(vorlage));
+}
+
+async function jahrgangAnlegenAusfuehren(vorlage){
+  const feld = document.getElementById('njJahr');
+  const y = feld ? feld.value.trim() : '';
+  const standFeld = document.getElementById('njStand');
+  const haken = document.getElementById('njTitel');
+  if(!/^\d{4}$/.test(y))
+    return ladeStand('Das Jahr wird vierstellig erwartet, etwa 2028.', true);
+  if(DATEN[y])
+    return ladeStand(`Jahrgang ${y} ist bereits angelegt.`, true);
+  ladeKnoepfe(true);
+  ladeStand(`Jahrgang ${y} wird angelegt …`);
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    await dbAnfrage('/rest/v1/jahrgang', {method:'POST',
+      headers:{Prefer:'return=minimal'},
+      body: JSON.stringify({jahr:y, stand: standFeld ? standFeld.value.trim() : ''})});
+    const titel = (haken && haken.checked && DATEN[vorlage]) ? DATEN[vorlage].titel : [];
+    if(titel.length)
+      await dbAnfrage('/rest/v1/titel', {method:'POST',
+        headers:{Prefer:'return=minimal'},
+        body: JSON.stringify(titel.map(t=>({jahr:y, id:t.id, kurz:t.short,
+          voll:t.full, auflage:t.auflage||0, hex:t.hex||'#00285a'})))});
+    DATEN = await datenHolen();
+    dialogSchliessen();
+    waehleJahrgang(y);
+    // Der neue Jahrgang ist leer; gearbeitet wird jetzt in der Bearbeiten-Ansicht.
+    setView('bearbeiten');
+    sicherungenHolen();
+  }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
+}
+
 function jahrgangEntfernen(){
   schliesseDaten();
   if(jahrgaenge().length<2) return;      // der letzte bleibt

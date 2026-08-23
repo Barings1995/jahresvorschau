@@ -99,6 +99,12 @@ Im Menü *Daten*:
   **im Ganzen ersetzt**; nur so verschwinden gestrichene Hefte.
   Vorher entsteht ohne Zutun ein Sicherungspunkt. Der Prüfbericht vor dem
   Übernehmen bleibt derselbe wie zuvor.
+* **Jahrgang anlegen** — der zweite Weg zu einem neuen Jahr, neben dem
+  Excel-Eingang. Jahr und Stand im Dialog, auf Wunsch werden die Titel des
+  gezeigten Jahrgangs übernommen (mit Nummer, vollem Namen, Kennfarbe und
+  Auflage — Angaben, die nicht in der Excel-Tabelle stehen). Hefte kommen
+  keine mit; der Jahrgang entsteht leer und wird über *+ Ausgabe* gefüllt.
+  Danach steht die Bearbeiten-Ansicht offen.
 * **Jahrgang entfernen** — nimmt Titel, Ausgaben und die Sicherungspunkte des
   Jahrgangs mit. Der letzte Jahrgang bleibt stehen.
 
