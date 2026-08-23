@@ -135,6 +135,10 @@ mark{background:rgba(238,125,17,.18);color:var(--warm);border-radius:2px;padding
 .stxt{font-size:.76rem;color:var(--muted);line-height:1.4;font-style:italic}
 
 /* legend */
+/* Bearbeiten ist keine Ansicht neben den anderen, sondern ein eigener
+   Arbeitsschirm. Die Legende gehoert zu den Terminspalten der Druckvorlagen
+   und hat dort nichts zu suchen. */
+body.bearbmodus .legend{display:none}
 .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.71rem;color:var(--muted);margin-bottom:14px}
 .legend span{display:flex;align-items:center;gap:5px}
 
@@ -992,6 +996,7 @@ function setView(v){
   // wird der Menuepunkt hervorgehoben.
   const bm=document.getElementById('bearbMenuBtn');
   if(bm) bm.classList.toggle('aktiv', v==='bearbeiten');
+  document.body.classList.toggle('bearbmodus', v==='bearbeiten');
   render();
 }
 
