@@ -70,10 +70,14 @@ ausgeblendet, solange gearbeitet wird.
 
 Derselbe Menüpunkt führt hinein und wieder hinaus — beim Öffnen heißt er
 *Bearbeiten*, danach *Bearbeiten beenden* und benennt die Ansicht, zu der er
-zurückführt. Ebenso beendet ihn ein Klick auf einen der fünf Ansichtsknöpfe.
-Steht eine ungespeicherte Änderung im Weg, wird vorher gefragt. Gedruckt und
-als PDF ausgegeben wird immer eine der fünf Druckvorlagen: steht der
-Arbeitsschirm offen, wird er dafür geschlossen.
+zurückführt. Er ist der einzige Weg hinaus: Suche, Inhaltsarten,
+Ansichtsknöpfe und Titel-Schalter sind blass und gesperrt, solange gearbeitet
+wird. Sie bleiben sichtbar, damit die Kopfzeilen beim Öffnen und Schließen
+nicht springen. Bedienbar bleiben die Jahrgangswahl und der Stand.
+
+Steht eine ungespeicherte Änderung im Weg, wird vor dem Schließen gefragt.
+Gedruckt und als PDF ausgegeben wird immer eine der fünf Druckvorlagen: steht
+der Arbeitsschirm offen, wird er dafür geschlossen.
 
 Links die Ausgaben des Jahrgangs, rechts das Formular. Gearbeitet wird auf
 einer Arbeitskopie: erst *Speichern* schreibt in die Datenbank und danach in
