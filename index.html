@@ -485,6 +485,11 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 @media(max-width:820px){.bearb{grid-template-columns:1fr}}
 .bearb-liste{background:var(--surface);border:1px solid var(--border);
   border-radius:6px;overflow:hidden;max-height:74vh;overflow-y:auto}
+/* Jede Titelgruppe steht in einem eigenen Block. Ohne ihn haengen alle
+   Titelkoepfe am selben Behaelter und bleiben beim Blaettern gleichzeitig
+   oben kleben - sie stapeln sich dann uebereinander. So begrenzt sich jeder
+   Kopf auf seine Gruppe und wird vom naechsten sauber hinausgeschoben. */
+.bearb-block{position:relative}
 .bearb-titel{display:flex;justify-content:space-between;gap:8px;width:100%;
   padding:7px 12px;font-family:inherit;font-size:.72rem;font-weight:700;
   text-align:left;text-transform:uppercase;letter-spacing:.05em;color:#ffffff;
@@ -3188,7 +3193,8 @@ function renderBearbeiten(){
     // Der Titelkopf fuehrt zu seinen Stammdaten. Die Zahl daneben sagt, wie
     // viele Ausgaben daran haengen - das ist zugleich der Hinweis darauf, was
     // ein Entfernen mitnaehme.
-    return `<button type="button" class="bearb-titel${helleFarbe(t.hex)?' hell':''}${
+    return `<div class="bearb-block">
+      <button type="button" class="bearb-titel${helleFarbe(t.hex)?' hell':''}${
         gewaehltIst('titel',t.id)?' gewaehlt':''}"
         style="background:${escA(t.hex)}" title="Stammdaten des Titels bearbeiten"
         onclick="bearbWaehleTitel(${t.id})">
@@ -3197,7 +3203,8 @@ function renderBearbeiten(){
       ${eintraege}
       <button type="button" class="bearb-eintrag bearb-neu${neuIst('ausgabe',t.id)?' gewaehlt':''}"
         onclick="bearbNeueAusgabe(${t.id})">
-        <span>+ Ausgabe</span></button>`;
+        <span>+ Ausgabe</span></button>
+    </div>`;
   }).join('');
 
   const titelNeu = !!bearbAuswahl && bearbAuswahl.art==='titel' && !!bearbAuswahl.neu;
