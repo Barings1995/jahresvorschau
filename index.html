@@ -2284,11 +2284,22 @@ async function jahrgangAnlegenAusfuehren(vorlage){
       headers:{Prefer:'return=minimal'},
       body: JSON.stringify({jahr:y, stand: standFeld ? standFeld.value.trim() : ''})});
     const titel = (haken && haken.checked && DATEN[vorlage]) ? DATEN[vorlage].titel : [];
-    if(titel.length)
-      await dbAnfrage('/rest/v1/titel', {method:'POST',
-        headers:{Prefer:'return=minimal'},
-        body: JSON.stringify(titel.map(t=>({jahr:y, id:t.id, kurz:t.short,
-          voll:t.full, auflage:t.auflage||0, hex:t.hex||'#00285a'})))});
+    if(titel.length){
+      // Scheitert der zweite Schritt, bliebe sonst ein Jahrgang ohne Titel
+      // zurueck und ein neuer Versuch liefe auf den Primaerschluessel.
+      try{
+        await dbAnfrage('/rest/v1/titel', {method:'POST',
+          headers:{Prefer:'return=minimal'},
+          body: JSON.stringify(titel.map(t=>({jahr:y, id:t.id, kurz:t.short,
+            voll:t.full, auflage:t.auflage||0, hex:t.hex||'#00285a'})))});
+      }catch(fehler){
+        try{
+          await dbAnfrage('/rest/v1/jahrgang?jahr=eq.'+encodeURIComponent(y),
+            {method:'DELETE', headers:{Prefer:'return=minimal'}});
+        }catch(e2){}
+        throw fehler;
+      }
+    }
     DATEN = await datenHolen();
     dialogSchliessen();
     waehleJahrgang(y);
@@ -3410,7 +3421,15 @@ async function dbAnfrage(pfad, einstellungen = {}, mitSitzung = true){
       kopf.Authorization = 'Bearer ' + sitzung.access_token;
 
     const antwort = await fetch(SUPABASE_URL + pfad, { ...einstellungen, headers: kopf });
-    if(antwort.ok) return antwort.status === 204 ? null : antwort.json();
+    if(antwort.ok){
+      // Auf "Prefer: return=minimal" antwortet die Datenbank je nach Verfahren
+      // mit 204 ohne Rumpf oder mit 201 und leerem Rumpf. Ein leerer Rumpf ist
+      // hier kein Fehler, sondern die Bestaetigung selbst - er darf nicht als
+      // JSON gelesen werden.
+      if(antwort.status === 204 || antwort.status === 205) return null;
+      const rumpf = await antwort.text();
+      return rumpf ? JSON.parse(rumpf) : null;
+    }
 
     let text = '';
     try { text = await antwort.text(); } catch(e){}
