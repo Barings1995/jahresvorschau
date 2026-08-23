@@ -1569,7 +1569,7 @@ function baueKopie(){
   // Ohne Zeilenkennungen: sie zeigen auf eine Datenbank, die die Kopie nie
   // erreicht, und blaehen die Datei nur auf.
   const ohneKennung = JOURNALS.map(j=>({...j, issues: j.issues.map(iss=>{
-    const {id, ...rest} = iss; return rest;
+    const {id, reihenfolge, ...rest} = iss; return rest;
   })}));
   schreibeDaten(klon,{[jahrgang()]:{stand:standText(),titel:ohneKennung}});
 
@@ -2798,7 +2798,7 @@ async function ausgabeAnlegen(){
     const antwort = await dbAnfrage('/rest/v1/ausgabe', {
       method:'POST', headers:{ Prefer:'return=representation' },
       body: JSON.stringify(Object.assign(
-        { jahr: jahrgang(), titel_id: t.id, reihenfolge: t.issues.length+1 },
+        { jahr: jahrgang(), titel_id: t.id, reihenfolge: naechsteReihenfolge(t) },
         ausgabeAusEntwurf()))
     });
     const zeile = Array.isArray(antwort) ? antwort[0] : antwort;
@@ -2814,37 +2814,45 @@ async function ausgabeAnlegen(){
       return;
     }
 
-    const iss = { id: zeile.id };
+    const iss = { id: zeile.id, reihenfolge: zeile.reihenfolge };
     t.issues.push(iss);
     entwurfInAusgabe(iss);
     GESAMT = JOURNALS.reduce((n,j)=>n+j.issues.length,0);
-    const geordnet = await reihenfolgeOrdnen(t);
-    bearbAuswahl = { art:'ausgabe', titelId:t.id, index:t.issues.indexOf(iss) };
+    await reihenfolgeOrdnen(t);
+    const platz = t.issues.indexOf(iss);
+    bearbAuswahl = { art:'ausgabe', titelId:t.id, index:platz };
     render();
-    bearbStand(geordnet ? 'Angelegt und nach dem Erscheinungstermin eingeordnet'
-                        : 'Angelegt', 'gut');
+    bearbStand(platz < t.issues.length-1
+      ? 'Angelegt und nach dem Erscheinungstermin eingeordnet'
+      : 'Angelegt', 'gut');
   }catch(fehler){
     bearbStand(fehlertext(fehler), 'schlecht');
   }
 }
 
+function naechsteReihenfolge(t){
+  return t.issues.reduce((m,iss)=>Math.max(m, iss.reihenfolge||0), 0) + 1;
+}
+
 // Die Ausgaben eines Titels stehen in der Datenbank in der Reihenfolge ihres
 // Erscheinens. Wird eine dazwischen angelegt, ruecken die spaeteren nach.
-// Der Regelfall - die naechste Ausgabe hinten anfuegen - kostet dabei keine
-// einzige weitere Anfrage.
+// Geschrieben wird nur, wo die Nummer nicht schon stimmt - der Regelfall, die
+// naechste Ausgabe hinten anfuegen, kostet keine einzige weitere Anfrage.
+// Nebenbei zieht das Luecken zusammen, die ein Entfernen hinterlassen hat.
 async function reihenfolgeOrdnen(t){
-  const vorher = t.issues.slice();
-  const sortiert = t.issues.slice().sort((x,y)=>
+  t.issues.sort((x,y)=>
     (x.et||'9999-99-99').localeCompare(y.et||'9999-99-99'));
-  if(sortiert.every((iss,i)=>iss===vorher[i])) return false;
-  t.issues = sortiert;
-  for(let i=0;i<sortiert.length;i++){
-    if(sortiert[i]===vorher[i]) continue;
-    await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(sortiert[i].id),
+  let geschrieben = 0;
+  for(let i=0;i<t.issues.length;i++){
+    const iss = t.issues[i];
+    if(iss.reihenfolge === i+1) continue;
+    await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(iss.id),
       { method:'PATCH', headers:{ Prefer:'return=minimal' },
         body: JSON.stringify({ reihenfolge: i+1 }) });
+    iss.reihenfolge = i+1;
+    geschrieben++;
   }
-  return true;
+  return geschrieben;
 }
 
 async function ausgabeEntfernen(){
@@ -3321,6 +3329,7 @@ function inDatenForm(jahrgaenge, titel, ausgaben){
     if(!t) continue;
     t.issues.push({
       id: a.id,                      // Zeilenkennung, nur zum Speichern
+      reihenfolge: a.reihenfolge,    // Platz im Titel, ebenfalls nur intern
       heft: a.heft,
       et: a.erscheinung || '', as: a.anzeigenschluss || '',
       du: a.druckunterlagen || '', eh: a.anlieferung || '',
