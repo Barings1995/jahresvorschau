@@ -1,0 +1,6 @@
+# Der Ordner "werkzeug" enthaelt die Zwischenschritte der Uebernahme, darunter
+# daten.json mit der vollstaendigen Heftplanung im Klartext. Waere er
+# veroeffentlicht, laege genau der Bestand offen, den die Anmeldung schuetzt.
+werkzeug/
+
+.DS_Store
