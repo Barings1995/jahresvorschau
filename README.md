@@ -55,8 +55,9 @@ Konten werden im Supabase-Verwaltungsbereich angelegt, nicht im Werkzeug:
   bereits verwendeten Kongressnamen. Gespeichert wird auf Knopfdruck, nie
   stillschweigend; eine angefangene Änderung überlebt jeden Ansichtswechsel und
   meldet sich beim Verlassen der Seite. Dazu Sicherungspunkte je Jahrgang.
-* **Dritter Bauabschnitt — offen.** Excel-Eingang auf die Datenbank umstellen,
-  Ausgaben und Titel anlegen und entfernen, Veröffentlichung über GitHub Pages.
+* **Dritter Bauabschnitt — fertig.** Veröffentlicht über GitHub Pages. Der
+  Excel-Eingang schreibt in die Datenbank; Ausgaben und Titel lassen sich
+  anlegen und entfernen, ebenso ein ganzer Jahrgang.
 
 ## Bearbeiten
 
@@ -68,6 +69,30 @@ Die Kongressfelder schlagen beim Tippen bereits verwendete Namen vor. Ein neuer
 Name ist erlaubt — nur wird ein Kongress, dessen Schreibweise von den übrigen
 abweicht, in der Kongressansicht zu einem eigenen Kasten.
 
+## Anlegen und Entfernen
+
+In der Ansicht *Bearbeiten*:
+
+* **Ausgabe anlegen** — die Zeile *+ Ausgabe* unter den Heften eines Titels.
+  Die Ausgabe entsteht erst mit *Anlegen*, und nur mit Heftnummer. Sie wird
+  anschließend nach ihrem Erscheinungstermin einsortiert.
+* **Ausgabe entfernen** — im Formular unten rechts, mit Rückfrage.
+* **Titel-Stammdaten** — der farbige Kopf über den Heften führt zu Kurzname,
+  vollständigem Namen, Auflage und Kennfarbe. Sie gelten je Jahrgang: die
+  Auflage unterscheidet sich von Jahr zu Jahr.
+* **Titel anlegen und entfernen** — *+ Titel* am Ende der Liste, *Titel
+  entfernen* im Formular. Ein entfernter Titel nimmt seine Ausgaben mit; der
+  letzte Titel eines Jahrgangs bleibt stehen.
+
+Im Menü *Daten*:
+
+* **Aus Excel laden** — die Heftplanung aus der Redaktion. Der Jahrgang wird in
+  der Datenbank **im Ganzen ersetzt**; nur so verschwinden gestrichene Hefte.
+  Vorher entsteht ohne Zutun ein Sicherungspunkt. Der Prüfbericht vor dem
+  Übernehmen bleibt derselbe wie zuvor.
+* **Jahrgang entfernen** — nimmt Titel, Ausgaben und die Sicherungspunkte des
+  Jahrgangs mit. Der letzte Jahrgang bleibt stehen.
+
 ## Sicherungspunkte
 
 *Sicherungspunkt anlegen* legt den ganzen Jahrgang als Schnappschuss ab.
@@ -76,14 +101,15 @@ dabei ersetzt, alles seither Geänderte geht verloren. Es wird vorher gefragt.
 
 ## Veröffentlichung
 
-Noch nicht erfolgt. `.gitignore` schließt den Ordner `werkzeug/` aus: dort
-liegt `daten.json` mit der vollständigen Heftplanung im Klartext. Öffentlich
-gehören nur `index.html`, `konfiguration.js`, `schema.sql` und `README.md`.
+Live unter https://barings1995.github.io/jahresvorschau/, Quelltext unter
+https://github.com/Barings1995/jahresvorschau.
 
-Bis dahin ruhen im Menü „Daten" die Punkte *Aus Excel laden* und *Jahrgang
-entfernen*: sie schrieben nur in den Arbeitsspeicher und täuschten einen Stand
-vor, den die Datenbank nicht kennt. *Werkzeug sichern* ist mit der Datenbank
-hinfällig und durch *Abmelden* ersetzt.
+`.gitignore` schließt den Ordner `werkzeug/` aus: dort liegt `daten.json` mit
+der vollständigen Heftplanung im Klartext. Öffentlich gehören nur
+`index.html`, `konfiguration.js`, `schema.sql` und `README.md`.
+
+*Werkzeug sichern* ist mit der Datenbank hinfällig und durch *Abmelden*
+ersetzt.
 
 ## Was unverändert geblieben ist
 

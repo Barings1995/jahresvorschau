@@ -83,14 +83,14 @@ input::placeholder{color:var(--muted)}
 .chip{background:var(--surface2);border:1.5px solid var(--border);border-radius:4px;padding:4px 12px;font-size:.75rem;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none}
 .chip:hover{color:var(--text);border-color:var(--faint)}
 .chip:active{transform:translateY(1px)}
-.chip.active{color:#ffffff;font-weight:600}
-.chip[data-j="0"].active{background:var(--navy);border-color:var(--navy);color:#ffffff}
-.chip[data-j="1"].active{background:var(--j1);border-color:var(--j1)}
-.chip[data-j="2"].active{background:var(--j2);border-color:var(--j2)}
-.chip[data-j="3"].active{background:var(--j3);border-color:var(--j3)}
-.chip[data-j="4"].active{background:var(--j4);border-color:var(--j4);color:#1a1a1a}
-.chip[data-j="5"].active{background:var(--j5);border-color:var(--j5)}
-.chip[data-j="6"].active{background:var(--j6);border-color:var(--j6)}
+/* Die Kennfarbe kommt aus den Daten des Titels, nicht aus einer Regel je
+   Nummer: ein neu angelegter Titel bekaeme sonst gar keine. Die Werte sind
+   dieselben wie zuvor, sie stehen jetzt nur an einer Stelle. Auf hellen
+   Farben steht dunkler Text - bei der Hausfarbe von FORUM DKG war das schon
+   immer so. */
+.chip.active{color:#ffffff;font-weight:600;
+  background:var(--jcol,var(--navy));border-color:var(--jcol,var(--navy))}
+.chip.active.hell{color:#1a1a1a}
 
 /* ── Main ── */
 main{padding:24px 1.5rem}
@@ -300,7 +300,13 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .dlg-blatt{background:var(--surface);border-radius:8px;box-shadow:0 18px 50px rgba(0,40,90,.28);max-width:560px;width:100%;max-height:84vh;display:flex;flex-direction:column;overflow:hidden}
 .dlg-kopf{font-size:.92rem;font-weight:600;color:var(--navy);padding:15px 18px 12px;border-bottom:1px solid var(--surface3)}
 .dlg-inhalt{padding:14px 18px;overflow-y:auto;font-size:.78rem;color:var(--text)}
-.dlg-fuss{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--surface3);background:var(--navy-faint)}
+.dlg-fuss{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--surface3);background:var(--navy-faint)}
+/* Waehrend geschrieben wird, steht hier, was gerade geschieht - und bei einem
+   Fehlschlag, woran es lag. Der Dialog bleibt dann offen. */
+.dlg-stand{margin-right:auto;font-size:.74rem;color:var(--muted)}
+.dlg-stand.schlecht{color:var(--warm)}
+.dlg-btn:disabled{color:var(--faint);border-color:var(--surface3);cursor:default}
+.dlg-ok:disabled{color:#ffffff;background:var(--faint);border-color:var(--faint)}
 .dlg-btn{padding:6px 14px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);background:var(--surface);border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .dlg-btn:hover{border-color:var(--navy-light)}
 .dlg-ok{color:#ffffff;background:var(--navy);border-color:var(--navy)}
@@ -479,9 +485,19 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 @media(max-width:820px){.bearb{grid-template-columns:1fr}}
 .bearb-liste{background:var(--surface);border:1px solid var(--border);
   border-radius:6px;overflow:hidden;max-height:74vh;overflow-y:auto}
-.bearb-titel{padding:7px 12px;font-size:.72rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.05em;color:#ffffff;
-  position:sticky;top:0}
+.bearb-titel{display:flex;justify-content:space-between;gap:8px;width:100%;
+  padding:7px 12px;font-family:inherit;font-size:.72rem;font-weight:700;
+  text-align:left;text-transform:uppercase;letter-spacing:.05em;color:#ffffff;
+  border:none;cursor:pointer;position:sticky;top:0;z-index:1}
+.bearb-titel.hell{color:#1a1a1a}
+.bearb-titel .bt-zahl{font-weight:400;opacity:.75}
+.bearb-titel.gewaehlt{box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}
+.bearb-titel.hell.gewaehlt{box-shadow:inset 0 0 0 2px rgba(0,0,0,.45)}
+/* Die letzte Zeile einer Titelgruppe legt eine weitere Ausgabe an, die letzte
+   Zeile der ganzen Liste einen weiteren Titel. */
+.bearb-neu{color:var(--navy);font-weight:600}
+.bearb-neu.gewaehlt{background:var(--navy);color:#ffffff}
+.bearb-titelneu{border-top:1px solid var(--surface3)}
 .bearb-eintrag{display:flex;justify-content:space-between;gap:8px;width:100%;
   padding:7px 12px;font-family:inherit;font-size:.79rem;text-align:left;
   color:var(--text);background:none;border:none;border-top:1px solid var(--surface3);
@@ -498,6 +514,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .bearb-unterkopf{font-size:.76rem;color:var(--muted);margin-bottom:14px}
 .bearb-reihe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
   margin-bottom:12px}
+.bearb-reihe.zwei{grid-template-columns:repeat(2,1fr)}
 @media(max-width:640px){.bearb-reihe{grid-template-columns:repeat(2,1fr)}}
 .bearb-feld{display:block;font-size:.7rem;font-weight:600;color:var(--navy);
   text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
@@ -506,6 +523,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   letter-spacing:normal;text-transform:none;color:var(--text);
   background:var(--surface);border:1.5px solid var(--border);border-radius:4px}
 .bearb-feld input:focus,.bearb-feld textarea:focus{border-color:var(--navy);outline:none}
+.bearb-feld input[type="color"]{height:32px;padding:2px 3px;cursor:pointer}
 .bearb-feld .hinweis{display:block;margin-top:3px;font-size:.68rem;
   font-weight:400;text-transform:none;letter-spacing:normal;color:var(--muted)}
 
@@ -537,6 +555,10 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   font-weight:600;color:var(--navy);background:var(--surface);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .bearb-verwerfen:disabled{color:var(--faint);border-color:var(--surface3);cursor:default}
+.bearb-loeschen{margin-left:auto;padding:7px 12px;font-family:inherit;
+  font-size:.8rem;font-weight:600;color:var(--warm);background:var(--surface);
+  border:1.5px solid var(--surface3);border-radius:4px;cursor:pointer}
+.bearb-loeschen:hover{border-color:var(--warm)}
 .bearb-stand{font-size:.77rem;color:var(--muted)}
 p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-stand.gut{color:#25855a}
@@ -647,13 +669,13 @@ p.bearb-stand:not(:empty){margin-top:9px}
         Daten<span class="ex-chev">&#9660;</span>
       </button>
       <div class="export-menu" id="datenMenu" role="menu">
-        <button class="ex-item" role="menuitem" disabled>
+        <button class="ex-item" role="menuitem" onclick="datenLadenKlick()">
           <span class="ex-t">Aus Excel laden</span>
-          <span class="ex-d">Folgt im dritten Bauabschnitt &ndash; der Eingang schreibt dann unmittelbar in die Datenbank</span>
+          <span class="ex-d">Heftplanung aus der Redaktion. Der Jahrgang wird in der Datenbank ersetzt &ndash; vorher entsteht ein Sicherungspunkt</span>
         </button>
-        <button class="ex-item" id="entfernenBtn" role="menuitem" disabled>
+        <button class="ex-item" id="entfernenBtn" role="menuitem" onclick="jahrgangEntfernen()" disabled>
           <span class="ex-t" id="entfernenText">Jahrgang entfernen</span>
-          <span class="ex-d">Folgt im dritten Bauabschnitt</span>
+          <span class="ex-d">Nimmt den Jahrgang mit allen Titeln, Ausgaben und Sicherungspunkten aus der Datenbank</span>
         </button>
         <button class="ex-item" role="menuitem" onclick="abmelden()">
           <span class="ex-t">Abmelden</span>
@@ -732,6 +754,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
       <h3 class="dlg-kopf" id="ladeKopf"></h3>
       <div class="dlg-inhalt" id="ladeInhalt"></div>
       <div class="dlg-fuss">
+        <span class="dlg-stand" id="ladeStand"></span>
         <button class="dlg-btn" id="ladeAbbruch" onclick="dialogSchliessen()">Abbrechen</button>
         <button class="dlg-btn dlg-ok" id="ladeOk" onclick="dialogAusfuehren()">&Uuml;bernehmen</button>
       </div>
@@ -842,9 +865,7 @@ function waehleJahrgang(y){
   // einer da ist – ein leeres Werkzeug soll nicht entstehen können.
   const et=document.getElementById('entfernenText'), eb=document.getElementById('entfernenBtn');
   if(et) et.textContent=`Jahrgang ${y} entfernen`;
-  // Der Menuepunkt ruht bis zum dritten Bauabschnitt; entfernt wird ein
-  // Jahrgang bis dahin nicht.
-  if(eb) eb.disabled = true;
+  if(eb) eb.disabled = jahrgaenge().length<2;
   render();
 }
 
@@ -855,10 +876,11 @@ function baueChips(){
   const zeile=document.getElementById('chipRow');
   if(!zeile) return;
   zeile.querySelectorAll('.chip').forEach(c=>c.remove());
-  const anlegen=(id,text,aktiv)=>{
+  const anlegen=(id,text,aktiv,hex)=>{
     const c=document.createElement('span');
-    c.className='chip'+(aktiv?' active':'');
+    c.className='chip'+(aktiv?' active':'')+(hex&&helleFarbe(hex)?' hell':'');
     c.dataset.j=id;
+    if(hex) c.style.setProperty('--jcol',hex);
     c.textContent=text;
     c.setAttribute('onclick',`toggleJ(${id})`);
     c.setAttribute('role','button');
@@ -868,8 +890,22 @@ function baueChips(){
     });
     zeile.appendChild(c);
   };
-  anlegen(0,'Alle Titel',true);
-  JOURNALS.forEach(j=>anlegen(j.id,j.short,false));
+  // Die getroffene Titelauswahl ueberdauert einen Neuaufbau der Zeile - sonst
+  // zeigten die Schalter nach einer Aenderung an den Stammdaten etwas anderes
+  // an als die Ansicht darunter. Beim Jahrgangswechsel ist activeJ leer, dort
+  // aendert sich dadurch nichts.
+  anlegen(0,'Alle Titel',activeJ.size===0);
+  JOURNALS.forEach(j=>anlegen(j.id,j.short,activeJ.has(j.id),j.hex));
+}
+
+// Auf einer hellen Kennfarbe ist weisser Text nicht mehr zu lesen. Die
+// Schwelle ist so gewaehlt, dass genau das Gruen von FORUM DKG darunter faellt
+// - wie in der bisherigen Regel, die dafuer eigens dunklen Text vorsah.
+function helleFarbe(hex){
+  const m=/^#?([0-9a-f]{6})$/i.exec(String(hex||''));
+  if(!m) return false;
+  const n=parseInt(m[1],16);
+  return (0.299*(n>>16&255)+0.587*(n>>8&255)+0.114*(n&255))/255 > 0.6;
 }
 
 function baueJahrAuswahl(){
@@ -1929,7 +1965,24 @@ function schliesseDaten(){
 
 function datenLadenKlick(){
   schliesseDaten();
+  if(!bearbFrei()) return;
   document.getElementById('datenDatei').click();
+}
+
+// Waehrend geschrieben wird, steht im Fuss des Dialogs, was gerade geschieht.
+// Bei einem Fehlschlag bleibt der Dialog offen und nennt den Grund - so ist
+// nachvollziehbar, an welcher Stelle es haengt.
+function ladeStand(text, schlecht){
+  const e=document.getElementById('ladeStand');
+  if(!e) return;
+  e.textContent=text||'';
+  e.className='dlg-stand'+(schlecht?' schlecht':'');
+}
+function ladeKnoepfe(gesperrt){
+  const ok=document.getElementById('ladeOk');
+  const ab=document.getElementById('ladeAbbruch');
+  if(ok) ok.disabled=!!gesperrt;
+  if(ab) ab.disabled=!!gesperrt;
 }
 
 // Der Dialog trägt seine Handlung selbst: laden, entfernen oder nur melden.
@@ -1944,6 +1997,7 @@ function dialogZeigen(titel,html,okText,aktion,warnend){
   ok.textContent=okText||'Übernehmen';
   ok.classList.toggle('dlg-warnung',!!warnend);
   document.getElementById('ladeAbbruch').textContent=aktion?'Abbrechen':'Schließen';
+  ladeStand(''); ladeKnoepfe(false);
   document.getElementById('ladeDialog').classList.add('offen');
 }
 function dialogAusfuehren(){
@@ -1984,6 +2038,7 @@ function verlust(y,neu){
 function dialogSchliessen(){
   document.getElementById('ladeDialog').classList.remove('offen');
   ladeErgebnis=null; dialogAktion=null;
+  ladeStand(''); ladeKnoepfe(false);
 }
 
 async function datenDateiGewaehlt(ev){
@@ -2060,16 +2115,68 @@ async function datenDateiGewaehlt(ev){
   }
 }
 
-function ladenUebernehmen(){
+async function ladenUebernehmen(){
   if(!ladeErgebnis) return dialogSchliessen();
   const jahre=Object.keys(ladeErgebnis).sort();
-  jahre.forEach(y=>{
-    DATEN[y]={stand:ladeErgebnis[y].stand||'',
-              titel:ladeErgebnis[y].titel.map(t=>({id:t.id,short:t.short,full:t.full,
-                auflage:t.auflage,color:t.color,hex:t.hex,issues:t.issues}))};
-  });
-  dialogSchliessen();
-  waehleJahrgang(jahre[0]);
+  ladeKnoepfe(true);
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    for(const y of jahre){
+      // Der Import ersetzt den Jahrgang im Ganzen. Ein Weg zurueck soll ohne
+      // Zutun bereitliegen, deshalb entsteht vorher ein Sicherungspunkt - aber
+      // nur, wenn es ueberhaupt etwas zu sichern gibt.
+      if(DATEN[y]){
+        ladeStand(`Jahrgang ${y}: Sicherungspunkt wird angelegt …`);
+        await sicherungSchreiben(y,'Vor dem Laden aus Excel');
+      }
+      ladeStand(`Jahrgang ${y} wird in die Datenbank geschrieben …`);
+      await jahrgangSchreiben(y, ladeErgebnis[y].stand||'', ladeErgebnis[y].titel);
+    }
+    // Danach wird der Bestand frisch geholt: erst damit stehen die von der
+    // Datenbank vergebenen Zeilenkennungen bereit, ohne die sich eine Ausgabe
+    // nicht bearbeiten liesse.
+    ladeStand('Der Bestand wird neu geladen …');
+    DATEN = await datenHolen();
+    dialogSchliessen();
+    waehleJahrgang(jahre.includes(jahr) ? jahr : jahre[0]);
+    sicherungenHolen();
+  }catch(fehler){
+    ladeStand(fehlertext(fehler), true);
+    ladeKnoepfe(false);
+  }
+}
+
+// Einen ganzen Jahrgang schreiben: aus Excel, aus einem Sicherungspunkt - der
+// Weg ist derselbe. Die Titel zu loeschen nimmt ueber die Fremdschluessel die
+// Ausgaben mit; nur so verschwinden gestrichene Hefte wirklich.
+async function jahrgangSchreiben(y, stand, titel){
+  const da = await dbAnfrage('/rest/v1/jahrgang?select=jahr&jahr=eq.'+encodeURIComponent(y));
+  if(da && da.length)
+    await dbAnfrage('/rest/v1/jahrgang?jahr=eq.'+encodeURIComponent(y),
+      {method:'PATCH', headers:{Prefer:'return=minimal'},
+       body: JSON.stringify({stand: stand||''})});
+  else
+    await dbAnfrage('/rest/v1/jahrgang',
+      {method:'POST', headers:{Prefer:'return=minimal'},
+       body: JSON.stringify({jahr:y, stand: stand||''})});
+
+  await dbAnfrage('/rest/v1/titel?jahr=eq.'+encodeURIComponent(y),
+    {method:'DELETE', headers:{Prefer:'return=minimal'}});
+  await dbAnfrage('/rest/v1/titel',
+    {method:'POST', headers:{Prefer:'return=minimal'},
+     body: JSON.stringify(titel.map(t=>({jahr:y, id:t.id, kurz:t.short, voll:t.full,
+       auflage:t.auflage||0, hex:t.hex||'#00285a'})))});
+
+  const zeilen=[];
+  titel.forEach(t=>t.issues.forEach((iss,n)=>zeilen.push({
+    jahr:y, titel_id:t.id, reihenfolge:n+1, heft:iss.heft,
+    erscheinung:iss.et||null, anzeigenschluss:iss.as||null,
+    druckunterlagen:iss.du||null, anlieferung:iss.eh||null,
+    thema:iss.top||'', sonderthema:iss.sw||'',
+    auslagen:iss.a||[], berichte:iss.b||[]})));
+  if(zeilen.length)
+    await dbAnfrage('/rest/v1/ausgabe',
+      {method:'POST', headers:{Prefer:'return=minimal'}, body: JSON.stringify(zeilen)});
 }
 
 // ── Jahrgang entfernen ──
@@ -2079,42 +2186,42 @@ function ladenUebernehmen(){
 function jahrgangEntfernen(){
   schliesseDaten();
   if(jahrgaenge().length<2) return;      // der letzte bleibt
+  if(!bearbFrei()) return;
   const y=jahr, d=DATEN[y];
   const ausgaben=d.titel.reduce((s,j)=>s+j.issues.length,0);
   const eintr=d.titel.reduce((s,j)=>s+j.issues.reduce((n,i)=>n+i.a.length+i.b.length,0),0);
+  const sicher=sicherungen.length;
   dialogZeigen(`Jahrgang ${y} entfernen`,
-    `<div class="pr-warn"><div class="pr-warn-kopf">Dieser Jahrgang wird aus dem Werkzeug genommen</div>`
+    `<div class="pr-warn"><div class="pr-warn-kopf">Dieser Jahrgang wird aus der Datenbank entfernt</div>`
     +`<b>${d.titel.length} Titel</b> · <b>${ausgaben} Ausgabe${ausgaben===1?'':'n'}</b> · `
-    +`<b>${eintr} Kongresseintr${eintr===1?'ag':'äge'}</b></div>`
+    +`<b>${eintr} Kongresseintr${eintr===1?'ag':'äge'}</b><br>`
+    +`Die Sicherungspunkte dieses Jahrgangs gehen mit. Ein Weg zurück bleibt danach nicht.</div>`
     +`<div class="pr-stand">Danach bleiben: ${jahrgaenge().filter(x=>x!==y).join(' · ')}. `
-    +`Dauerhaft wird das erst mit »Werkzeug sichern«; eine bereits versendete Kopie bleibt unberührt.</div>`,
+    +`Bereits versendete Kopien und Ausdrucke bleiben unberührt.</div>`,
     'Entfernen', ()=>jahrgangEntfernenAusfuehren(y), true);
 }
-function jahrgangEntfernenAusfuehren(y){
-  delete DATEN[y];
-  dialogSchliessen();
-  waehleJahrgang(jahrgaenge()[0]);
-}
 
-// ── Werkzeug mit den geladenen Daten sichern ──
-function werkzeugSichern(){
-  schliesseDaten();
-  // Ein von Hand geaenderter Stand gehoert zum Jahrgang und wird mitgesichert.
-  if(DATEN[jahr]) DATEN[jahr].stand=standText();
-  const klon=neutralerKlon();
-  klon.querySelectorAll('.daten-dialog').forEach(d=>d.classList.remove('offen'));
-  const stand=klon.querySelector('#standFeld');
-  if(stand) stand.textContent='';        // wird beim Oeffnen aus den Daten gesetzt
-  schreibeDaten(klon,DATEN);
-  const html='<!DOCTYPE html>\n'+klon.outerHTML;
-  const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-  const a=document.createElement('a');
-  // Die gesicherte Datei traegt den Namen der Arbeitsdatei, nicht den eines
-  // Exports: sie ist dazu da, die Arbeitsdatei zu ersetzen. Wird die
-  // Arbeitsdatei umbenannt, gehoert diese Zeile mit umbenannt.
-  a.href=url; a.download='Jahresvorschau_Onkologie_SMV_'+heute(true)+'.html';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),4000);
+async function jahrgangEntfernenAusfuehren(y){
+  ladeKnoepfe(true);
+  ladeStand(`Jahrgang ${y} wird entfernt …`);
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    // Die Sicherungspunkte haengen nicht am Fremdschluessel und muessen eigens
+    // weg - sonst blieben Schnappschuesse eines Jahrgangs zurueck, den es
+    // nicht mehr gibt.
+    await dbAnfrage('/rest/v1/sicherung?jahr=eq.'+encodeURIComponent(y),
+      {method:'DELETE', headers:{Prefer:'return=minimal'}});
+    // Den Jahrgang zu loeschen nimmt Titel und Ausgaben mit.
+    await dbAnfrage('/rest/v1/jahrgang?jahr=eq.'+encodeURIComponent(y),
+      {method:'DELETE', headers:{Prefer:'return=minimal'}});
+    delete DATEN[y];
+    dialogSchliessen();
+    waehleJahrgang(jahrgaenge()[0]);
+    sicherungenHolen();
+  }catch(fehler){
+    ladeStand(fehlertext(fehler), true);
+    ladeKnoepfe(false);
+  }
 }
 
 function xmlText(s){
@@ -2413,10 +2520,6 @@ function starteAnsicht(){
   waehleJahrgang(jahrgaenge().includes(String(TODAY.getFullYear()))
     ? String(TODAY.getFullYear()) : jahrgaenge()[0]);
 }
-// Eine Kopie traegt ihren Jahrgang bereits im Dokument und beginnt sofort.
-// Die Arbeitsfassung beginnt erst, wenn die Datenbank geantwortet hat.
-if(OHNE_DATENBANK) starteAnsicht();
-
 function onInput(){
   const btn = document.getElementById('clearBtn');
   btn.style.display = document.getElementById('q').value ? 'block' : 'none';
@@ -2481,7 +2584,12 @@ document.addEventListener('keydown',e=>{
 // angezeigten Jahrgang. Dadurch ueberlebt eine angefangene Aenderung jedes
 // Neuzeichnen, und ein Abbruch laesst den gezeigten Stand unangetastet.
 
-let bearbAuswahl = null;       // {titelId, index}
+// bearbAuswahl sagt, woran gearbeitet wird:
+//   {art:'ausgabe', titelId, index}          eine vorhandene Ausgabe
+//   {art:'ausgabe', titelId, neu:true}       eine noch nicht angelegte
+//   {art:'titel',   titelId}                 die Stammdaten eines Titels
+//   {art:'titel',   neu:true}                ein noch nicht angelegter Titel
+let bearbAuswahl = null;
 let entwurf      = null;       // Arbeitskopie der gewaehlten Ausgabe
 let entwurfRein  = null;       // derselbe Stand beim Oeffnen, zum Vergleich
 let bearbStandText = '';
@@ -2508,24 +2616,64 @@ function bearbStand(text, art){
   if(e){ e.textContent = bearbStandText; e.className = 'bearb-stand ' + bearbStandArt; }
   const s = document.getElementById('bearbSpeichern');
   const v = document.getElementById('bearbVerwerfen');
-  if(s) s.disabled = !entwurfGeaendert();
+  if(s) s.disabled = !speicherbar();
   if(v) v.disabled = !entwurfGeaendert();
 }
 
-function bearbWaehle(titelId, index){
-  if(entwurfGeaendert() &&
-     !confirm('Die begonnene Änderung ist noch nicht gespeichert. Soll sie verworfen werden?'))
-    return;
-  const t = JOURNALS.find(j=>j.id===titelId);
-  const iss = t && t.issues[index];
-  if(!iss) return;
-  bearbAuswahl = { titelId, index };
-  entwurf = { id: iss.id, heft: iss.heft, et: iss.et||'', as: iss.as||'',
-              du: iss.du||'', eh: iss.eh||'', top: iss.top||'', sw: iss.sw||'',
-              a: [...(iss.a||[])], b: [...(iss.b||[])] };
+// Vor jedem Wechsel: eine angefangene Aenderung wird nicht stillschweigend
+// fallengelassen. Auch der Excel-Eingang und das Entfernen eines Jahrgangs
+// fragen hier nach.
+function bearbFrei(){
+  return !entwurfGeaendert() ||
+    confirm('Die begonnene Änderung ist noch nicht gespeichert. Soll sie verworfen werden?');
+}
+
+function bearbBeginn(auswahl, roh){
+  bearbAuswahl = auswahl;
+  entwurf = roh;
   entwurfRein = JSON.stringify(entwurf);
   bearbStandText = ''; bearbStandArt = '';
   render();
+}
+
+function bearbWaehle(titelId, index){
+  if(!bearbFrei()) return;
+  const t = JOURNALS.find(j=>j.id===titelId);
+  const iss = t && t.issues[index];
+  if(!iss) return;
+  bearbBeginn({ art:'ausgabe', titelId, index },
+    { id: iss.id, heft: iss.heft, et: iss.et||'', as: iss.as||'',
+      du: iss.du||'', eh: iss.eh||'', top: iss.top||'', sw: iss.sw||'',
+      a: [...(iss.a||[])], b: [...(iss.b||[])] });
+}
+
+// Eine neue Ausgabe ist zunaechst nur ein leerer Entwurf. Angelegt wird sie
+// erst mit »Anlegen« - wie jede andere Aenderung auch.
+function bearbNeueAusgabe(titelId){
+  if(!bearbFrei()) return;
+  if(!JOURNALS.some(j=>j.id===titelId)) return;
+  bearbBeginn({ art:'ausgabe', titelId, neu:true },
+    { id:null, heft:'', et:'', as:'', du:'', eh:'', top:'', sw:'', a:[], b:[] });
+}
+
+function bearbWaehleTitel(titelId){
+  if(!bearbFrei()) return;
+  const t = JOURNALS.find(j=>j.id===titelId);
+  if(!t) return;
+  // auflage bleibt hier Text: der Entwurf wird zum Vergleich als JSON
+  // geschrieben, und eine Zahl neben einer Zeichenkette gaelte sonst als
+  // Aenderung, obwohl dasselbe dasteht.
+  bearbBeginn({ art:'titel', titelId },
+    { id:t.id, short:t.short||'', full:t.full||'',
+      auflage:String(t.auflage||0), hex:t.hex||'#00285a' });
+}
+
+function bearbNeuerTitel(){
+  if(!bearbFrei()) return;
+  // Die Nummer bestimmt die Reihenfolge und wird ueber alle Jahrgaenge hinweg
+  // vergeben - derselbe Titel traegt in 2026 und 2027 dieselbe.
+  bearbBeginn({ art:'titel', neu:true },
+    { id:naechsteTitelId(), short:'', full:'', auflage:'0', hex:'#00285a' });
 }
 
 // Texteingaben zeichnen bewusst nicht neu – sonst spraenge die Schreibmarke
@@ -2556,66 +2704,253 @@ function bearbZeileWeg(art, i){
 function bearbVerwerfen(){
   if(!entwurf || !bearbAuswahl) return;
   if(!confirm('Die begonnene Änderung verwerfen?')) return;
-  bearbWaehleErzwungen(bearbAuswahl.titelId, bearbAuswahl.index);
+  const a = bearbAuswahl;
+  entwurf = null; entwurfRein = null; bearbAuswahl = null;
+  if(a.neu){ bearbStandText=''; bearbStandArt=''; render(); return; }
+  if(a.art==='titel') bearbWaehleTitel(a.titelId);
+  else                bearbWaehle(a.titelId, a.index);
 }
-function bearbWaehleErzwungen(titelId, index){
-  entwurf = null; entwurfRein = null;
-  bearbWaehle(titelId, index);
+
+// Gespeichert werden kann nur, was sich geaendert hat und vollstaendig genug
+// ist: eine Ausgabe braucht eine Heftnummer, ein Titel beide Namen.
+function speicherbar(){
+  if(!entwurf || !bearbAuswahl || !entwurfGeaendert()) return false;
+  if(bearbAuswahl.art==='titel')
+    return !!entwurf.short.trim() && !!entwurf.full.trim();
+  return !!String(entwurf.heft).trim();
 }
 
 // ── Speichern ───────────────────────────────────────────────────────────────
 
+// Ein Knopf, vier Wege: Ausgabe aendern oder anlegen, Titel aendern oder
+// anlegen. Welcher gilt, steht in bearbAuswahl.
 async function bearbSpeichern(){
-  if(!entwurf || !entwurfGeaendert()) return;
+  if(!speicherbar()) return;
+  if(bearbAuswahl.art==='titel') return titelSpeichern();
+  return bearbAuswahl.neu ? ausgabeAnlegen() : ausgabeAendern();
+}
+
+// Die Spaltennamen der Datenbank stehen nur hier. Leere Termine werden zu
+// null: ein leerer Text waere fuer eine Datumsspalte kein gueltiger Wert.
+function ausgabeAusEntwurf(){
+  const leerZuNull = w => (w && w.trim()) ? w : null;
+  return {
+    heft: entwurf.heft,
+    erscheinung:     leerZuNull(entwurf.et),
+    anzeigenschluss: leerZuNull(entwurf.as),
+    druckunterlagen: leerZuNull(entwurf.du),
+    anlieferung:     leerZuNull(entwurf.eh),
+    thema:       entwurf.top,
+    sonderthema: entwurf.sw,
+    auslagen: entwurf.a.map(x=>x.trim()).filter(Boolean),
+    berichte: entwurf.b.map(x=>x.trim()).filter(Boolean)
+  };
+}
+
+// Den bestaetigten Entwurf in die angezeigte Ausgabe uebernehmen. Erst hier,
+// nie vorher - sonst zeigte das Werkzeug einen Stand, den es in der Datenbank
+// nicht gibt.
+function entwurfInAusgabe(iss){
+  iss.heft = entwurf.heft;
+  iss.et = entwurf.et; iss.as = entwurf.as;
+  iss.du = entwurf.du; iss.eh = entwurf.eh;
+  iss.top = entwurf.top; iss.sw = entwurf.sw;
+  iss.a = entwurf.a.map(x=>x.trim()).filter(Boolean);
+  iss.b = entwurf.b.map(x=>x.trim()).filter(Boolean);
+  entwurf.a = [...iss.a]; entwurf.b = [...iss.b];
+  entwurfRein = JSON.stringify(entwurf);
+}
+
+function bearbArbeitet(text){
   const knopf = document.getElementById('bearbSpeichern');
   if(knopf) knopf.disabled = true;
-  bearbStand('Wird gespeichert …', '');
+  bearbStand(text, '');
+}
+
+async function ausgabeAendern(){
+  bearbArbeitet('Wird gespeichert …');
   try{
     if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
-    const leerZuNull = w => (w && w.trim()) ? w : null;
+    entwurf.heft = String(entwurf.heft).trim();
     await dbAnfrage('/rest/v1/ausgabe?id=eq.' + encodeURIComponent(entwurf.id), {
-      method: 'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({
-        heft: entwurf.heft,
-        erscheinung:     leerZuNull(entwurf.et),
-        anzeigenschluss: leerZuNull(entwurf.as),
-        druckunterlagen: leerZuNull(entwurf.du),
-        anlieferung:     leerZuNull(entwurf.eh),
-        thema:       entwurf.top,
-        sonderthema: entwurf.sw,
-        auslagen: entwurf.a.map(s=>s.trim()).filter(Boolean),
-        berichte: entwurf.b.map(s=>s.trim()).filter(Boolean)
-      })
+      method: 'PATCH', headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify(ausgabeAusEntwurf())
     });
-
-    // Erst nach der Bestaetigung der Datenbank in den gezeigten Jahrgang
-    // uebernehmen – sonst zeigte das Werkzeug einen Stand, den es dort
-    // nicht gibt.
     const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
-    const iss = t.issues[bearbAuswahl.index];
-    iss.heft = entwurf.heft;
-    iss.et = entwurf.et; iss.as = entwurf.as;
-    iss.du = entwurf.du; iss.eh = entwurf.eh;
-    iss.top = entwurf.top; iss.sw = entwurf.sw;
-    iss.a = entwurf.a.map(s=>s.trim()).filter(Boolean);
-    iss.b = entwurf.b.map(s=>s.trim()).filter(Boolean);
-    entwurf.a = [...iss.a]; entwurf.b = [...iss.b];
-    entwurfRein = JSON.stringify(entwurf);
+    entwurfInAusgabe(t.issues[bearbAuswahl.index]);
     render();
     bearbStand('Gespeichert', 'gut');
   }catch(fehler){
     bearbStand(fehlertext(fehler), 'schlecht');
-    if(knopf) knopf.disabled = false;
   }
+}
+
+async function ausgabeAnlegen(){
+  bearbArbeitet('Wird angelegt …');
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
+    if(!t) throw new Error('Der Titel ist nicht mehr vorhanden.');
+    entwurf.heft = String(entwurf.heft).trim();
+    // Die Zeilenkennung vergibt die Datenbank. Ohne sie liesse sich die neue
+    // Ausgabe anschliessend nicht mehr aendern, deshalb wird die angelegte
+    // Zeile zurueckverlangt.
+    const antwort = await dbAnfrage('/rest/v1/ausgabe', {
+      method:'POST', headers:{ Prefer:'return=representation' },
+      body: JSON.stringify(Object.assign(
+        { jahr: jahrgang(), titel_id: t.id, reihenfolge: t.issues.length+1 },
+        ausgabeAusEntwurf()))
+    });
+    const zeile = Array.isArray(antwort) ? antwort[0] : antwort;
+    // Bleibt die Kennung aus, ist die Zeile trotzdem angelegt - sie liesse
+    // sich hier nur nicht weiter ansprechen. Dann wird der Bestand neu geholt
+    // statt eine Ausgabe ohne Kennung im Werkzeug zu fuehren.
+    if(!zeile || !zeile.id){
+      const y = jahrgang();
+      DATEN = await datenHolen();
+      entwurf=null; entwurfRein=null; bearbAuswahl=null;
+      waehleJahrgang(y);
+      bearbStand('Angelegt', 'gut');
+      return;
+    }
+
+    const iss = { id: zeile.id };
+    t.issues.push(iss);
+    entwurfInAusgabe(iss);
+    GESAMT = JOURNALS.reduce((n,j)=>n+j.issues.length,0);
+    const geordnet = await reihenfolgeOrdnen(t);
+    bearbAuswahl = { art:'ausgabe', titelId:t.id, index:t.issues.indexOf(iss) };
+    render();
+    bearbStand(geordnet ? 'Angelegt und nach dem Erscheinungstermin eingeordnet'
+                        : 'Angelegt', 'gut');
+  }catch(fehler){
+    bearbStand(fehlertext(fehler), 'schlecht');
+  }
+}
+
+// Die Ausgaben eines Titels stehen in der Datenbank in der Reihenfolge ihres
+// Erscheinens. Wird eine dazwischen angelegt, ruecken die spaeteren nach.
+// Der Regelfall - die naechste Ausgabe hinten anfuegen - kostet dabei keine
+// einzige weitere Anfrage.
+async function reihenfolgeOrdnen(t){
+  const vorher = t.issues.slice();
+  const sortiert = t.issues.slice().sort((x,y)=>
+    (x.et||'9999-99-99').localeCompare(y.et||'9999-99-99'));
+  if(sortiert.every((iss,i)=>iss===vorher[i])) return false;
+  t.issues = sortiert;
+  for(let i=0;i<sortiert.length;i++){
+    if(sortiert[i]===vorher[i]) continue;
+    await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(sortiert[i].id),
+      { method:'PATCH', headers:{ Prefer:'return=minimal' },
+        body: JSON.stringify({ reihenfolge: i+1 }) });
+  }
+  return true;
+}
+
+async function ausgabeEntfernen(){
+  if(!bearbAuswahl || bearbAuswahl.art!=='ausgabe' || bearbAuswahl.neu) return;
+  const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
+  const iss = t && t.issues[bearbAuswahl.index];
+  if(!iss) return;
+  if(!confirm('Heft ' + iss.heft + ' von ' + t.short + ' wird aus der Datenbank '
+    + 'entfernt. Termine, Themen und Kongresseinträge dieser Ausgabe gehen '
+    + 'dabei verloren. Fortfahren?')) return;
+  bearbArbeitet('Wird entfernt …');
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(iss.id),
+      { method:'DELETE', headers:{ Prefer:'return=minimal' } });
+    t.issues.splice(bearbAuswahl.index,1);
+    GESAMT = JOURNALS.reduce((n,j)=>n+j.issues.length,0);
+    entwurf=null; entwurfRein=null; bearbAuswahl=null;
+    mxSel.clear();
+    render();
+    bearbStand('Die Ausgabe wurde entfernt', 'gut');
+  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+}
+
+// ── Titel ───────────────────────────────────────────────────────────────────
+// Stammdaten gehoeren zum Jahrgang: die Auflage unterscheidet sich von Jahr zu
+// Jahr, und ein Titel kann in einem Jahrgang gefuehrt werden und im naechsten
+// nicht mehr. Geaendert wird deshalb immer nur der gezeigte Jahrgang.
+
+async function titelSpeichern(){
+  const warNeu = !!bearbAuswahl.neu;
+  bearbArbeitet(warNeu ? 'Wird angelegt …' : 'Wird gespeichert …');
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    const j = jahrgang();
+    const feld = { kurz: entwurf.short.trim(), voll: entwurf.full.trim(),
+                   auflage: Number(entwurf.auflage)||0, hex: entwurf.hex };
+    if(warNeu){
+      if(JOURNALS.some(x=>x.id===entwurf.id))
+        throw new Error('Die Nummer ' + entwurf.id + ' ist in diesem Jahrgang schon vergeben.');
+      await dbAnfrage('/rest/v1/titel', { method:'POST',
+        headers:{ Prefer:'return=minimal' },
+        body: JSON.stringify(Object.assign({ jahr:j, id:entwurf.id }, feld)) });
+      JOURNALS.push({ id:entwurf.id, short:feld.kurz, full:feld.voll,
+        auflage:feld.auflage, color:'var(--j'+entwurf.id+')', hex:feld.hex,
+        issues:[] });
+      JOURNALS.sort((a,b)=>a.id-b.id);
+      bearbAuswahl = { art:'titel', titelId:entwurf.id };
+    } else {
+      await dbAnfrage('/rest/v1/titel?jahr=eq.'+encodeURIComponent(j)
+        +'&id=eq.'+encodeURIComponent(entwurf.id),
+        { method:'PATCH', headers:{ Prefer:'return=minimal' },
+          body: JSON.stringify(feld) });
+      const t = JOURNALS.find(x=>x.id===entwurf.id);
+      t.short=feld.kurz; t.full=feld.voll; t.auflage=feld.auflage; t.hex=feld.hex;
+    }
+    entwurf.short=feld.kurz; entwurf.full=feld.voll;
+    entwurf.auflage=String(feld.auflage);
+    entwurfRein = JSON.stringify(entwurf);
+    baueChips();
+    render();
+    bearbStand(warNeu ? 'Der Titel wurde angelegt' : 'Gespeichert', 'gut');
+  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+}
+
+async function titelEntfernen(){
+  if(!bearbAuswahl || bearbAuswahl.art!=='titel' || bearbAuswahl.neu) return;
+  const t = JOURNALS.find(x=>x.id===bearbAuswahl.titelId);
+  if(!t) return;
+  if(JOURNALS.length<2){
+    bearbStand('Der letzte Titel eines Jahrgangs lässt sich nicht entfernen.', 'schlecht');
+    return;
+  }
+  const n = t.issues.length;
+  if(!confirm(t.short + ' wird aus dem Jahrgang ' + jahrgang() + ' entfernt, '
+    + 'mit ' + n + ' Ausgabe' + (n===1?'':'n') + '. Andere Jahrgänge bleiben '
+    + 'unberührt. Fortfahren?')) return;
+  bearbArbeitet('Wird entfernt …');
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    // Den Titel zu loeschen nimmt ueber den Fremdschluessel seine Ausgaben mit.
+    await dbAnfrage('/rest/v1/titel?jahr=eq.'+encodeURIComponent(jahrgang())
+      +'&id=eq.'+encodeURIComponent(t.id),
+      { method:'DELETE', headers:{ Prefer:'return=minimal' } });
+    JOURNALS.splice(JOURNALS.indexOf(t),1);
+    GESAMT = JOURNALS.reduce((x,j)=>x+j.issues.length,0);
+    activeJ.delete(t.id);
+    mxSel.clear();
+    entwurf=null; entwurfRein=null; bearbAuswahl=null;
+    baueChips();
+    render();
+    bearbStand('Der Titel wurde entfernt', 'gut');
+  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
 }
 
 // ── Sicherungspunkte ────────────────────────────────────────────────────────
 // Ein Schnappschuss haelt den ganzen Jahrgang fest, in der Form, die das
 // Werkzeug innen ohnehin verwendet.
 
-function jahrgangAlsBlock(){
-  return { stand: standText(), titel: JOURNALS.map(j=>({
+// Ohne Angabe der gezeigte Jahrgang. Vor dem Excel-Eingang wird auch ein
+// Jahrgang gesichert, der gerade nicht auf dem Schirm steht.
+function jahrgangAlsBlock(y){
+  const jetzt = !y || y===jahrgang();
+  const stand = jetzt ? standText() : ((DATEN[y] && DATEN[y].stand) || '');
+  const titel = jetzt ? JOURNALS   : ((DATEN[y] && DATEN[y].titel) || []);
+  return { stand: stand, titel: titel.map(j=>({
     id:j.id, kurz:j.short, voll:j.full, auflage:j.auflage, hex:j.hex,
     issues: j.issues.map(iss=>({
       heft:iss.heft, et:iss.et, as:iss.as, du:iss.du, eh:iss.eh,
@@ -2633,17 +2968,21 @@ async function sicherungenHolen(){
   if(b) b.innerHTML = sicherungListeHtml();
 }
 
+async function sicherungSchreiben(y, wie){
+  await dbAnfrage('/rest/v1/sicherung', {
+    method:'POST', headers:{ Prefer:'return=minimal' },
+    body: JSON.stringify({ jahr: y, bezeichnung: wie,
+                           inhalt: jahrgangAlsBlock(y) })
+  });
+}
+
 async function sicherungAnlegen(){
   const wie = prompt('Kurze Bezeichnung für den Sicherungspunkt:',
                      'Stand ' + heute(new Date().toISOString().slice(0,10)));
   if(wie === null) return;
   try{
     if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
-    await dbAnfrage('/rest/v1/sicherung', {
-      method:'POST', headers:{ Prefer:'return=minimal' },
-      body: JSON.stringify({ jahr: jahrgang(), bezeichnung: wie.trim(),
-                             inhalt: jahrgangAlsBlock() })
-    });
+    await sicherungSchreiben(jahrgang(), wie.trim());
     await sicherungenHolen();
     bearbStand('Sicherungspunkt angelegt', 'gut');
   }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
@@ -2662,26 +3001,12 @@ async function sicherungZurueck(id, wie){
     if(!block) throw new Error('Der Sicherungspunkt ist nicht lesbar.');
 
     const j = jahrgang();
-    // Die Titel loeschen nimmt ueber die Fremdschluessel die Ausgaben mit.
-    await dbAnfrage('/rest/v1/titel?jahr=eq.' + encodeURIComponent(j),
-                    { method:'DELETE', headers:{ Prefer:'return=minimal' } });
-    await dbAnfrage('/rest/v1/titel', { method:'POST',
-      headers:{ Prefer:'return=minimal' },
-      body: JSON.stringify(block.titel.map(t=>({
-        jahr:j, id:t.id, kurz:t.kurz, voll:t.voll,
-        auflage:t.auflage, hex:t.hex }))) });
-    const zeilen = [];
-    block.titel.forEach(t=>t.issues.forEach((iss,n)=>zeilen.push({
-      jahr:j, titel_id:t.id, reihenfolge:n+1, heft:iss.heft,
-      erscheinung:iss.et||null, anzeigenschluss:iss.as||null,
-      druckunterlagen:iss.du||null, anlieferung:iss.eh||null,
-      thema:iss.top||'', sonderthema:iss.sw||'',
-      auslagen:iss.a||[], berichte:iss.b||[] })));
-    await dbAnfrage('/rest/v1/ausgabe', { method:'POST',
-      headers:{ Prefer:'return=minimal' }, body: JSON.stringify(zeilen) });
-    await dbAnfrage('/rest/v1/jahrgang?jahr=eq.' + encodeURIComponent(j),
-      { method:'PATCH', headers:{ Prefer:'return=minimal' },
-        body: JSON.stringify({ stand: block.stand || '' }) });
+    // Denselben Weg nimmt der Excel-Eingang: der Jahrgang wird im Ganzen
+    // ersetzt. Ein Sicherungspunkt fuehrt die Namen anders als das Werkzeug
+    // innen, deshalb die Umbenennung.
+    await jahrgangSchreiben(j, block.stand || '', block.titel.map(t=>({
+      id:t.id, short:t.kurz, full:t.voll, auflage:t.auflage, hex:t.hex,
+      issues:t.issues })));
 
     entwurf = null; entwurfRein = null; bearbAuswahl = null;
     DATEN = await datenHolen();
@@ -2727,19 +3052,37 @@ function zeilenGruppe(art, beschriftung, hinweis){
   </div>`;
 }
 
+// Der Fuss ist bei Ausgaben und Titeln derselbe; nur die Beschriftung des
+// ersten Knopfes und der Loeschweg unterscheiden sich.
+function bearbFussHtml(speichern, loeschen){
+  return `<div class="bearb-fuss">
+      <button type="button" class="bearb-speichern" id="bearbSpeichern"
+              onclick="bearbSpeichern()" disabled>${speichern}</button>
+      <button type="button" class="bearb-verwerfen" id="bearbVerwerfen"
+              onclick="bearbVerwerfen()" disabled>Verwerfen</button>
+      ${loeschen || ''}
+    </div>`;
+}
+
 function formInhaltHtml(){
-  if(!entwurf){
-    return `<p class="bearb-unterkopf">Links eine Ausgabe wählen.</p>`;
-  }
+  if(!entwurf || !bearbAuswahl)
+    return `<p class="bearb-unterkopf">Links eine Ausgabe oder einen Titel wählen.</p>`;
+  return bearbAuswahl.art==='titel' ? formTitelHtml() : formAusgabeHtml();
+}
+
+function formAusgabeHtml(){
+  const neu = !!bearbAuswahl.neu;
   const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
   const termine = TERMINE.map(([k,beschriftung])=>
     `<label class="bearb-feld">${beschriftung}
        <input type="date" value="${escA(entwurf[k])}"
               oninput="bearbFeld('${k}',this.value)"></label>`).join('');
   return `
-    <div class="bearb-kopf">${esc(t.short)} &middot; Heft ${esc(entwurf.heft)}</div>
-    <div class="bearb-unterkopf">Jahrgang ${jahrgang()} &middot;
-      Änderungen werden erst mit &raquo;Speichern&laquo; übernommen</div>
+    <div class="bearb-kopf">${esc(t?t.short:'')} &middot; ${
+      neu ? 'neue Ausgabe' : 'Heft ' + esc(entwurf.heft)}</div>
+    <div class="bearb-unterkopf">Jahrgang ${jahrgang()} &middot; ${
+      neu ? 'Die Ausgabe entsteht erst mit &raquo;Anlegen&laquo;'
+          : 'Änderungen werden erst mit &raquo;Speichern&laquo; übernommen'}</div>
 
     <label class="bearb-feld">Heftnummer
       <input type="text" value="${escA(entwurf.heft)}"
@@ -2758,12 +3101,46 @@ function formInhaltHtml(){
     ${zeilenGruppe('a','Kongressauslagen','Der Kongress liegt in dieser Ausgabe aus')}
     ${zeilenGruppe('b','Kongressberichte','Über den Kongress wird berichtet')}
 
-    <div class="bearb-fuss">
-      <button type="button" class="bearb-speichern" id="bearbSpeichern"
-              onclick="bearbSpeichern()" disabled>Speichern</button>
-      <button type="button" class="bearb-verwerfen" id="bearbVerwerfen"
-              onclick="bearbVerwerfen()" disabled>Verwerfen</button>
-    </div>`;
+    ${bearbFussHtml(neu ? 'Anlegen' : 'Speichern', neu ? '' :
+      `<button type="button" class="bearb-loeschen" onclick="ausgabeEntfernen()">
+         Ausgabe entfernen</button>`)}`;
+}
+
+function formTitelHtml(){
+  const neu = !!bearbAuswahl.neu;
+  const t = neu ? null : JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
+  const anzahl = t ? t.issues.length : 0;
+  return `
+    <div class="bearb-kopf">${neu ? 'Neuer Titel' : esc(t?t.short:'')}</div>
+    <div class="bearb-unterkopf">Stammdaten &middot; Jahrgang ${jahrgang()} &middot; ${
+      neu ? 'Der Titel entsteht nur in diesem Jahrgang, ohne Ausgaben'
+          : anzahl + ' Ausgabe' + (anzahl===1?'':'n') +
+            ' &middot; Andere Jahrgänge bleiben unberührt'}</div>
+
+    <label class="bearb-feld">Kurzname
+      <input type="text" value="${escA(entwurf.short)}"
+             oninput="bearbFeld('short',this.value)">
+      <span class="hinweis">So steht der Titel auf den Schaltern, in der Tabelle
+        und in der Matrix</span></label>
+    <label class="bearb-feld">Vollständiger Name
+      <input type="text" value="${escA(entwurf.full)}"
+             oninput="bearbFeld('full',this.value)">
+      <span class="hinweis">Wird beim Ausklappen in der Monatsliste gezeigt</span></label>
+
+    <div class="bearb-reihe zwei">
+      <label class="bearb-feld">Auflage
+        <input type="number" min="0" step="100" value="${escA(entwurf.auflage)}"
+               oninput="bearbFeld('auflage',this.value)">
+        <span class="hinweis">Gilt für diesen Jahrgang</span></label>
+      <label class="bearb-feld">Kennfarbe
+        <input type="color" value="${escA(entwurf.hex)}"
+               oninput="bearbFeld('hex',this.value)">
+        <span class="hinweis">Farbe des Titels in Kacheln, Matrix und Tabelle</span></label>
+    </div>
+
+    ${bearbFussHtml(neu ? 'Anlegen' : 'Speichern', neu ? '' :
+      `<button type="button" class="bearb-loeschen" onclick="titelEntfernen()">
+         Titel entfernen</button>`)}`;
 }
 
 function sicherungListeHtml(){
@@ -2786,20 +3163,41 @@ function sicherungListeHtml(){
 }
 
 function renderBearbeiten(){
+  const gewaehltIst = (art, titelId, index) => !!bearbAuswahl
+    && bearbAuswahl.art===art && !bearbAuswahl.neu
+    && bearbAuswahl.titelId===titelId
+    && (index===undefined || bearbAuswahl.index===index);
+  const neuIst = (art, titelId) => !!bearbAuswahl && bearbAuswahl.art===art
+    && !!bearbAuswahl.neu && bearbAuswahl.titelId===titelId;
+
   const liste = JOURNALS.map(t=>{
-    const eintraege = t.issues.map((iss,i)=>{
-      const gewaehlt = bearbAuswahl &&
-        bearbAuswahl.titelId===t.id && bearbAuswahl.index===i;
-      return `<button type="button" class="bearb-eintrag${gewaehlt?' gewaehlt':''}"
+    const eintraege = t.issues.map((iss,i)=>
+      `<button type="button" class="bearb-eintrag${gewaehltIst('ausgabe',t.id,i)?' gewaehlt':''}"
         onclick="bearbWaehle(${t.id},${i})">
         <span>Heft ${esc(iss.heft)}</span>
-        <span class="bd">${fmt(iss.et)}</span></button>`;
-    }).join('');
-    return `<div class="bearb-titel" style="background:${escA(t.hex)}">${esc(t.short)}</div>${eintraege}`;
+        <span class="bd">${fmt(iss.et)}</span></button>`).join('');
+    const n = t.issues.length;
+    // Der Titelkopf fuehrt zu seinen Stammdaten. Die Zahl daneben sagt, wie
+    // viele Ausgaben daran haengen - das ist zugleich der Hinweis darauf, was
+    // ein Entfernen mitnaehme.
+    return `<button type="button" class="bearb-titel${helleFarbe(t.hex)?' hell':''}${
+        gewaehltIst('titel',t.id)?' gewaehlt':''}"
+        style="background:${escA(t.hex)}" title="Stammdaten des Titels bearbeiten"
+        onclick="bearbWaehleTitel(${t.id})">
+        <span>${esc(t.short)}</span>
+        <span class="bt-zahl">${n} Heft${n===1?'':'e'}</span></button>
+      ${eintraege}
+      <button type="button" class="bearb-eintrag bearb-neu${neuIst('ausgabe',t.id)?' gewaehlt':''}"
+        onclick="bearbNeueAusgabe(${t.id})">
+        <span>+ Ausgabe</span></button>`;
   }).join('');
 
+  const titelNeu = !!bearbAuswahl && bearbAuswahl.art==='titel' && !!bearbAuswahl.neu;
   return `<div class="bearb">
-    <div class="bearb-liste">${liste}</div>
+    <div class="bearb-liste">${liste}
+      <button type="button" class="bearb-eintrag bearb-neu bearb-titelneu${titelNeu?' gewaehlt':''}"
+        onclick="bearbNeuerTitel()"><span>+ Titel</span></button>
+    </div>
     <div>
       <div class="bearb-form" id="bearbForm">${formInhaltHtml()}</div>
       <p class="bearb-stand" id="bearbStand"></p>
@@ -3023,7 +3421,12 @@ window.addEventListener('offline', ()=>
   netzhinweis('Keine Netzverbindung – der angezeigte Stand bleibt sichtbar, Änderungen sind nicht möglich.'));
 window.addEventListener('online', ()=> netzhinweis(''));
 
-if(!OHNE_DATENBANK) starteArbeitsfassung();
+// Zum Schluss, nicht mitten im Text: waehleJahrgang() greift auf Groessen zu,
+// die weiter unten stehen. Von hier aus ist alles vorhanden.
+// Eine Kopie traegt ihren Jahrgang bereits im Dokument und beginnt sofort.
+// Die Arbeitsfassung beginnt erst, wenn die Datenbank geantwortet hat.
+if(OHNE_DATENBANK) starteAnsicht();
+else               starteArbeitsfassung();
 </script>
 </body>
 </html>
