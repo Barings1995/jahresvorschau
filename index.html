@@ -507,7 +507,16 @@ table.tab tbody tr:hover td{background:var(--surface2)}
    Zeile der ganzen Liste einen weiteren Titel. */
 .bearb-neu{color:var(--navy);font-weight:600}
 .bearb-neu.gewaehlt{background:var(--navy);color:#ffffff}
-.bearb-titelneu{border-top:1px solid var(--surface3)}
+/* Steht unter der Liste, nicht in ihr - deshalb immer sichtbar, gleich wie
+   weit geblaettert ist. */
+.bearb-spalte{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bearb-titelknopf{width:100%;padding:8px 12px;font-family:inherit;
+  font-size:.79rem;font-weight:600;color:var(--navy);background:var(--surface);
+  border:1.5px dashed var(--navy-light);border-radius:6px;cursor:pointer;
+  transition:background .12s,border-color .12s}
+.bearb-titelknopf:hover{background:var(--navy-faint);border-color:var(--navy)}
+.bearb-titelknopf.gewaehlt{color:#ffffff;background:var(--navy);
+  border-style:solid;border-color:var(--navy)}
 .bearb-eintrag{display:flex;justify-content:space-between;gap:8px;width:100%;
   padding:7px 12px;font-family:inherit;font-size:.79rem;text-align:left;
   color:var(--text);background:none;border:none;border-top:1px solid var(--surface3);
@@ -3230,10 +3239,14 @@ function renderBearbeiten(){
   }).join('');
 
   const titelNeu = !!bearbAuswahl && bearbAuswahl.art==='titel' && !!bearbAuswahl.neu;
+  // Der Knopf fuer einen neuen Titel steht ausserhalb der Liste: in ihr haette
+  // er hinter allen Heften gestanden und waere erst nach langem Blaettern zu
+  // sehen gewesen.
   return `<div class="bearb">
-    <div class="bearb-liste">${liste}
-      <button type="button" class="bearb-eintrag bearb-neu bearb-titelneu${titelNeu?' gewaehlt':''}"
-        onclick="bearbNeuerTitel()"><span>+ Titel</span></button>
+    <div class="bearb-spalte">
+      <div class="bearb-liste">${liste}</div>
+      <button type="button" class="bearb-titelknopf${titelNeu?' gewaehlt':''}"
+        onclick="bearbNeuerTitel()">+ Neuen Titel anlegen</button>
     </div>
     <div>
       <div class="bearb-form" id="bearbForm">${formInhaltHtml()}</div>

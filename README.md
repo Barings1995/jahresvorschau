@@ -87,8 +87,9 @@ In der Ansicht *Bearbeiten*:
 * **Titel-Stammdaten** — der farbige Kopf über den Heften führt zu Kurzname,
   vollständigem Namen, Auflage und Kennfarbe. Sie gelten je Jahrgang: die
   Auflage unterscheidet sich von Jahr zu Jahr.
-* **Titel anlegen und entfernen** — *+ Titel* am Ende der Liste, *Titel
-  entfernen* im Formular. Ein entfernter Titel nimmt seine Ausgaben mit; der
+* **Titel anlegen und entfernen** — *+ Neuen Titel anlegen* steht unter der
+  Liste, nicht in ihr, und bleibt damit sichtbar, gleich wie weit geblättert
+  ist; *Titel entfernen* im Formular. Ein entfernter Titel nimmt seine Ausgaben mit; der
   letzte Titel eines Jahrgangs bleibt stehen.
 
 Im Menü *Daten*:
