@@ -3124,13 +3124,16 @@ function formAusgabeHtml(){
     <div class="bearb-reihe">${termine}</div>
 
     <label class="bearb-feld">Themenschwerpunkt
-      <input type="text" value="${escA(entwurf.top)}"
-             oninput="bearbFeld('top',this.value)"></label>
-    <label class="bearb-feld">Sonderthema
       <input type="text" value="${escA(entwurf.sw)}"
              oninput="bearbFeld('sw',this.value)"></label>
+    <label class="bearb-feld">Top-Thema
+      <input type="text" value="${escA(entwurf.top)}"
+             oninput="bearbFeld('top',this.value)">
+      <span class="hinweis">Nur in der &Auml;rzte Zeitung ONKOLOGIE UND
+        H&Auml;MATOLOGIE gebr&auml;uchlich; die &uuml;brigen Titel f&uuml;hren
+        allein einen Themenschwerpunkt</span></label>
 
-    ${zeilenGruppe('a','Kongressauslagen','Der Kongress liegt in dieser Ausgabe aus')}
+    ${zeilenGruppe('a','Kongressauslagen','Diese Ausgabe liegt auf dem Kongress aus')}
     ${zeilenGruppe('b','Kongressberichte','Über den Kongress wird berichtet')}
 
     ${bearbFussHtml(neu ? 'Anlegen' : 'Speichern', neu ? '' :
