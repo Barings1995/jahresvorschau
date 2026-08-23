@@ -3390,24 +3390,38 @@ function netzhinweis(text){
 
 // ── Anfragen ────────────────────────────────────────────────────────────────
 
-async function dbAnfrage(pfad, einstellungen = {}, mitSitzung = true){
-  const kopf = {
-    apikey: SUPABASE_ANON_KEY,
-    'Content-Type': 'application/json',
-    ...(einstellungen.headers || {})
-  };
-  if(mitSitzung && sitzung && sitzung.access_token)
-    kopf.Authorization = 'Bearer ' + sitzung.access_token;
+// Die Datenbank prueft den Ausstellungszeitpunkt der Sitzung gegen ihre
+// eigene Uhr. Gehen die Uhren der beiden Supabase-Dienste ein paar Sekunden
+// auseinander, gilt eine eben ausgestellte Sitzung als "in der Zukunft
+// ausgestellt" und die Anfrage wird abgewiesen (PGRST303) - ohne dass sie
+// ausgefuehrt wurde. Nach wenigen Sekunden ist der Zeitpunkt erreicht und
+// dieselbe Sitzung gilt. Ein zweiter Versuch ist deshalb gefahrlos, auch bei
+// schreibenden Anfragen, und erspart das Anmelden von Hand.
+const ZU_FRUEH = /PGRST303|issued at future/i;
 
-  const antwort = await fetch(SUPABASE_URL + pfad, { ...einstellungen, headers: kopf });
-  if(!antwort.ok){
+async function dbAnfrage(pfad, einstellungen = {}, mitSitzung = true){
+  for(let versuch = 0; ; versuch++){
+    const kopf = {
+      apikey: SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      ...(einstellungen.headers || {})
+    };
+    if(mitSitzung && sitzung && sitzung.access_token)
+      kopf.Authorization = 'Bearer ' + sitzung.access_token;
+
+    const antwort = await fetch(SUPABASE_URL + pfad, { ...einstellungen, headers: kopf });
+    if(antwort.ok) return antwort.status === 204 ? null : antwort.json();
+
     let text = '';
     try { text = await antwort.text(); } catch(e){}
+    if(ZU_FRUEH.test(text) && versuch < 2){
+      await new Promise(w=>setTimeout(w, 1500 * (versuch + 1)));
+      continue;
+    }
     const fehler = new Error(text || ('Antwort ' + antwort.status));
     fehler.status = antwort.status;
     throw fehler;
   }
-  return antwort.status === 204 ? null : antwort.json();
 }
 
 // Die Sitzung laeuft nach einer Stunde ab. Vor jedem Laden wird sie
@@ -3521,6 +3535,10 @@ function fehlertext(fehler){
     return 'Das Konto ist noch nicht bestätigt.';
   if(/Failed to fetch|NetworkError|Load failed/i.test(roh))
     return 'Die Datenbank ist nicht erreichbar. Besteht eine Netzverbindung?';
+  if(ZU_FRUEH.test(roh))
+    return 'Die Uhren von Anmeldung und Datenbank gehen einige Sekunden '
+         + 'auseinander; die Sitzung gilt der Datenbank noch als zu früh '
+         + 'ausgestellt. In einer knappen Minute erneut versuchen.';
   return 'Der Zugriff ist fehlgeschlagen: ' + roh;
 }
 

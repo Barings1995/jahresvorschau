@@ -76,6 +76,18 @@ Die Kongressfelder schlagen beim Tippen bereits verwendete Namen vor. Ein neuer
 Name ist erlaubt — nur wird ein Kongress, dessen Schreibweise von den übrigen
 abweicht, in der Kongressansicht zu einem eigenen Kasten.
 
+## Wenn die Anmeldung »JWT issued at future« meldet
+
+Gelegentlich weist die Datenbank eine eben ausgestellte Sitzung mit dem Code
+**PGRST303** ab: die Uhren des Anmeldedienstes und der Datenbank gehen ein
+paar Sekunden auseinander, und die Sitzung gilt ihr deshalb als in der Zukunft
+ausgestellt. Die Anfrage wird dabei gar nicht erst ausgeführt.
+
+Das Werkzeug versucht es in diesem Fall von selbst noch zweimal, nach 1,5 und
+nach 3 Sekunden — auch bei schreibenden Anfragen, die dann nachweislich nicht
+ausgeführt wurden. Bleibt es dabei, erscheint statt der Rohmeldung ein Hinweis,
+es in einer knappen Minute erneut zu versuchen.
+
 ## Anlegen und Entfernen
 
 In der Ansicht *Bearbeiten*:
