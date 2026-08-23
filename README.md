@@ -86,8 +86,9 @@ In der Ansicht *Bearbeiten*:
 
 Im Menü *Daten*:
 
-* **Aus Excel laden** — die Heftplanung aus der Redaktion. Der Jahrgang wird in
-  der Datenbank **im Ganzen ersetzt**; nur so verschwinden gestrichene Hefte.
+* **Aus Excel laden** — eine Excel-Tabelle mit einem vollständigen Jahrgang,
+  im Aufbau des eigenen Excel-Ausgangs. Der Jahrgang wird in der Datenbank
+  **im Ganzen ersetzt**; nur so verschwinden gestrichene Hefte.
   Vorher entsteht ohne Zutun ein Sicherungspunkt. Der Prüfbericht vor dem
   Übernehmen bleibt derselbe wie zuvor.
 * **Jahrgang entfernen** — nimmt Titel, Ausgaben und die Sicherungspunkte des
