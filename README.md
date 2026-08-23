@@ -50,23 +50,30 @@ Konten werden im Supabase-Verwaltungsbereich angelegt, nicht im Werkzeug:
 * **Erster Bauabschnitt — fertig.** Datenbank angelegt, Jahrgänge 2026 und 2027
   eingespielt, Werkzeug liest daraus. Sämtliche gemessenen Sollwerte kommen
   unverändert heraus.
-* **Zweiter Bauabschnitt — fertig.** Sechste Ansicht „Bearbeiten": Termine,
+* **Zweiter Bauabschnitt — fertig.** Arbeitsschirm „Bearbeiten": Termine,
   Themen und die beiden Kongresslisten je Ausgabe, mit Vorschlägen aus den
   bereits verwendeten Kongressnamen. Gespeichert wird auf Knopfdruck, nie
-  stillschweigend; eine angefangene Änderung überlebt jeden Ansichtswechsel und
-  meldet sich beim Verlassen der Seite. Dazu Sicherungspunkte je Jahrgang.
+  stillschweigend; eine angefangene Änderung meldet sich beim Verlassen des
+  Arbeitsschirms wie beim Verlassen der Seite. Dazu Sicherungspunkte je Jahrgang.
 * **Dritter Bauabschnitt — fertig.** Veröffentlicht über GitHub Pages. Der
   Excel-Eingang schreibt in die Datenbank; Ausgaben und Titel lassen sich
   anlegen und entfernen, ebenso ein ganzer Jahrgang.
 
 ## Bearbeiten
 
-Die Ansicht steht im Menü *Daten* an erster Stelle, nicht in der
-Ansichtsauswahl — dort stehen nur die fünf Druckvorlagen. Sie ist kein
-gleichwertiger sechster Blick auf denselben Bestand, sondern ein eigener
-Arbeitsschirm; die Terminlegende wird dort deshalb ausgeblendet. Solange sie
-offen ist, ist der Menüpunkt hinterlegt; zurück geht es über einen der fünf
-Ansichtsknöpfe.
+Der Arbeitsschirm steht im Menü *Daten* an erster Stelle, nicht in der
+Ansichtsauswahl — dort stehen nur die fünf Druckvorlagen. Er ist kein
+gleichwertiger sechster Blick auf denselben Bestand und auch im Unterbau keine
+Ansicht mehr, sondern ein eigener Zustand daneben: die zuletzt gewählte
+Druckansicht bleibt bestehen und liegt darunter. Die Terminlegende wird
+ausgeblendet, solange gearbeitet wird.
+
+Derselbe Menüpunkt führt hinein und wieder hinaus — beim Öffnen heißt er
+*Bearbeiten*, danach *Bearbeiten beenden* und benennt die Ansicht, zu der er
+zurückführt. Ebenso beendet ihn ein Klick auf einen der fünf Ansichtsknöpfe.
+Steht eine ungespeicherte Änderung im Weg, wird vorher gefragt. Gedruckt und
+als PDF ausgegeben wird immer eine der fünf Druckvorlagen: steht der
+Arbeitsschirm offen, wird er dafür geschlossen.
 
 Links die Ausgaben des Jahrgangs, rechts das Formular. Gearbeitet wird auf
 einer Arbeitskopie: erst *Speichern* schreibt in die Datenbank und danach in
@@ -116,7 +123,7 @@ Im Menü *Daten*:
   gezeigten Jahrgangs übernommen (mit Nummer, vollem Namen, Kennfarbe und
   Auflage — Angaben, die nicht in der Excel-Tabelle stehen). Hefte kommen
   keine mit; der Jahrgang entsteht leer und wird über *+ Ausgabe* gefüllt.
-  Danach steht die Bearbeiten-Ansicht offen.
+  Danach steht der Arbeitsschirm offen.
 * **Jahrgang entfernen** — nimmt Titel, Ausgaben und die Sicherungspunkte des
   Jahrgangs mit. Der letzte Jahrgang bleibt stehen.
 

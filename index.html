@@ -988,6 +988,12 @@ let druckFormat = null;
 // Regel wie bei den Titel-Chips, wo keine Auswahl fuer "Alle Titel" steht.
 const modus = new Set();          // 'auslage' | 'bericht' | 'thema'
 let view = 'cards';
+// Die Arbeitsansicht ist keine sechste Ansicht, sondern ein Zustand daneben:
+// sie liegt ueber der zuletzt gewaehlten Druckansicht, die in »view« stehen
+// bleibt. Deshalb fuehrt das Schliessen von selbst dorthin zurueck, und
+// Dokumentkopf, Formatempfehlung und die Kopie sehen nie einen Wert, den es
+// als Druckbild nicht gibt.
+let bearbOffen = false;
 let ohneVerstrichene = false;   // Schalter in der Legendenzeile
 const activeJ = new Set();
 let sortKey = 'et', sortDir = 1;
@@ -1014,15 +1020,40 @@ function setModus(art){
 }
 
 function setView(v){
+  // Eine Druckansicht zu waehlen beendet die Arbeitsansicht. Eine angefangene
+  // Aenderung kann den Wechsel abbrechen.
+  if(bearbOffen && !bearbBeenden()) return;
   view = v;
   document.querySelectorAll('.view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
-  // "Bearbeiten" steht im Menue "Daten" und hat deshalb keinen Knopf in der
-  // Ansichtsauswahl. Damit trotzdem ablesbar ist, welche Ansicht offen steht,
-  // wird der Menuepunkt hervorgehoben.
-  const bm=document.getElementById('bearbMenuBtn');
-  if(bm) bm.classList.toggle('aktiv', v==='bearbeiten');
-  document.body.classList.toggle('bearbmodus', v==='bearbeiten');
+  bearbAnzeige();
   render();
+}
+
+// Menuepunkt und Koerperklasse folgen dem Zustand der Arbeitsansicht. Der
+// Punkt im Menue "Daten" ist zugleich der Weg hinein und wieder hinaus, und
+// benennt beim Schliessen die Ansicht, zu der er zurueckfuehrt.
+function bearbAnzeige(){
+  const bm=document.getElementById('bearbMenuBtn');
+  if(bm){
+    bm.classList.toggle('aktiv', bearbOffen);
+    const t=bm.querySelector('.ex-t'), d=bm.querySelector('.ex-d');
+    if(t) t.textContent = bearbOffen ? 'Bearbeiten beenden' : 'Bearbeiten';
+    if(d) d.innerHTML = bearbOffen
+      ? `Schlie&szlig;t die Arbeitsansicht und f&uuml;hrt zur Ansicht &raquo;${VIEW_TEXT[view]}&laquo; zur&uuml;ck`
+      : '&Ouml;ffnet die Arbeitsansicht: Ausgaben und Titel anlegen, &auml;ndern und entfernen';
+  }
+  document.body.classList.toggle('bearbmodus', bearbOffen);
+}
+
+// Schliesst die Arbeitsansicht, sofern nichts Ungespeichertes im Weg steht.
+// Der Rueckgabewert sagt, ob geschlossen wurde. Zeichnet bewusst nicht neu –
+// darum kuemmern sich die Aufrufer, damit ein Wechsel nur einmal neu aufbaut.
+function bearbBeenden(){
+  if(!bearbFrei()) return false;
+  bearbAuswahl = null; entwurf = null; entwurfRein = null;
+  bearbStandText = ''; bearbStandArt = '';
+  bearbOffen = false;
+  return true;
 }
 
 function setAs(b){
@@ -1516,6 +1547,13 @@ function zurueckZumExport(){
 // Chrome uebernimmt den Seitentitel als Dateinamen-Vorschlag beim Sichern
 // als PDF – deshalb wird er kurz gesetzt und danach zurueckgestellt.
 function druckeMit(fmt){
+  // Gedruckt wird eine der fuenf Druckvorlagen, nie der Arbeitsschirm: steht
+  // er offen, wird er vorher geschlossen und die gewaehlte Ansicht aufgebaut.
+  if(bearbOffen){
+    if(!bearbBeenden()) return;
+    bearbAnzeige();
+    render();
+  }
   druckFormat = fmt;
   setzePageStyle();
   schliesseExport();
@@ -1565,6 +1603,11 @@ function neutralerKlon(){
   // sie setzt ihre Ansicht beim Oeffnen ohnehin selbst (setView im Startskript).
   klon.querySelectorAll('.view-btn').forEach(b=>
     b.classList.toggle('active', b.dataset.view==='cards'));
+  // Stand die Arbeitsansicht beim Erzeugen offen, traegt der Klon noch deren
+  // Koerperklasse - in der Kopie waere die Legende sonst bis zum ersten
+  // Neuzeichnen ausgeblendet.
+  const kb = klon.querySelector('body');
+  if(kb) kb.classList.remove('bearbmodus');
   const feld = klon.querySelector('#q');
   if(feld) feld.removeAttribute('value');
   const loeschen = klon.querySelector('#clearBtn');
@@ -2009,7 +2052,13 @@ function schliesseDaten(){
 
 function bearbeitenKlick(){
   schliesseDaten();
-  setView('bearbeiten');
+  if(bearbOffen){
+    if(!bearbBeenden()) return;
+  } else {
+    bearbOffen = true;
+  }
+  bearbAnzeige();
+  render();
 }
 
 function datenLadenKlick(){
@@ -2303,8 +2352,10 @@ async function jahrgangAnlegenAusfuehren(vorlage){
     DATEN = await datenHolen();
     dialogSchliessen();
     waehleJahrgang(y);
-    // Der neue Jahrgang ist leer; gearbeitet wird jetzt in der Bearbeiten-Ansicht.
-    setView('bearbeiten');
+    // Der neue Jahrgang ist leer; gearbeitet wird jetzt in der Arbeitsansicht.
+    bearbOffen = true;
+    bearbAnzeige();
+    render();
     sicherungenHolen();
   }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
 }
@@ -2595,7 +2646,7 @@ function render(){
   const jCount = activeJ.size||JOURNALS.length;
   const suchInfo = q?` &middot; Suche: <strong>&raquo;${q}&laquo;</strong>`:'';
 
-  if(view==='bearbeiten'){
+  if(bearbOffen){
     res.className='bearbansicht';
     res.innerHTML=renderBearbeiten();
     sts.innerHTML=`Bearbeiten &middot; Jahrgang ${jahrgang()}`;
