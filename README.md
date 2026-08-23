@@ -61,6 +61,11 @@ Konten werden im Supabase-Verwaltungsbereich angelegt, nicht im Werkzeug:
 
 ## Bearbeiten
 
+Die Ansicht steht im Menü *Daten* an erster Stelle, nicht in der
+Ansichtsauswahl — dort stehen nur die fünf Druckvorlagen. Solange sie offen
+ist, ist der Menüpunkt hinterlegt; zurück geht es über einen der fünf
+Ansichtsknöpfe.
+
 Links die Ausgaben des Jahrgangs, rechts das Formular. Gearbeitet wird auf
 einer Arbeitskopie: erst *Speichern* schreibt in die Datenbank und danach in
 den angezeigten Jahrgang. Ein Abbruch lässt den gezeigten Stand unangetastet.

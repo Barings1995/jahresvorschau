@@ -351,6 +351,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .exf-kopf{padding:9px 13px 7px;font-size:.68rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--navy-faint);border-bottom:1px solid var(--surface3)}
 .exf-tipp{display:none;margin-left:7px;padding:1px 6px;border-radius:9px;font-size:.6rem;font-weight:600;letter-spacing:.02em;text-transform:none;color:var(--navy);background:var(--navy-faint)}
 .exf-btn.emp .exf-tipp{display:inline}
+.ex-item.aktiv{background:var(--navy-faint)}
 .exf-back .ex-t{font-weight:400;font-size:.72rem;color:var(--muted)}
 
 /* Dokumentkopf des Exports: am Bildschirm unsichtbar, nur auf Papier/PDF */
@@ -666,7 +667,6 @@ p.bearb-stand:not(:empty){margin-top:9px}
       <button class="view-btn"        data-view="matrix"  onclick="setView('matrix')">Jahresmatrix</button>
       <button class="view-btn"        data-view="tabelle" onclick="setView('tabelle')">Tabelle</button>
       <button class="view-btn"        data-view="kongress" onclick="setView('kongress')">Kongressliste</button>
-      <button class="view-btn bearb-knopf" data-view="bearbeiten" onclick="setView('bearbeiten')">Bearbeiten</button>
     </div>
     <div class="daten-wrap">
       <button class="daten-btn" id="datenBtn" aria-haspopup="true" aria-expanded="false" onclick="toggleDaten(event)">
@@ -674,6 +674,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
         Daten<span class="ex-chev">&#9660;</span>
       </button>
       <div class="export-menu" id="datenMenu" role="menu">
+        <button class="ex-item" id="bearbMenuBtn" role="menuitem" onclick="bearbeitenKlick()">
+          <span class="ex-t">Bearbeiten</span>
+          <span class="ex-d">&Ouml;ffnet die Arbeitsansicht: Ausgaben und Titel anlegen, &auml;ndern und entfernen</span>
+        </button>
         <button class="ex-item" role="menuitem" onclick="datenLadenKlick()">
           <span class="ex-t">Aus Excel laden</span>
           <span class="ex-d">Excel-Tabelle mit einem vollst&auml;ndigen Jahrgang. Der Jahrgang wird in der Datenbank ersetzt &ndash; vorher entsteht ein Sicherungspunkt</span>
@@ -983,6 +987,11 @@ function setModus(art){
 function setView(v){
   view = v;
   document.querySelectorAll('.view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  // "Bearbeiten" steht im Menue "Daten" und hat deshalb keinen Knopf in der
+  // Ansichtsauswahl. Damit trotzdem ablesbar ist, welche Ansicht offen steht,
+  // wird der Menuepunkt hervorgehoben.
+  const bm=document.getElementById('bearbMenuBtn');
+  if(bm) bm.classList.toggle('aktiv', v==='bearbeiten');
   render();
 }
 
@@ -1554,8 +1563,8 @@ function schreibeDaten(klon,obj){
 function baueKopie(){
   const klon = neutralerKlon();
   // Bedienelemente, die nur zur Arbeitsdatei gehoeren, fallen in der Kopie weg.
-  ['.export-wrap','.daten-wrap','.daten-dialog','#anmeldung','#netzhinweis',
-   '.bearb-knopf'].forEach(sel=>{ const w=klon.querySelector(sel); if(w) w.remove(); });
+  // Der Menuepunkt "Bearbeiten" liegt in .daten-wrap und faellt damit mit weg.
+  ['.export-wrap','.daten-wrap','.daten-dialog','#anmeldung','#netzhinweis'].forEach(sel=>{ const w=klon.querySelector(sel); if(w) w.remove(); });
   // Die Zugangsdatei liegt neben der Arbeitsfassung, nicht neben der Kopie.
   // Ihr Skript-Verweis wuerde dort ins Leere zeigen.
   klon.querySelectorAll('script[src="konfiguration.js"]').forEach(s=>s.remove());
@@ -1966,6 +1975,11 @@ function schliesseDaten(){
   if(!m) return;
   m.classList.remove('open');
   b.setAttribute('aria-expanded','false');
+}
+
+function bearbeitenKlick(){
+  schliesseDaten();
+  setView('bearbeiten');
 }
 
 function datenLadenKlick(){
