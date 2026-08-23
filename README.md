@@ -93,8 +93,8 @@ In der Ansicht *Bearbeiten*:
 
 Im Menü *Daten*:
 
-* **Aus Excel laden** — eine Excel-Tabelle mit einem vollständigen Jahrgang,
-  im Aufbau des eigenen Excel-Ausgangs. Der Jahrgang wird in der Datenbank
+* **Aus Excel laden** — erwartet das Blatt *Ausgaben* dieses Werkzeugs,
+  ausgegeben ohne Suche und Filter, mit einem vollständigen Jahrgang. Der Jahrgang wird in der Datenbank
   **im Ganzen ersetzt**; nur so verschwinden gestrichene Hefte.
   Vorher entsteht ohne Zutun ein Sicherungspunkt. Der Prüfbericht vor dem
   Übernehmen bleibt derselbe wie zuvor.
