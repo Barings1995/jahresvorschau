@@ -2672,8 +2672,18 @@ function render(){
   const suchInfo = q?` &middot; Suche: <strong>&raquo;${q}&laquo;</strong>`:'';
 
   if(bearbOffen){
+    // Die Liste links wird bei jedem Zeichnen mitsamt ihrem Kasten neu
+    // aufgebaut, und ein frisches Element steht oben. Ohne dieses Merken
+    // spraenge die Liste bei jeder Auswahl an den Anfang zurueck - wer weiter
+    // unten arbeitet, muesste sich jedes Mal neu herunterrollen.
+    const alteListe = res.querySelector('.bearb-liste');
+    const listeStand = alteListe ? alteListe.scrollTop : 0;
     res.className='bearbansicht';
     res.innerHTML=renderBearbeiten();
+    if(listeStand){
+      const neueListe = res.querySelector('.bearb-liste');
+      if(neueListe) neueListe.scrollTop = listeStand;
+    }
     sts.innerHTML=`Bearbeiten &middot; Jahrgang ${jahrgang()}`;
     bearbStand(bearbStandText,bearbStandArt);
     return;

@@ -81,7 +81,10 @@ der Arbeitsschirm offen, wird er dafür geschlossen.
 
 Links die Ausgaben des Jahrgangs, rechts das Formular. Gearbeitet wird auf
 einer Arbeitskopie: erst *Speichern* schreibt in die Datenbank und danach in
-den angezeigten Jahrgang. Ein Abbruch lässt den gezeigten Stand unangetastet.
+den angezeigten Jahrgang. Ein Abbruch lässt den gezeigten Stand unangetastet. Die
+Liste links behält beim Wechsel der Ausgabe ihre Rollposition — sie wird bei
+jedem Zeichnen neu aufgebaut, ihr Stand wird dabei aber gemerkt und wieder
+gesetzt.
 
 Die Kongressfelder schlagen beim Tippen bereits verwendete Namen vor. Ein neuer
 Name ist erlaubt — nur wird ein Kongress, dessen Schreibweise von den übrigen
