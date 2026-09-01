@@ -233,6 +233,7 @@ table.tab th.sortable:hover{color:var(--sblue)}
 .sar{color:var(--accent)}
 table.tab td{padding:6px 8px;border-bottom:1px solid var(--surface3);vertical-align:top;line-height:1.35}
 table.tab tr:last-child td{border-bottom:none}
+table.tab tfoot{display:none}
 table.tab tbody tr:hover td{background:var(--surface2)}
 .t-num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .t-titel{font-weight:700;line-height:1.25;min-width:140px}
@@ -474,7 +475,18 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   table.tab{min-width:0!important;width:100%;font-size:7.5pt}
   table.tab thead{display:table-header-group}
   table.tab th{background:none;color:var(--navy);border-bottom:1.5px solid var(--navy);font-size:6.5pt;padding:5px 5px}
-  table.tab td{padding:4px 5px;border-bottom:.5px solid var(--border)}
+  /* Die Trennlinie steht im Druck UEBER der Zeile, nicht darunter: eine
+     Linie am unteren Rand der letzten Zeile einer Seite faellt genau auf die
+     Seitenkante und wird von Chrome nicht mehr gezeichnet - gemessen mit
+     einem unteren Seitenrand von 12,1 und 12,2 mm, wo die Zeile buendig mit
+     der Kante abschliesst. Weder ein staerkerer Strich noch getrennte Rahmen
+     (border-collapse:separate) noch box-decoration-break:clone halfen dagegen.
+     Den unteren Abschluss jeder Seite zeichnet stattdessen eine leere
+     Fusszeile: Chrome wiederholt sie wie die Kopfzeile auf jeder Seite, und
+     ihre Linie liegt innerhalb der Seite statt auf deren Kante. */
+  table.tab td{padding:4px 5px;border-top:.5px solid var(--border);border-bottom:none}
+  table.tab tfoot{display:table-footer-group}
+  table.tab tfoot td{height:0;padding:0;border-top:.5px solid var(--border)}
   table.tab tr{break-inside:avoid}
   /* Im Druck ist die Tabelle schmaler und die Schrift kleiner, deshalb eigene
      Werte: 38 % geben der Kongressspalte 99 mm statt 72 mm ohne Vorgabe – damit
@@ -1425,7 +1437,7 @@ function renderTabelle(items,q){
   const koerper=zeilen.map(({j,iss})=>
     `<tr>${spalten.map(s=>tabZelle(s,j,iss,q)).join('')}</tr>`).join('');
 
-  return`<div class="tabwrap"><table class="tab"><thead><tr>${kopf}</tr></thead><tbody>${koerper}</tbody></table></div>`;
+  return`<div class="tabwrap"><table class="tab"><thead><tr>${kopf}</tr></thead><tbody>${koerper}</tbody><tfoot><tr><td class="t-fuss" colspan="${spalten.length}"></td></tr></tfoot></table></div>`;
 }
 
 // ─── Ansicht: Kongresse ────────────────────────────────────────────────────

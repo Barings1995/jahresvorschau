@@ -172,6 +172,17 @@ der vollständigen Heftplanung im Klartext. Öffentlich gehören nur
 *Werkzeug sichern* ist mit der Datenbank hinfällig und durch *Abmelden*
 ersetzt.
 
+## Tabelle im Druck
+
+Die Trennlinie steht im Druck über der Zeile, nicht darunter, und den unteren
+Abschluss jeder Seite zeichnet eine leere Fußzeile, die Chrome wie die Kopfzeile
+auf jeder Seite wiederholt. Grund: Eine Linie am unteren Rand der letzten Zeile
+einer Seite fällt genau auf die Seitenkante und wird dort nicht mehr gezeichnet
+— die Ausgabe hatte dann eine Zeile ohne Abschluss. Ein stärkerer Strich,
+getrennte Rahmen (`border-collapse: separate`) und `box-decoration-break: clone`
+halfen gemessen nicht; die Fußzeile liegt dagegen innerhalb der Seite. Am
+Bildschirm bleibt sie ausgeblendet, dort schließt der Tabellenrahmen ab.
+
 ## Was unverändert geblieben ist
 
 Alle fünf Ansichten, die Mehrfachauswahl der Inhalte, Suche, Druckregeln,
