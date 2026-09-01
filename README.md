@@ -181,7 +181,10 @@ einer Seite fällt genau auf die Seitenkante und wird dort nicht mehr gezeichnet
 — die Ausgabe hatte dann eine Zeile ohne Abschluss. Ein stärkerer Strich,
 getrennte Rahmen (`border-collapse: separate`) und `box-decoration-break: clone`
 halfen gemessen nicht; die Fußzeile liegt dagegen innerhalb der Seite. Am
-Bildschirm bleibt sie ausgeblendet, dort schließt der Tabellenrahmen ab.
+Bildschirm bleibt sie ausgeblendet, dort schließt der Tabellenrahmen ab. Im
+Druck ist der untere Rand des Tabellenrahmens abgeschaltet: sonst stünden dort
+zwei Linien dicht beieinander und der Abschluss wirkte doppelt so stark wie die
+übrigen Linien.
 
 ## Was unverändert geblieben ist
 

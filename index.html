@@ -485,6 +485,12 @@ table.tab tbody tr:hover td{background:var(--surface2)}
      Fusszeile: Chrome wiederholt sie wie die Kopfzeile auf jeder Seite, und
      ihre Linie liegt innerhalb der Seite statt auf deren Kante. */
   table.tab td{padding:4px 5px;border-top:.5px solid var(--border);border-bottom:none}
+  /* Ohne diese Zeile stuenden am Seitenfuss zwei Linien dicht beieinander -
+     die der Fusszeile und der untere Rand des Tabellenrahmens - und der
+     Abschluss wirkte doppelt so stark wie die uebrigen Linien (gemessen 116
+     gegen 55 Einheiten Farbauftrag). Den Abschluss zeichnet allein die
+     Fusszeile, auch auf der letzten Seite. */
+  table.tab{border-bottom:none}
   table.tab tfoot{display:table-footer-group}
   table.tab tfoot td{height:0;padding:0;border-top:.5px solid var(--border)}
   table.tab tr{break-inside:avoid}
