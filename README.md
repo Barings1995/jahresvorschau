@@ -122,10 +122,11 @@ verlässlich. Eine neue Anmeldung ändert dagegen nichts; sie stellt die Sitzung
 nur noch einmal aus und läuft in dieselbe Prüfung.
 
 Steht das Werkzeug lange offen, ist die Sitzung beim nächsten Griff womöglich
-abgelaufen. Jeder Datenbankzugriff frischt sie deshalb vorher auf — auch das
-Holen der Sicherungspunkte, das dies als einziges lange nicht tat. Während des
-Abrufs steht im Kasten »Die Sicherungspunkte werden geladen …«, nicht der
-Leerhinweis.
+abgelaufen. Aufgefrischt wird sie deshalb in `dbAnfrage()` — der einen Stelle,
+durch die jede Anfrage läuft. Zuvor stand die Zeile in dreizehn aufrufenden
+Funktionen einzeln, und beim Holen der Sicherungspunkte fehlte sie; dieser eine
+Weg scheiterte dann an der Sitzung statt an den Daten. Während des Abrufs steht
+im Kasten »Die Sicherungspunkte werden geladen …«, nicht der Leerhinweis.
 
 ## Anlegen und Entfernen
 

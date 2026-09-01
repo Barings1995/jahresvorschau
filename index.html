@@ -2300,7 +2300,6 @@ async function ladenUebernehmen(){
   const jahre=Object.keys(ladeErgebnis).sort();
   ladeKnoepfe(true);
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     for(const y of jahre){
       // Der Import ersetzt den Jahrgang im Ganzen. Ein Weg zurueck soll ohne
       // Zutun bereitliegen, deshalb entsteht vorher ein Sicherungspunkt - aber
@@ -2410,7 +2409,6 @@ async function jahrgangAnlegenAusfuehren(vorlage){
   ladeKnoepfe(true);
   ladeStand(`Jahrgang ${y} wird angelegt …`);
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     await dbAnfrage('/rest/v1/jahrgang', {method:'POST',
       headers:{Prefer:'return=minimal'},
       body: JSON.stringify({jahr:y, stand: standFeld ? standFeld.value.trim() : ''})});
@@ -2463,7 +2461,6 @@ async function jahrgangEntfernenAusfuehren(y){
   ladeKnoepfe(true);
   ladeStand(`Jahrgang ${y} wird entfernt …`);
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     // Die Sicherungspunkte haengen nicht am Fremdschluessel und muessen eigens
     // weg - sonst blieben Schnappschuesse eines Jahrgangs zurueck, den es
     // nicht mehr gibt.
@@ -2811,7 +2808,6 @@ async function standSpeichern(){
   if(!bearbOffen || !DATEN[y] || neu === DATEN[y].stand) return;
   bearbStand('Der Stand wird gespeichert \u2026', '');
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     await dbAnfrage('/rest/v1/jahrgang?jahr=eq.' + encodeURIComponent(y),
       {method:'PATCH', headers:{Prefer:'return=minimal'},
        body: JSON.stringify({stand: neu})});
@@ -3064,7 +3060,6 @@ function bearbArbeitet(text){
 async function ausgabeAendern(){
   bearbArbeitet('Wird gespeichert …');
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     entwurf.heft = String(entwurf.heft).trim();
     await dbAnfrage('/rest/v1/ausgabe?id=eq.' + encodeURIComponent(entwurf.id), {
       method: 'PATCH', headers: { Prefer: 'return=minimal' },
@@ -3082,7 +3077,6 @@ async function ausgabeAendern(){
 async function ausgabeAnlegen(){
   bearbArbeitet('Wird angelegt …');
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
     if(!t) throw new Error('Der Titel ist nicht mehr vorhanden.');
     entwurf.heft = String(entwurf.heft).trim();
@@ -3159,7 +3153,6 @@ async function ausgabeEntfernen(){
     + 'dabei verloren. Fortfahren?')) return;
   bearbArbeitet('Wird entfernt …');
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(iss.id),
       { method:'DELETE', headers:{ Prefer:'return=minimal' } });
     t.issues.splice(bearbAuswahl.index,1);
@@ -3180,7 +3173,6 @@ async function titelSpeichern(){
   const warNeu = !!bearbAuswahl.neu;
   bearbArbeitet(warNeu ? 'Wird angelegt …' : 'Wird gespeichert …');
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     const j = jahrgang();
     const feld = { kurz: entwurf.short.trim(), voll: entwurf.full.trim(),
                    auflage: Number(entwurf.auflage)||0, hex: entwurf.hex };
@@ -3226,7 +3218,6 @@ async function titelEntfernen(){
     + 'unberührt. Fortfahren?')) return;
   bearbArbeitet('Wird entfernt …');
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     // Den Titel zu loeschen nimmt ueber den Fremdschluessel seine Ausgaben mit.
     await dbAnfrage('/rest/v1/titel?jahr=eq.'+encodeURIComponent(jahrgang())
       +'&id=eq.'+encodeURIComponent(t.id),
@@ -3273,7 +3264,6 @@ async function sicherungenHolen(){
     // Wie jeder andere Zugriff: erst die Sitzung auffrischen. Steht das
     // Werkzeug lange offen, ist sie sonst alt, wenn die Arbeitsansicht
     // geoeffnet wird - und der Abruf scheitert an ihr statt an den Daten.
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     sicherungen = await dbAnfrage('/rest/v1/sicherung?jahr=eq.' +
       encodeURIComponent(jahrgang()) +
       '&select=id,bezeichnung,erstellt_am&order=erstellt_am.desc&limit=25') || [];
@@ -3297,7 +3287,6 @@ async function sicherungAnlegen(){
                      'Stand ' + heute(new Date().toISOString().slice(0,10)));
   if(wie === null) return;
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     await sicherungSchreiben(jahrgang(), wie.trim());
     await sicherungenHolen();
     bearbStand('Sicherungspunkt angelegt', 'gut');
@@ -3309,7 +3298,6 @@ async function sicherungZurueck(id, wie){
               '»' + wie + '« zurückgesetzt. Alle seither vorgenommenen ' +
               'Änderungen gehen dabei verloren. Fortfahren?')) return;
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     bearbStand('Wird zurückgesetzt …', '');
     const treffer = await dbAnfrage('/rest/v1/sicherung?id=eq.' +
       encodeURIComponent(id) + '&select=inhalt');
@@ -3339,7 +3327,6 @@ async function sicherungEntfernen(id, wie){
   if(!confirm('Der Sicherungspunkt »' + wie + '« wird entfernt. Der darin ' +
               'gesicherte Stand ist danach nicht mehr zu erreichen. Fortfahren?')) return;
   try{
-    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     await dbAnfrage('/rest/v1/sicherung?id=eq.' + encodeURIComponent(id),
       {method:'DELETE', headers:{Prefer:'return=minimal'}});
     await sicherungenHolen();
@@ -3633,6 +3620,14 @@ function sitzungIat(marke){
 }
 
 async function dbAnfrage(pfad, einstellungen = {}, mitSitzung = true){
+  // Die Sitzung wird hier aufgefrischt, an der einen Stelle, durch die jede
+  // Anfrage laeuft. Frueher stand die Zeile in dreizehn aufrufenden Funktionen
+  // einzeln - beim Holen der Sicherungspunkte fehlte sie, und nach langer
+  // Standzeit scheiterte allein dieser Weg an der abgelaufenen Sitzung.
+  // Kein Rueckschlag in sich selbst: sitzungAuffrischen() ruft mit
+  // mitSitzung = false.
+  if(mitSitzung && !await sitzungAuffrischen())
+    throw new Error('Die Sitzung ist abgelaufen.');
   for(let versuch = 0; ; versuch++){
     const kopf = {
       apikey: SUPABASE_ANON_KEY,
