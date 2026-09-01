@@ -71,10 +71,12 @@ ausgeblendet, solange gearbeitet wird.
 Derselbe Menüpunkt führt hinein und wieder hinaus — beim Öffnen heißt er
 *Bearbeiten*, danach *Bearbeiten beenden* und benennt die Ansicht, zu der er
 zurückführt. Er ist der einzige Weg hinaus: Suche, Inhaltsarten,
-Ansichtsknöpfe und Titel-Schalter sind blass und gesperrt, solange gearbeitet
-wird. Sie bleiben sichtbar, damit die Kopfzeilen beim Öffnen und Schließen
-nicht springen. Bedienbar bleiben die Jahrgangswahl und der Stand der
-Heftplanung.
+Ansichtsknöpfe, Titel-Schalter und der Knopf *Exportieren* sind blass und
+gesperrt, solange gearbeitet wird. Sie bleiben sichtbar, damit die Kopfzeilen
+beim Öffnen und Schließen nicht springen. Der Export ist gesperrt, weil er die
+Druckansichten ausgibt — im Arbeitsschirm gäbe es dafür keine Vorlage; ein noch
+offenes Klappmenü wird beim Öffnen der Arbeitsansicht geschlossen. Bedienbar
+bleiben die Jahrgangswahl und der Stand der Heftplanung.
 
 Der Stand im Navy-Streifen ist ausschließlich hier beschreibbar: außerhalb der
 Arbeitsansicht steht er da wie jede andere Angabe im Kopf, ohne Schreibmarke und

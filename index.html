@@ -143,12 +143,14 @@ mark{background:rgba(238,125,17,.18);color:var(--warm);border-radius:2px;padding
    und hat dort nichts zu suchen. */
 body.bearbmodus .legend{display:none}
 /* Die Auswahl im Kopf gilt im Arbeitsschirm nicht: Suche, Inhaltsarten,
-   Ansichten und Titel bleiben stehen, damit die Zeilen beim Oeffnen und
-   Schliessen nicht springen, nehmen aber keine Eingabe an. Verlassen wird
-   allein ueber den Menuepunkt. */
+   Ansichten, Titel und Export bleiben stehen, damit die Zeilen beim Oeffnen und
+   Schliessen nicht springen, nehmen aber keine Eingabe an. Der Export ist
+   gesperrt, weil er die Druckansichten ausgibt - im Arbeitsschirm gaebe es
+   dafuer keine Vorlage. Verlassen wird allein ueber den Menuepunkt. */
 body.bearbmodus .search-wrap,
 body.bearbmodus .mode-group,
 body.bearbmodus .view-group,
+body.bearbmodus .export-wrap,
 body.bearbmodus .filter-row{opacity:.38;pointer-events:none}
 .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.71rem;color:var(--muted);margin-bottom:14px}
 .legend span{display:flex;align-items:center;gap:5px}
@@ -1085,8 +1087,11 @@ function bearbAnzeige(){
   standFeldModus();
   // Das Ausgrauen erledigt die Koerperklasse; gesperrt wird zusaetzlich am
   // Bedienelement selbst, damit auch die Tastatur nicht hineinkommt.
-  document.querySelectorAll('.mode-btn,.view-btn,#clearBtn')
+  document.querySelectorAll('.mode-btn,.view-btn,#clearBtn,#exportBtn')
     .forEach(b=>b.disabled = bearbOffen);
+  // Ein noch offenes Exportklappmenue wuerde sonst ueber dem gesperrten Knopf
+  // stehen bleiben und liesse sich nicht mehr schliessen.
+  if(bearbOffen) schliesseExport();
   const qf = document.getElementById('q');
   if(qf) qf.disabled = bearbOffen;
   // Die Titel-Schalter sind keine Knoepfe, sondern beschriftete Felder.
