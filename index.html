@@ -44,10 +44,13 @@ h1 .accent{color:var(--accent)}
 /* Ersetzt das Auswahlfeld in einer exportierten Kopie: derselbe Platz, aber
    fest stehender Jahrgang ohne Pfeil. Farbe erbt das Weiss der Ueberschrift. */
 .jahr-fest{margin-left:.18em}
-/* Standstempel rechts im Navy-Streifen; der Wert ist frei beschreibbar */
+/* Standstempel rechts im Navy-Streifen. Beschreibbar ist er allein in der
+   Arbeitsansicht - dort traegt ihn die Klasse "bearbbar", sonst steht er da
+   wie jede andere Angabe im Streifen. */
 .hero-stamp{margin-left:auto;align-self:center;font-size:.68rem;color:rgba(255,255,255,.6);letter-spacing:.03em;white-space:nowrap;flex:none}
-.stand-feld{color:rgba(255,255,255,.85);border-bottom:1px dotted rgba(255,255,255,.35);padding:0 0 0 2px;cursor:text;outline:none;min-width:2em;display:inline-block}
-.stand-feld:hover{border-bottom-color:var(--accent)}
+.stand-feld{color:rgba(255,255,255,.85);padding:0 0 0 2px;outline:none;min-width:2em;display:inline-block}
+.stand-feld.bearbbar{border-bottom:1px dotted rgba(255,255,255,.35);cursor:text}
+.stand-feld.bearbbar:hover{border-bottom-color:var(--accent)}
 .stand-feld:focus{background:rgba(255,255,255,.12);border-bottom:1px solid var(--accent);color:#ffffff}
 .controls{padding:12px 1.5rem 14px}
 
@@ -679,7 +682,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
         <h1>Jahresvorschau <span class="accent">Onkologie/Print</span><select class="hero-year" id="yearSel" aria-label="Jahrgang wählen" onchange="waehleJahrgang(this.value)"></select></h1>
         <span class="brand-sub">Termine &middot; Themen &middot; Kongresse</span>
       </div>
-      <span class="hero-stamp">Stand <span class="stand-feld" id="standFeld" contenteditable="plaintext-only" title="Stand der Heftplanung &ndash; frei beschreibbar"></span></span>
+      <span class="hero-stamp">Stand <span class="stand-feld" id="standFeld"></span></span>
     </div>
   </div>
   <div class="controls">
@@ -1050,6 +1053,7 @@ function bearbAnzeige(){
       : '&Ouml;ffnet die Arbeitsansicht: Ausgaben und Titel anlegen, &auml;ndern und entfernen';
   }
   document.body.classList.toggle('bearbmodus', bearbOffen);
+  standFeldModus();
   // Das Ausgrauen erledigt die Koerperklasse; gesperrt wird zusaetzlich am
   // Bedienelement selbst, damit auch die Tastatur nicht hineinkommt.
   document.querySelectorAll('.mode-btn,.view-btn,#clearBtn')
@@ -1061,6 +1065,23 @@ function bearbAnzeige(){
     c.setAttribute('aria-disabled', bearbOffen ? 'true' : 'false');
     c.setAttribute('tabindex', bearbOffen ? '-1' : '0');
   });
+}
+
+// Der Stand der Heftplanung gehoert zum Jahrgang und steht in der Datenbank.
+// Beschreibbar ist er deshalb nur in der Arbeitsansicht - ausserhalb waere es
+// eine Aenderung, die niemand festhaelt. In einer Kopie steht er fest; dort
+// bleibt das Feld unberuehrt.
+function standFeldModus(){
+  const f=document.getElementById('standFeld');
+  if(!f || f.getAttribute('contenteditable')==='false') return;
+  if(bearbOffen){
+    f.setAttribute('contenteditable','plaintext-only');
+    f.setAttribute('title','Stand der Heftplanung \u2013 frei beschreibbar');
+  }else{
+    f.removeAttribute('contenteditable');
+    f.removeAttribute('title');
+  }
+  f.classList.toggle('bearbbar', bearbOffen);
 }
 
 // Schliesst die Arbeitsansicht, sofern nichts Ungespeichertes im Weg steht.
@@ -2743,6 +2764,26 @@ function clearSearch(){
   render();
 }
 
+// Der Stand wandert beim Verlassen des Feldes in die Datenbank. Einen eigenen
+// Speichern-Knopf gibt es im Kopf nicht - ein Wert, der nur auf dem Schirm
+// steht, waere beim naechsten Laden wieder fort. Unveraenderter Text loest
+// nichts aus.
+async function standSpeichern(){
+  const y = jahrgang(), neu = standText();
+  if(!bearbOffen || !DATEN[y] || neu === DATEN[y].stand) return;
+  bearbStand('Der Stand wird gespeichert \u2026', '');
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    await dbAnfrage('/rest/v1/jahrgang?jahr=eq.' + encodeURIComponent(y),
+      {method:'PATCH', headers:{Prefer:'return=minimal'},
+       body: JSON.stringify({stand: neu})});
+    DATEN[y].stand = neu;
+    bearbStand('Der Stand wurde gespeichert', 'gut');
+  }catch(fehler){
+    bearbStand(fehlertext(fehler), 'schlecht');
+  }
+}
+
 // Stand-Feld: Startwert setzen und die Eingabe auf reinen Text festhalten. In
 // einer Kopie steht der Wert schon im Dokument und ist nicht mehr aenderbar.
 (function(){
@@ -2755,6 +2796,7 @@ function clearSearch(){
     const t=f.textContent.replace(/\s+/g,' ').trim();
     f.textContent = t || standStart();
     render();                       // Kopf und kommende Exporte nachziehen
+    standSpeichern();
   });
   f.addEventListener('keydown',e=>{
     if(e.key==='Enter'){ e.preventDefault(); f.blur(); }

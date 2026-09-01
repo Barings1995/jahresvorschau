@@ -73,7 +73,15 @@ Derselbe Menüpunkt führt hinein und wieder hinaus — beim Öffnen heißt er
 zurückführt. Er ist der einzige Weg hinaus: Suche, Inhaltsarten,
 Ansichtsknöpfe und Titel-Schalter sind blass und gesperrt, solange gearbeitet
 wird. Sie bleiben sichtbar, damit die Kopfzeilen beim Öffnen und Schließen
-nicht springen. Bedienbar bleiben die Jahrgangswahl und der Stand.
+nicht springen. Bedienbar bleiben die Jahrgangswahl und der Stand der
+Heftplanung.
+
+Der Stand im Navy-Streifen ist ausschließlich hier beschreibbar: außerhalb der
+Arbeitsansicht steht er da wie jede andere Angabe im Kopf, ohne Schreibmarke und
+ohne gepunktete Linie. Er gehört zum Jahrgang und wird in der Datenbank geführt
+— beim Verlassen des Feldes wandert er dorthin, einen eigenen Speichern-Knopf
+gibt es dafür nicht. Bleibt das Feld leer, kehrt der zuletzt gespeicherte Wert
+zurück; der Stand lässt sich also ändern, aber nicht löschen.
 
 Steht eine ungespeicherte Änderung im Weg, wird vor dem Schließen gefragt.
 Gedruckt und als PDF ausgegeben wird immer eine der fünf Druckvorlagen: steht
