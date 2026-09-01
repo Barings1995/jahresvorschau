@@ -107,10 +107,18 @@ Gelegentlich weist die Datenbank eine eben ausgestellte Sitzung mit dem Code
 paar Sekunden auseinander, und die Sitzung gilt ihr deshalb als in der Zukunft
 ausgestellt. Die Anfrage wird dabei gar nicht erst ausgeführt.
 
-Das Werkzeug versucht es in diesem Fall von selbst noch zweimal, nach 1,5 und
-nach 3 Sekunden — auch bei schreibenden Anfragen, die dann nachweislich nicht
-ausgeführt wurden. Bleibt es dabei, erscheint statt der Rohmeldung ein Hinweis,
-es in einer knappen Minute erneut zu versuchen.
+Das Werkzeug versucht es in diesem Fall von selbst noch zweimal — auch bei
+schreibenden Anfragen, die dann nachweislich nicht ausgeführt wurden. Wie lange
+es dazwischen wartet, wird nicht geraten, sondern gemessen: die abweisende
+Antwort trägt die Uhrzeit der Datenbank, die Sitzung ihren Ausstellungszeitpunkt
+— die Differenz ist die Zeit, die noch fehlt. Gewartet wird eine Sekunde länger,
+höchstens aber 15 Sekunden, damit das Werkzeug nicht minutenlang stillsteht.
+Fehlt die Kopfzeile mit der Uhrzeit, bleibt es bei 2 und 8 Sekunden.
+
+Bleibt es auch dann dabei, erscheint statt der Rohmeldung ein Hinweis, der den
+gemessenen Versatz in Sekunden nennt und sagt, wann ein erneuter Versuch
+gelingt. Eine neue Anmeldung hilft in diesem Fall nicht — sie stellt die Sitzung
+nur noch einmal aus und läuft in dieselbe Prüfung.
 
 ## Anlegen und Entfernen
 
