@@ -622,6 +622,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
   font-size:.9rem;line-height:1;color:var(--muted);background:var(--surface2);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .bearb-sich-weg:hover{color:var(--warm);border-color:var(--warm)}
+.sich-fehler{color:var(--warm)}
+.sich-fehler .bearb-zu{margin-left:8px;vertical-align:middle}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
@@ -920,6 +922,8 @@ function waehleJahrgang(y){
   if(et) et.textContent=`Jahrgang ${y} entfernen`;
   if(eb) eb.disabled = jahrgaenge().length<2;
   render();
+  // Die Sicherungspunkte haengen am Jahrgang; oben sind sie geleert worden.
+  if(bearbOffen) sicherungenHolen();
 }
 
 // Die Titel-Chips stehen nicht mehr fest im Dokument, sondern kommen aus den
@@ -2105,6 +2109,10 @@ function bearbeitenKlick(){
     if(!bearbBeenden()) return;
   } else {
     bearbOffen = true;
+    // Die Liste gehoert zum Oeffnen, nicht zur Anmeldung: so ist sie frisch,
+    // und ein misslungener Abruf laesst sich durch Schliessen und erneutes
+    // Oeffnen wiederholen.
+    sicherungenHolen();
   }
   render();
 }
@@ -2853,6 +2861,7 @@ let entwurfRein  = null;       // derselbe Stand beim Oeffnen, zum Vergleich
 let bearbStandText = '';
 let bearbStandArt  = '';
 let sicherungen    = [];
+let sicherungenFehler = '';   // leer, solange der letzte Abruf gelang
 
 const TERMINE = [
   ['et','Erscheinungstermin'], ['as','Anzeigenschluss'],
@@ -3224,12 +3233,17 @@ function jahrgangAlsBlock(y){
   })) };
 }
 
+// Geholt wird beim Oeffnen der Arbeitsansicht, beim Jahrgangswechsel und nach
+// jedem Schreibvorgang. Frueher geschah es ein einziges Mal beim Anmelden: ging
+// der Abruf dabei schief, blieb die Liste den ganzen Besuch ueber leer, und der
+// Fehlschlag war von "noch nichts angelegt" nicht zu unterscheiden.
 async function sicherungenHolen(){
   try{
     sicherungen = await dbAnfrage('/rest/v1/sicherung?jahr=eq.' +
       encodeURIComponent(jahrgang()) +
       '&select=id,bezeichnung,erstellt_am&order=erstellt_am.desc&limit=25') || [];
-  }catch(e){ sicherungen = []; }
+    sicherungenFehler = '';
+  }catch(fehler){ sicherungen = []; sicherungenFehler = fehlertext(fehler); }
   const b = document.getElementById('bearbSicherungen');
   if(b) b.innerHTML = sicherungListeHtml();
 }
@@ -3428,6 +3442,11 @@ function formTitelHtml(){
 }
 
 function sicherungListeHtml(){
+  if(sicherungenFehler)
+    return `<p class="bearb-leerhinweis sich-fehler">Die Sicherungspunkte konnten
+      nicht geladen werden: ${esc(sicherungenFehler)}
+      <button type="button" class="bearb-zu" onclick="sicherungenHolen()">Erneut
+      versuchen</button></p>`;
   if(!sicherungen.length)
     return '<p class="bearb-leerhinweis">Für diesen Jahrgang ist noch kein Sicherungspunkt angelegt.</p>';
   return sicherungen.map(s=>{
@@ -3666,7 +3685,6 @@ async function bestandLadenUndZeigen(){
     throw new Error('Die Datenbank enthält noch keinen Jahrgang.');
   DATEN = neu;
   starteAnsicht();
-  sicherungenHolen();            // laeuft nebenher, haelt das Anzeigen nicht auf
   document.getElementById('anmeldung').hidden = true;
   netzhinweis('');
   anmeldeMeldung('');

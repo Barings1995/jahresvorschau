@@ -148,6 +148,11 @@ Im Menü *Daten*:
 *Zurücksetzen* spielt ihn wieder ein — Titel und Ausgaben des Jahrgangs werden
 dabei ersetzt, alles seither Geänderte geht verloren. Es wird vorher gefragt.
 
+Die Liste wird beim Öffnen der Arbeitsansicht geholt, beim Jahrgangswechsel und
+nach jedem Schreibvorgang — nicht mehr einmalig beim Anmelden. Misslingt der
+Abruf, steht das im Kasten samt *Erneut versuchen*; früher sah ein Fehlschlag
+aus wie „noch nichts angelegt".
+
 Sicherungspunkte verfallen nicht von selbst und werden auch nicht still
 ausgedünnt: Ein bewusst gesetzter Punkt soll nicht hinter der Liste
 verschwinden. Aufgeräumt wird von Hand, mit dem × am Ende der Zeile; auch dort
