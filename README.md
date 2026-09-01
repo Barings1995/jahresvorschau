@@ -107,18 +107,25 @@ Gelegentlich weist die Datenbank eine eben ausgestellte Sitzung mit dem Code
 paar Sekunden auseinander, und die Sitzung gilt ihr deshalb als in der Zukunft
 ausgestellt. Die Anfrage wird dabei gar nicht erst ausgeführt.
 
-Das Werkzeug versucht es in diesem Fall von selbst noch zweimal — auch bei
-schreibenden Anfragen, die dann nachweislich nicht ausgeführt wurden. Wie lange
-es dazwischen wartet, wird nicht geraten, sondern gemessen: die abweisende
-Antwort trägt die Uhrzeit der Datenbank, die Sitzung ihren Ausstellungszeitpunkt
-— die Differenz ist die Zeit, die noch fehlt. Gewartet wird eine Sekunde länger,
-höchstens aber 15 Sekunden, damit das Werkzeug nicht minutenlang stillsteht.
-Fehlt die Kopfzeile mit der Uhrzeit, bleibt es bei 2 und 8 Sekunden.
+Das Werkzeug versucht es in diesem Fall von selbst noch dreimal — auch bei
+schreibenden Anfragen, die dann nachweislich nicht ausgeführt wurden. Gewartet
+wird 3, 8 und 15 Sekunden. Lässt sich der Versatz messen, richtet sich die
+Wartezeit nach ihm: die abweisende Antwort trägt die Uhrzeit des vorgelagerten
+Dienstes, die Sitzung ihren Ausstellungszeitpunkt — die Differenz plus eine
+Sekunde, höchstens 15. Liegt die abweichende Uhr weiter hinten, misst sich hier
+nichts, und es bleibt bei der Staffel.
 
-Bleibt es auch dann dabei, erscheint statt der Rohmeldung ein Hinweis, der den
-gemessenen Versatz in Sekunden nennt und sagt, wann ein erneuter Versuch
-gelingt. Eine neue Anmeldung hilft in diesem Fall nicht — sie stellt die Sitzung
-nur noch einmal aus und läuft in dieselbe Prüfung.
+Bleibt es auch dann dabei, erscheint statt der Rohmeldung ein Hinweis: mit dem
+gemessenen Versatz, sofern er sich ermitteln ließ, und mit dem Rat, die Seite
+neu zu laden. Das behebt es zuverlässig. Eine neue Anmeldung hilft dagegen
+nicht — sie stellt die Sitzung nur noch einmal aus und läuft in dieselbe
+Prüfung.
+
+Steht das Werkzeug lange offen, ist die Sitzung beim nächsten Griff womöglich
+abgelaufen. Jeder Datenbankzugriff frischt sie deshalb vorher auf — auch das
+Holen der Sicherungspunkte, das dies als einziges lange nicht tat. Während des
+Abrufs steht im Kasten »Die Sicherungspunkte werden geladen …«, nicht der
+Leerhinweis.
 
 ## Anlegen und Entfernen
 

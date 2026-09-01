@@ -2887,7 +2887,8 @@ let entwurfRein  = null;       // derselbe Stand beim Oeffnen, zum Vergleich
 let bearbStandText = '';
 let bearbStandArt  = '';
 let sicherungen    = [];
-let sicherungenFehler = '';   // leer, solange der letzte Abruf gelang
+let sicherungenFehler = '';
+let sicherungenLaeuft = false;   // leer, solange der letzte Abruf gelang
 
 const TERMINE = [
   ['et','Erscheinungstermin'], ['as','Anzeigenschluss'],
@@ -3264,12 +3265,21 @@ function jahrgangAlsBlock(y){
 // der Abruf dabei schief, blieb die Liste den ganzen Besuch ueber leer, und der
 // Fehlschlag war von "noch nichts angelegt" nicht zu unterscheiden.
 async function sicherungenHolen(){
+  sicherungenLaeuft = true;
+  sicherungenFehler = '';
+  const kasten = document.getElementById('bearbSicherungen');
+  if(kasten) kasten.innerHTML = sicherungListeHtml();
   try{
+    // Wie jeder andere Zugriff: erst die Sitzung auffrischen. Steht das
+    // Werkzeug lange offen, ist sie sonst alt, wenn die Arbeitsansicht
+    // geoeffnet wird - und der Abruf scheitert an ihr statt an den Daten.
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
     sicherungen = await dbAnfrage('/rest/v1/sicherung?jahr=eq.' +
       encodeURIComponent(jahrgang()) +
       '&select=id,bezeichnung,erstellt_am&order=erstellt_am.desc&limit=25') || [];
     sicherungenFehler = '';
   }catch(fehler){ sicherungen = []; sicherungenFehler = fehlertext(fehler); }
+  sicherungenLaeuft = false;
   const b = document.getElementById('bearbSicherungen');
   if(b) b.innerHTML = sicherungListeHtml();
 }
@@ -3468,6 +3478,11 @@ function formTitelHtml(){
 }
 
 function sicherungListeHtml(){
+  // Waehrend des Abrufs stand hier frueher der Leerhinweis - bei einem
+  // Uhrenversatz wartet der Abruf inzwischen bis zu einer halben Minute, und
+  // solange sahe es aus, als gaebe es keine Sicherungspunkte.
+  if(sicherungenLaeuft)
+    return '<p class="bearb-leerhinweis">Die Sicherungspunkte werden geladen &hellip;</p>';
   if(sicherungenFehler)
     return `<p class="bearb-leerhinweis sich-fehler">Die Sicherungspunkte konnten
       nicht geladen werden: ${esc(sicherungenFehler)}
@@ -3640,17 +3655,19 @@ async function dbAnfrage(pfad, einstellungen = {}, mitSitzung = true){
 
     let text = '';
     try { text = await antwort.text(); } catch(e){}
-    if(ZU_FRUEH.test(text) && versuch < 2){
+    if(ZU_FRUEH.test(text) && versuch < 3){
       // Die Antwort traegt die Uhrzeit der Datenbank. Zusammen mit dem
       // Ausstellungszeitpunkt der Sitzung ergibt sich, wie lange sie noch
       // wartet - genauer als jede feste Staffel, die bei groesserem Versatz
       // zu frueh aufgibt. Fehlt die Kopfzeile, bleibt es bei 2 und 4 Sekunden.
       // Nach oben gedeckelt, damit das Werkzeug nicht minutenlang stillsteht;
-      // reicht es nicht, nennt die Meldung den gemessenen Versatz.
+      // reicht es nicht, nennt die Meldung den gemessenen Versatz. Der Kopf
+      // traegt die Uhr des vorgelagerten Dienstes - liegt der Versatz weiter
+      // hinten, misst sich hier 0 und es bleibt bei der Staffel.
       const datum = antwort.headers.get('Date');
       const marke = kopf.Authorization ? kopf.Authorization.slice(7) : '';
       const iat = sitzungIat(marke);
-      let warten = 2000 * (versuch + 1) * (versuch + 1);
+      let warten = [3000, 8000, 15000][versuch];
       if(datum && iat){
         const dbJetzt = Date.parse(datum) / 1000;
         if(dbJetzt) uhrVersatz = Math.max(0, Math.ceil(iat - dbJetzt));
@@ -3782,7 +3799,7 @@ function fehlertext(fehler){
          + 'ausgestellt. Ein erneuter Versuch in '
          + (uhrVersatz ? 'etwa ' + uhrVersatz + ' Sekunden' : 'einer knappen Minute')
          + ' gelingt; eine neue Anmeldung hilft nicht, sie stellt die Sitzung '
-         + 'nur noch einmal aus.';
+         + 'nur noch einmal aus. Zuverlässig behebt es das Neuladen der Seite.';
   return 'Der Zugriff ist fehlgeschlagen: ' + roh;
 }
 
