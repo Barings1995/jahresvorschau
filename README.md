@@ -116,10 +116,10 @@ Sekunde, höchstens 15. Liegt die abweichende Uhr weiter hinten, misst sich hier
 nichts, und es bleibt bei der Staffel.
 
 Bleibt es auch dann dabei, erscheint statt der Rohmeldung ein Hinweis: mit dem
-gemessenen Versatz, sofern er sich ermitteln ließ, und mit dem Rat, die Seite
-neu zu laden. Das behebt es zuverlässig. Eine neue Anmeldung hilft dagegen
-nicht — sie stellt die Sitzung nur noch einmal aus und läuft in dieselbe
-Prüfung.
+gemessenen Versatz, sofern er sich ermitteln ließ, mit dem Zeitpunkt für einen
+erneuten Versuch und mit dem Rat, die Seite neu zu laden — das hilft
+verlässlich. Eine neue Anmeldung ändert dagegen nichts; sie stellt die Sitzung
+nur noch einmal aus und läuft in dieselbe Prüfung.
 
 Steht das Werkzeug lange offen, ist die Sitzung beim nächsten Griff womöglich
 abgelaufen. Jeder Datenbankzugriff frischt sie deshalb vorher auf — auch das

@@ -3796,10 +3796,11 @@ function fehlertext(fehler){
     return 'Die Uhren von Anmeldung und Datenbank gehen '
          + (uhrVersatz ? 'etwa ' + uhrVersatz + ' Sekunden' : 'einige Sekunden')
          + ' auseinander; die Sitzung gilt der Datenbank noch als zu früh '
-         + 'ausgestellt. Ein erneuter Versuch in '
+         + 'ausgestellt. In '
          + (uhrVersatz ? 'etwa ' + uhrVersatz + ' Sekunden' : 'einer knappen Minute')
-         + ' gelingt; eine neue Anmeldung hilft nicht, sie stellt die Sitzung '
-         + 'nur noch einmal aus. Zuverlässig behebt es das Neuladen der Seite.';
+         + ' kann der Abruf erneut versucht werden, verlässlich hilft ein '
+         + 'Neuladen der Seite. Eine neue Anmeldung ändert nichts – sie stellt '
+         + 'die Sitzung nur noch einmal aus.';
   return 'Der Zugriff ist fehlgeschlagen: ' + roh;
 }
 
