@@ -612,8 +612,11 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-sich-kopf{display:flex;align-items:center;justify-content:space-between;
   gap:10px;margin-bottom:9px}
 .bearb-sich-kopf h3{font-size:.85rem;font-weight:600;color:var(--navy)}
-.bearb-sich-zeile{display:flex;align-items:center;justify-content:space-between;
-  gap:10px;padding:6px 0;border-top:1px solid var(--surface3);font-size:.78rem}
+/* Vier feste Spalten statt eines Fliesssatzes: sonst wandern Zeitpunkt und
+   Knopf mit der Laenge der Bezeichnung, und die Zeilen stehen versetzt. */
+.bearb-sich-zeile{display:grid;grid-template-columns:1fr max-content max-content max-content;
+  align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--surface3);
+  font-size:.78rem}
 .bearb-sich-zeile .bs-wann{color:var(--muted);font-variant-numeric:tabular-nums}
 .bearb-sich-zurueck{padding:4px 10px;font-family:inherit;font-size:.74rem;
   font-weight:600;color:var(--navy);background:var(--surface2);
