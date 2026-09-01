@@ -618,6 +618,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-sich-zurueck{padding:4px 10px;font-family:inherit;font-size:.74rem;
   font-weight:600;color:var(--navy);background:var(--surface2);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
+.bearb-sich-weg{flex:none;width:26px;height:24px;font-family:inherit;
+  font-size:.9rem;line-height:1;color:var(--muted);background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
+.bearb-sich-weg:hover{color:var(--warm);border-color:var(--warm)}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
@@ -3278,6 +3282,21 @@ async function sicherungZurueck(id, wie){
   }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
 }
 
+// Ein Sicherungspunkt verfaellt nicht von selbst und wird auch nicht still
+// ausgeduennt - ein bewusst gesetzter Punkt soll nicht hinter der Liste
+// verschwinden. Aufgeraeumt wird deshalb von Hand.
+async function sicherungEntfernen(id, wie){
+  if(!confirm('Der Sicherungspunkt »' + wie + '« wird entfernt. Der darin ' +
+              'gesicherte Stand ist danach nicht mehr zu erreichen. Fortfahren?')) return;
+  try{
+    if(!await sitzungAuffrischen()) throw new Error('Die Sitzung ist abgelaufen.');
+    await dbAnfrage('/rest/v1/sicherung?id=eq.' + encodeURIComponent(id),
+      {method:'DELETE', headers:{Prefer:'return=minimal'}});
+    await sicherungenHolen();
+    bearbStand('Der Sicherungspunkt wurde entfernt', 'gut');
+  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+}
+
 // ── Darstellung ─────────────────────────────────────────────────────────────
 
 function bearbFormNeu(){
@@ -3423,6 +3442,8 @@ function sicherungListeHtml(){
       <span class="bs-wann">${wann}</span>
       <button type="button" class="bearb-sich-zurueck"
         onclick="sicherungZurueck('${escA(s.id)}','${escA(wie)}')">Zurücksetzen</button>
+      <button type="button" class="bearb-sich-weg" title="Sicherungspunkt entfernen"
+        onclick="sicherungEntfernen('${escA(s.id)}','${escA(wie)}')">&times;</button>
     </div>`;
   }).join('');
 }
