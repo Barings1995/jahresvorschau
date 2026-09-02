@@ -204,6 +204,16 @@ Druck ist der untere Rand des Tabellenrahmens abgeschaltet: sonst stünden dort
 zwei Linien dicht beieinander und der Abschluss wirkte doppelt so stark wie die
 übrigen Linien.
 
+## Meldungen
+
+Meldungen erscheinen im Werkzeug, nicht im Browser. Der Dialog (`dialogZeigen`)
+kann beides: mit einer Handlung trägt er zwei Knöpfe („Übernehmen"/„Abbrechen"),
+ohne Handlung nur einen — „Schließen". Die eine Stelle, die bis zum 02.09.2026
+noch ein `alert()` des Browsers zeigte, ist der Export ohne Auswahl; sie meldet
+jetzt „Export nicht möglich" im selben Fenster wie alles andere. Damit steht in
+allen vier Werkzeugen dieselbe Regel — in den Angebotswerkzeugen über einen
+eigenen Baustein `hinweis()`, hier über den vorhandenen Dialog.
+
 ## Was unverändert geblieben ist
 
 Alle fünf Ansichten, die Mehrfachauswahl der Inhalte, Suche, Druckregeln,

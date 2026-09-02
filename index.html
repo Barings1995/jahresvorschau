@@ -2688,7 +2688,10 @@ function exportExcel(){
   const q=document.getElementById('q').value.trim();
   const paket=baueXlsx(q);
   if(!paket){
-    alert('Die aktuelle Auswahl enthält keine Ausgaben. Bitte Suchbegriff oder Filter anpassen.');
+    // Der vorhandene Dialog kann auch nur melden: ohne Handlung traegt er einen
+    // einzelnen Knopf „Schliessen". Frueher stand hier ein alert() des Browsers.
+    dialogZeigen('Export nicht möglich',
+      'Die aktuelle Auswahl enthält keine Ausgaben. Bitte Suchbegriff oder Filter anpassen.');
     return;
   }
   const url=URL.createObjectURL(new Blob([paket],
