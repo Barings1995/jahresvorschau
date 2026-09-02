@@ -204,12 +204,16 @@ Druck ist der untere Rand des Tabellenrahmens abgeschaltet: sonst stünden dort
 zwei Linien dicht beieinander und der Abschluss wirkte doppelt so stark wie die
 übrigen Linien.
 
-Tabelle und Jahresmatrix sind im Druck ein Pixel schmaler als der Satzspiegel.
-Chrome rundet die Spaltenbreiten einer Tabelle auf ganze Pixel auf; die Summe
-war dadurch breiter als der Druckbereich (gemessen 1040 gegen 1039,39 px im
-Querformat). Der rechte Rahmenstrich fiel zu 61 % in den Beschnitt und wirkte
-deshalb dünner als die drei übrigen. Mit dem Abzug steht er wieder ganz auf der
-Seite — gemessen im Quer- und im Hochformat.
+Der Satzspiegel hat im Druck rechts ein Pixel Luft. Chrome zeichnet jede Kante
+auf ganze Pixel und rundet dabei auf: der Druckbereich ist 1039,39 px breit
+(quer, A4, 11 mm Rand), gezeichnet wurde bis 1040. Bei den waagerechten Linien —
+Kopflinie, Legende — fällt das nicht auf, sie werden nur um 0,6 px gekürzt. Der
+senkrechte rechte Rahmenstrich der Tabelle lag dagegen zu 61 % im Beschnitt und
+wirkte dünner als die drei übrigen. Mit dem Pixel Luft endet alles gemeinsam bei
+1039 px: der Strich steht ganz auf der Seite und bündig unter Kopflinie und
+Legende — gemessen im Quer- und im Hochformat, für Tabelle und Jahresmatrix. Der
+Abzug gehört an den Satzspiegel und nicht an die Tabelle; säße er an der Tabelle,
+endete sie 0,4 px vor den Linien darüber.
 
 ## Meldungen
 

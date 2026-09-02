@@ -401,7 +401,17 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   .sm-hero,.controls,.stats,.clear-btn,.export-wrap,.daten-wrap,.daten-dialog,.mx-hint,.lchev{display:none!important}
   /* Die Bearbeiten-Ansicht ist Werkzeug, keine Druckvorlage. */
   .bearb,.bearb-sicherung{display:none!important}
-  main{padding:0}
+  /* Ein Pixel Luft rechts fuer den gesamten Satzspiegel. Chrome zeichnet jede
+     Kante auf ganze Pixel und rundet dabei auf: der Druckbereich ist 1039,39 px
+     breit (quer, A4, 11 mm Rand), gezeichnet wurde bis 1040. Bei den waagerechten
+     Linien - Kopflinie, Legende - faellt das nicht auf, sie werden nur um 0,6 px
+     gekuerzt. Der senkrechte rechte Rahmenstrich der Tabelle lag dagegen zu 61 %
+     im Beschnitt und wirkte duenner als die uebrigen drei. Mit dem Pixel Luft
+     endet alles gemeinsam bei 1039 px: der Strich steht ganz auf der Seite und
+     buendig unter Kopflinie und Legende (gemessen quer und hoch, Tabelle und
+     Jahresmatrix). Der Abzug gehoert an den Satzspiegel und nicht an die
+     Tabelle - sonst endete sie 0,4 px vor den Linien darueber. */
+  main{padding:0 1px 0 0}
 
   /* Dokumentkopf: Text links, Logo oben rechts */
   .exporthead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
@@ -463,8 +473,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 
   /* ── Jahresmatrix ── */
   .matrixwrap{overflow:visible;padding:0}
-  /* Ein Pixel schmaler - derselbe Grund wie bei der Tabelle weiter unten. */
-  table.matrix{min-width:0!important;width:calc(100% - 1px);break-inside:avoid;font-size:8pt}
+  table.matrix{min-width:0!important;width:100%;break-inside:avoid;font-size:8pt}
   .mx-month,.mx-corner{background:none;border-bottom:1.5px solid var(--navy);font-size:7pt}
   .mx-title{font-size:7.5pt}
   .mx-chip{background:none;font-size:7.5pt;border:1px solid var(--border);border-left:3px solid var(--jcol,var(--navy))}
@@ -478,12 +487,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 
   /* ── Tabelle: Kopfzeile wiederholt sich auf jeder Seite ── */
   .tabwrap{overflow:visible}
-  /* Ein Pixel schmaler als der Satzspiegel: Chrome rundet die Spaltenbreiten
-     einer Tabelle auf ganze Pixel auf, die Summe wurde dadurch breiter als der
-     Druckbereich (gemessen 1040 gegen 1039,39 px). Der rechte Rahmenstrich fiel
-     zu 61 % in den Beschnitt und wirkte duenner als die uebrigen drei; mit dem
-     Abzug steht er wieder ganz auf der Seite (gemessen quer und hoch). */
-  table.tab{min-width:0!important;width:calc(100% - 1px);font-size:7.5pt}
+  table.tab{min-width:0!important;width:100%;font-size:7.5pt}
   table.tab thead{display:table-header-group}
   table.tab th{background:none;color:var(--navy);border-bottom:1.5px solid var(--navy);font-size:6.5pt;padding:5px 5px}
   /* Die Trennlinie steht im Druck UEBER der Zeile, nicht darunter: eine
