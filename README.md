@@ -214,6 +214,27 @@ jetzt „Export nicht möglich" im selben Fenster wie alles andere. Damit steht 
 allen vier Werkzeugen dieselbe Regel — in den Angebotswerkzeugen über einen
 eigenen Baustein `hinweis()`, hier über den vorhandenen Dialog.
 
+## Rückfragen
+
+Seit dem 02.09.2026 gilt dasselbe für die Rückfragen: `frage(titel, html, jaText)`
+tritt an die Stelle von `confirm()` und liefert ein Versprechen, auf das die
+aufrufenden Funktionen warten. Betroffen sind sechs Stellen — die begonnene
+Änderung beim Wechseln und beim Verwerfen, das Entfernen einer Ausgabe, eines
+Titels und eines Sicherungspunkts sowie das Zurücksetzen eines Jahrgangs.
+
+Der Gewinn liegt in der Beschriftung: statt „OK" steht dort „Verwerfen",
+„Entfernen" oder „Zurücksetzen". Escape lehnt ab, wie zuvor bei `confirm()`, und
+der Fokus liegt auf „Abbrechen" — die Rückfragen stehen vor Handlungen, die
+etwas verwerfen.
+
+Anders als `dialogZeigen` belegt `frage()` nicht den vorhandenen Dialog, sondern
+legt ein eigenes Blatt an: zwei der Rückfragen kommen aus einem offenen Dialog
+heraus. Das Blatt trägt dieselbe Klasse `daten-dialog`, damit die Regeln für
+Druck und HTML-Kopie greifen, die es dort ausblenden bzw. entfernen; ein höherer
+z-Wert (500 gegenüber 400) legt es darüber. In `baueKopie` wurde dafür
+`querySelector` auf `querySelectorAll` umgestellt — es kann jetzt mehr als ein
+Dialogblatt geben.
+
 ## Was unverändert geblieben ist
 
 Alle fünf Ansichten, die Mehrfachauswahl der Inhalte, Suche, Druckregeln,

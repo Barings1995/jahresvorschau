@@ -1061,10 +1061,10 @@ function setModus(art){
   render();
 }
 
-function setView(v){
+async function setView(v){
   // Eine Druckansicht zu waehlen beendet die Arbeitsansicht. Eine angefangene
   // Aenderung kann den Wechsel abbrechen.
-  if(bearbOffen && !bearbBeenden()) return;
+  if(bearbOffen && !await bearbBeenden()) return;
   view = v;
   document.querySelectorAll('.view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
   render();
@@ -1121,8 +1121,8 @@ function standFeldModus(){
 // Schliesst die Arbeitsansicht, sofern nichts Ungespeichertes im Weg steht.
 // Der Rueckgabewert sagt, ob geschlossen wurde. Zeichnet bewusst nicht neu –
 // darum kuemmern sich die Aufrufer, damit ein Wechsel nur einmal neu aufbaut.
-function bearbBeenden(){
-  if(!bearbFrei()) return false;
+async function bearbBeenden(){
+  if(!await bearbFrei()) return false;
   bearbAuswahl = null; entwurf = null; entwurfRein = null;
   bearbStandText = ''; bearbStandArt = '';
   bearbOffen = false;
@@ -1619,11 +1619,11 @@ function zurueckZumExport(){
 
 // Chrome uebernimmt den Seitentitel als Dateinamen-Vorschlag beim Sichern
 // als PDF – deshalb wird er kurz gesetzt und danach zurueckgestellt.
-function druckeMit(fmt){
+async function druckeMit(fmt){
   // Gedruckt wird eine der fuenf Druckvorlagen, nie der Arbeitsschirm: steht
   // er offen, wird er vorher geschlossen und die gewaehlte Ansicht aufgebaut.
   if(bearbOffen){
-    if(!bearbBeenden()) return;
+    if(!await bearbBeenden()) return;
     render();
   }
   druckFormat = fmt;
@@ -1716,7 +1716,10 @@ function baueKopie(){
   const klon = neutralerKlon();
   // Bedienelemente, die nur zur Arbeitsdatei gehoeren, fallen in der Kopie weg.
   // Der Menuepunkt "Bearbeiten" liegt in .daten-wrap und faellt damit mit weg.
-  ['.export-wrap','.daten-wrap','.daten-dialog','#anmeldung','#netzhinweis'].forEach(sel=>{ const w=klon.querySelector(sel); if(w) w.remove(); });
+  // querySelectorAll, nicht querySelector: seit die Rueckfragen eigene Blaetter
+  // mit derselben Klasse anlegen, kann es mehr als ein .daten-dialog geben.
+  ['.export-wrap','.daten-wrap','.daten-dialog','#anmeldung','#netzhinweis']
+    .forEach(sel=>{ klon.querySelectorAll(sel).forEach(w=>w.remove()); });
   // Die Zugangsdatei liegt neben der Arbeitsfassung, nicht neben der Kopie.
   // Ihr Skript-Verweis wuerde dort ins Leere zeigen.
   klon.querySelectorAll('script[src="konfiguration.js"]').forEach(s=>s.remove());
@@ -2129,10 +2132,10 @@ function schliesseDaten(){
   b.setAttribute('aria-expanded','false');
 }
 
-function bearbeitenKlick(){
+async function bearbeitenKlick(){
   schliesseDaten();
   if(bearbOffen){
-    if(!bearbBeenden()) return;
+    if(!await bearbBeenden()) return;
   } else {
     bearbOffen = true;
     // Die Liste gehoert zum Oeffnen, nicht zur Anmeldung: so ist sie frisch,
@@ -2143,9 +2146,9 @@ function bearbeitenKlick(){
   render();
 }
 
-function datenLadenKlick(){
+async function datenLadenKlick(){
   schliesseDaten();
-  if(!bearbFrei()) return;
+  if(!await bearbFrei()) return;
   document.getElementById('datenDatei').click();
 }
 
@@ -2367,9 +2370,9 @@ async function jahrgangSchreiben(y, stand, titel){
 // gefuellt wird. Die Titel kommen auf Wunsch aus dem gezeigten Jahrgang -
 // Nummer, voller Name und Kennfarbe stehen nicht in der Excel-Tabelle und
 // muessten sonst abgetippt werden.
-function jahrgangAnlegen(){
+async function jahrgangAnlegen(){
   schliesseDaten();
-  if(!bearbFrei()) return;
+  if(!await bearbFrei()) return;
   const da = jahrgaenge();
   const vorlage = DATEN[jahr] ? jahr : da[da.length-1];
   const zahlen = da.map(Number).filter(n=>!isNaN(n));
@@ -2439,10 +2442,10 @@ async function jahrgangAnlegenAusfuehren(vorlage){
   }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
 }
 
-function jahrgangEntfernen(){
+async function jahrgangEntfernen(){
   schliesseDaten();
   if(jahrgaenge().length<2) return;      // der letzte bleibt
-  if(!bearbFrei()) return;
+  if(!await bearbFrei()) return;
   const y=jahr, d=DATEN[y];
   const ausgaben=d.titel.reduce((s,j)=>s+j.issues.length,0);
   const eintr=d.titel.reduce((s,j)=>s+j.issues.reduce((n,i)=>n+i.a.length+i.b.length,0),0);
@@ -2913,12 +2916,63 @@ function bearbStand(text, art){
   if(v) v.disabled = !entwurfGeaendert();
 }
 
+// Rueckfragefenster, an der Stelle von confirm(). Der Vorteil liegt weniger in
+// der Optik als in der Beschriftung: der Browser konnte nur „OK" und
+// „Abbrechen" anbieten, hier steht auf dem Knopf, was er tut.
+//
+// Anders als dialogZeigen belegt es nicht den vorhandenen Dialog, sondern legt
+// ein eigenes Blatt an und raeumt es wieder weg - zwei der Rueckfragen kommen
+// aus einem offenen Dialog heraus. Die Klasse daten-dialog wird mitgenommen,
+// damit die Regeln fuer Druck und HTML-Kopie greifen, die es dort ausblenden
+// bzw. entfernen; der hoehere z-Wert legt die Rueckfrage darueber.
+//
+// Zurueck kommt ein Versprechen mit true (bestaetigt) oder false (abgelehnt).
+// Abgelehnt wird auch durch Escape - wie bei confirm(), wo Escape „Abbrechen"
+// entsprach. Der Fokus liegt auf dem abweisenden Knopf: die Rueckfrage steht
+// vor einer Handlung, die etwas verwirft, und die Eingabetaste soll dann nichts
+// ausloesen, was nicht ausdruecklich gewollt ist.
+function frage(titel, html, jaText, neinText='Abbrechen'){
+  return new Promise(res=>{
+    const back = document.createElement('div');
+    back.className = 'daten-dialog offen';
+    back.style.zIndex = '500';
+    back.setAttribute('role','dialog');
+    back.setAttribute('aria-modal','true');
+    back.innerHTML =
+      '<div class="dlg-blatt">' +
+        '<h3 class="dlg-kopf"></h3><div class="dlg-inhalt"></div>' +
+        '<div class="dlg-fuss">' +
+          '<button class="dlg-btn" data-w="nein"></button>' +
+          '<button class="dlg-btn dlg-ok dlg-warnung" data-w="ja"></button>' +
+        '</div>' +
+      '</div>';
+    back.querySelector('.dlg-kopf').textContent = titel;
+    back.querySelector('.dlg-inhalt').innerHTML = html;
+    const bJa = back.querySelector('[data-w="ja"]'), bNein = back.querySelector('[data-w="nein"]');
+    bJa.textContent = jaText;
+    bNein.textContent = neinText;
+    const zu = w => {
+      document.removeEventListener('keydown', escFrage, true);
+      back.remove();
+      res(w);
+    };
+    function escFrage(e){ if(e.key === 'Escape'){ e.stopPropagation(); zu(false); } }
+    bJa.onclick = () => zu(true);
+    bNein.onclick = () => zu(false);
+    document.addEventListener('keydown', escFrage, true);
+    document.body.appendChild(back);
+    bNein.focus();
+  });
+}
+
 // Vor jedem Wechsel: eine angefangene Aenderung wird nicht stillschweigend
 // fallengelassen. Auch der Excel-Eingang und das Entfernen eines Jahrgangs
 // fragen hier nach.
-function bearbFrei(){
+async function bearbFrei(){
   return !entwurfGeaendert() ||
-    confirm('Die begonnene Änderung ist noch nicht gespeichert. Soll sie verworfen werden?');
+    await frage('Begonnene Änderung verwerfen?',
+      '<p>Die begonnene Änderung ist noch nicht gespeichert. Beim Wechseln geht sie verloren.</p>',
+      'Verwerfen');
 }
 
 function bearbBeginn(auswahl, roh){
@@ -2929,8 +2983,8 @@ function bearbBeginn(auswahl, roh){
   render();
 }
 
-function bearbWaehle(titelId, index){
-  if(!bearbFrei()) return;
+async function bearbWaehle(titelId, index){
+  if(!await bearbFrei()) return;
   const t = JOURNALS.find(j=>j.id===titelId);
   const iss = t && t.issues[index];
   if(!iss) return;
@@ -2942,15 +2996,15 @@ function bearbWaehle(titelId, index){
 
 // Eine neue Ausgabe ist zunaechst nur ein leerer Entwurf. Angelegt wird sie
 // erst mit »Anlegen« - wie jede andere Aenderung auch.
-function bearbNeueAusgabe(titelId){
-  if(!bearbFrei()) return;
+async function bearbNeueAusgabe(titelId){
+  if(!await bearbFrei()) return;
   if(!JOURNALS.some(j=>j.id===titelId)) return;
   bearbBeginn({ art:'ausgabe', titelId, neu:true },
     { id:null, heft:'', et:'', as:'', du:'', eh:'', top:'', sw:'', a:[], b:[] });
 }
 
-function bearbWaehleTitel(titelId){
-  if(!bearbFrei()) return;
+async function bearbWaehleTitel(titelId){
+  if(!await bearbFrei()) return;
   const t = JOURNALS.find(j=>j.id===titelId);
   if(!t) return;
   // auflage bleibt hier Text: der Entwurf wird zum Vergleich als JSON
@@ -2961,8 +3015,8 @@ function bearbWaehleTitel(titelId){
       auflage:String(t.auflage||0), hex:t.hex||'#00285a' });
 }
 
-function bearbNeuerTitel(){
-  if(!bearbFrei()) return;
+async function bearbNeuerTitel(){
+  if(!await bearbFrei()) return;
   // Die Nummer bestimmt die Reihenfolge und wird ueber alle Jahrgaenge hinweg
   // vergeben - derselbe Titel traegt in 2026 und 2027 dieselbe.
   bearbBeginn({ art:'titel', neu:true },
@@ -2994,14 +3048,16 @@ function bearbZeileWeg(art, i){
   entwurf[art].splice(i,1);
   bearbFormNeu();
 }
-function bearbVerwerfen(){
+async function bearbVerwerfen(){
   if(!entwurf || !bearbAuswahl) return;
-  if(!confirm('Die begonnene Änderung verwerfen?')) return;
+  if(!await frage('Begonnene Änderung verwerfen?',
+    '<p>Die begonnene Änderung wird verworfen und der zuletzt gespeicherte Stand wieder angezeigt.</p>',
+    'Verwerfen')) return;
   const a = bearbAuswahl;
   entwurf = null; entwurfRein = null; bearbAuswahl = null;
   if(a.neu){ bearbStandText=''; bearbStandArt=''; render(); return; }
-  if(a.art==='titel') bearbWaehleTitel(a.titelId);
-  else                bearbWaehle(a.titelId, a.index);
+  if(a.art==='titel') await bearbWaehleTitel(a.titelId);
+  else                await bearbWaehle(a.titelId, a.index);
 }
 
 // Gespeichert werden kann nur, was sich geaendert hat und vollstaendig genug
@@ -3151,9 +3207,10 @@ async function ausgabeEntfernen(){
   const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
   const iss = t && t.issues[bearbAuswahl.index];
   if(!iss) return;
-  if(!confirm('Heft ' + iss.heft + ' von ' + t.short + ' wird aus der Datenbank '
-    + 'entfernt. Termine, Themen und Kongresseinträge dieser Ausgabe gehen '
-    + 'dabei verloren. Fortfahren?')) return;
+  if(!await frage('Ausgabe entfernen?',
+    '<p>Heft ' + esc(iss.heft) + ' von ' + esc(t.short) + ' wird aus der Datenbank entfernt.</p>' +
+    '<p>Termine, Themen und Kongresseinträge dieser Ausgabe gehen dabei verloren.</p>',
+    'Entfernen')) return;
   bearbArbeitet('Wird entfernt …');
   try{
     await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(iss.id),
@@ -3216,9 +3273,11 @@ async function titelEntfernen(){
     return;
   }
   const n = t.issues.length;
-  if(!confirm(t.short + ' wird aus dem Jahrgang ' + jahrgang() + ' entfernt, '
-    + 'mit ' + n + ' Ausgabe' + (n===1?'':'n') + '. Andere Jahrgänge bleiben '
-    + 'unberührt. Fortfahren?')) return;
+  if(!await frage('Titel entfernen?',
+    '<p>' + esc(t.short) + ' wird aus dem Jahrgang ' + esc(jahrgang()) + ' entfernt, mit <b>' +
+    n + '</b> Ausgabe' + (n===1?'':'n') + '.</p>' +
+    '<p>Andere Jahrgänge bleiben unberührt.</p>',
+    'Entfernen')) return;
   bearbArbeitet('Wird entfernt …');
   try{
     // Den Titel zu loeschen nimmt ueber den Fremdschluessel seine Ausgaben mit.
@@ -3297,9 +3356,10 @@ async function sicherungAnlegen(){
 }
 
 async function sicherungZurueck(id, wie){
-  if(!confirm('Der Jahrgang ' + jahrgang() + ' wird auf den Stand ' +
-              '»' + wie + '« zurückgesetzt. Alle seither vorgenommenen ' +
-              'Änderungen gehen dabei verloren. Fortfahren?')) return;
+  if(!await frage('Jahrgang zurücksetzen?',
+    '<p>Der Jahrgang ' + esc(jahrgang()) + ' wird auf den Stand »' + esc(wie) + '« zurückgesetzt.</p>' +
+    '<p>Alle seither vorgenommenen Änderungen gehen dabei verloren.</p>',
+    'Zurücksetzen')) return;
   try{
     bearbStand('Wird zurückgesetzt …', '');
     const treffer = await dbAnfrage('/rest/v1/sicherung?id=eq.' +
@@ -3327,8 +3387,10 @@ async function sicherungZurueck(id, wie){
 // ausgeduennt - ein bewusst gesetzter Punkt soll nicht hinter der Liste
 // verschwinden. Aufgeraeumt wird deshalb von Hand.
 async function sicherungEntfernen(id, wie){
-  if(!confirm('Der Sicherungspunkt »' + wie + '« wird entfernt. Der darin ' +
-              'gesicherte Stand ist danach nicht mehr zu erreichen. Fortfahren?')) return;
+  if(!await frage('Sicherungspunkt entfernen?',
+    '<p>Der Sicherungspunkt »' + esc(wie) + '« wird entfernt.</p>' +
+    '<p>Der darin gesicherte Stand ist danach nicht mehr zu erreichen.</p>',
+    'Entfernen')) return;
   try{
     await dbAnfrage('/rest/v1/sicherung?id=eq.' + encodeURIComponent(id),
       {method:'DELETE', headers:{Prefer:'return=minimal'}});
