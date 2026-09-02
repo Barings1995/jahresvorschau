@@ -346,6 +346,9 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .pr-stand{margin-top:6px;font-size:.72rem;color:var(--muted)}
 /* Eingabefelder im Dialog - bisher trug er nur Berichte, jetzt auch das
    Formular fuer einen neuen Jahrgang. */
+/* Der Erklaerungssatz ueber dem Feld im Eingabefenster. Ohne den Abstand klebt
+   die Beschriftung des Feldes daran - die Absaetze tragen sonst keinen. */
+.dlg-erklaerung{margin-bottom:11px}
 .dlg-feld{display:block;font-size:.7rem;font-weight:600;color:var(--navy);
   text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px}
 .dlg-feld input{display:block;width:100%;margin-top:4px;padding:6px 8px;
@@ -2965,6 +2968,53 @@ function frage(titel, html, jaText, neinText='Abbrechen'){
   });
 }
 
+// Eingabefenster, an der Stelle von prompt(). Aufbau wie frage(), nur mit einem
+// Textfeld zwischen Erklaerung und Knoepfen. Zurueck kommt der eingetippte Text
+// oder null, wenn abgebrochen wurde - genau wie bei prompt(). Leer ist erlaubt
+// und nicht dasselbe wie abgebrochen.
+// Die Eingabetaste im Feld bestaetigt, Escape bricht ab. Anders als bei der
+// Rueckfrage liegt der Fokus im Feld: hier wird etwas angelegt, nichts
+// verworfen, und der vorgeschlagene Text steht zum Ueberschreiben bereit.
+function eingabe(titel, erklaerung, beschriftung, vorgabe, jaText){
+  return new Promise(res=>{
+    const back = document.createElement('div');
+    back.className = 'daten-dialog offen';
+    back.style.zIndex = '500';
+    back.setAttribute('role','dialog');
+    back.setAttribute('aria-modal','true');
+    back.innerHTML =
+      '<div class="dlg-blatt">' +
+        '<h3 class="dlg-kopf"></h3>' +
+        '<div class="dlg-inhalt"><p class="dlg-erklaerung"></p>' +
+          '<label class="dlg-feld"><span></span><input type="text"></label></div>' +
+        '<div class="dlg-fuss">' +
+          '<button class="dlg-btn" data-w="nein">Abbrechen</button>' +
+          '<button class="dlg-btn dlg-ok" data-w="ja"></button>' +
+        '</div>' +
+      '</div>';
+    back.querySelector('.dlg-kopf').textContent = titel;
+    back.querySelector('.dlg-inhalt p').textContent = erklaerung;
+    back.querySelector('.dlg-feld span').textContent = beschriftung;
+    const feld = back.querySelector('input');
+    feld.value = vorgabe || '';
+    const bJa = back.querySelector('[data-w="ja"]'), bNein = back.querySelector('[data-w="nein"]');
+    bJa.textContent = jaText;
+    const zu = w => {
+      document.removeEventListener('keydown', escEingabe, true);
+      back.remove();
+      res(w);
+    };
+    function escEingabe(e){ if(e.key === 'Escape'){ e.stopPropagation(); zu(null); } }
+    feld.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); zu(feld.value); } };
+    bJa.onclick = () => zu(feld.value);
+    bNein.onclick = () => zu(null);
+    document.addEventListener('keydown', escEingabe, true);
+    document.body.appendChild(back);
+    feld.focus();
+    feld.select();
+  });
+}
+
 // Vor jedem Wechsel: eine angefangene Aenderung wird nicht stillschweigend
 // fallengelassen. Auch der Excel-Eingang und das Entfernen eines Jahrgangs
 // fragen hier nach.
@@ -3345,8 +3395,9 @@ async function sicherungSchreiben(y, wie){
 }
 
 async function sicherungAnlegen(){
-  const wie = prompt('Kurze Bezeichnung für den Sicherungspunkt:',
-                     'Stand ' + heute(new Date().toISOString().slice(0,10)));
+  const wie = await eingabe('Sicherungspunkt anlegen',
+    'Der Sicherungspunkt hält den heutigen Stand des Jahrgangs ' + jahrgang() + ' fest.',
+    'Bezeichnung', 'Stand ' + heute(new Date().toISOString().slice(0,10)), 'Anlegen');
   if(wie === null) return;
   try{
     await sicherungSchreiben(jahrgang(), wie.trim());

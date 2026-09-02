@@ -235,6 +235,22 @@ z-Wert (500 gegenüber 400) legt es darüber. In `baueKopie` wurde dafür
 `querySelector` auf `querySelectorAll` umgestellt — es kann jetzt mehr als ein
 Dialogblatt geben.
 
+## Eingaben
+
+Die letzte Stelle, die noch ein Fenster des Browsers zeigte, war die Bezeichnung
+beim Anlegen eines Sicherungspunkts (`prompt()`). Seit dem 02.09.2026 gilt dort
+`eingabe(titel, erklaerung, beschriftung, vorgabe, jaText)` — derselbe Aufbau wie
+`frage()`, nur mit einem Textfeld dazwischen. Zurück kommt der eingetippte Text
+oder `null` bei Abbruch.
+
+Vom `prompt()` übernommen: die Vorgabe steht markiert im Feld, der Fokus liegt im
+Feld statt auf einem Knopf, die Eingabetaste bestätigt, Escape bricht ab. Ein
+leeres Feld liefert `''` und ist nicht dasselbe wie abgebrochen.
+
+Damit kommt aus dem Werkzeug kein Fenster des Browsers mehr — abgesehen von der
+Warnung des Browsers selbst beim Verlassen der Seite, die kein Werkzeug ersetzen
+kann.
+
 ## Was unverändert geblieben ist
 
 Alle fünf Ansichten, die Mehrfachauswahl der Inhalte, Suche, Druckregeln,
