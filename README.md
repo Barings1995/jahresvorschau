@@ -208,10 +208,12 @@ Der Satzspiegel hat im Druck rechts ein Pixel Luft. Chrome zeichnet jede Kante
 auf ganze Pixel und rundet dabei auf: der Druckbereich ist 1039,39 px breit
 (quer, A4, 11 mm Rand), gezeichnet wurde bis 1040. Bei den waagerechten Linien —
 Kopflinie, Legende — fällt das nicht auf, sie werden nur um 0,6 px gekürzt. Der
-senkrechte rechte Rahmenstrich der Tabelle lag dagegen zu 61 % im Beschnitt und
-wirkte dünner als die drei übrigen. Mit dem Pixel Luft endet alles gemeinsam bei
-1039 px: der Strich steht ganz auf der Seite und bündig unter Kopflinie und
-Legende — gemessen im Quer- und im Hochformat, für Tabelle und Jahresmatrix. Der
+senkrechte rechte Rahmenstrich lag dagegen zu 61 % im Beschnitt und wirkte dünner
+als die drei übrigen — in der Tabelle ebenso wie an den Kacheln, den Zeilen der
+Monatsliste, den Kongresskästen und der Jahresmatrix. Mit dem Pixel Luft endet
+alles gemeinsam bei 1039 px: der Strich steht ganz auf der Seite und bündig unter
+Kopflinie und Legende — gemessen im Quer- und im Hochformat für alle fünf
+Ansichten. Der
 Abzug gehört an den Satzspiegel und nicht an die Tabelle; säße er an der Tabelle,
 endete sie 0,4 px vor den Linien darüber.
 
