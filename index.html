@@ -463,7 +463,8 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 
   /* ── Jahresmatrix ── */
   .matrixwrap{overflow:visible;padding:0}
-  table.matrix{min-width:0!important;width:100%;break-inside:avoid;font-size:8pt}
+  /* Ein Pixel schmaler - derselbe Grund wie bei der Tabelle weiter unten. */
+  table.matrix{min-width:0!important;width:calc(100% - 1px);break-inside:avoid;font-size:8pt}
   .mx-month,.mx-corner{background:none;border-bottom:1.5px solid var(--navy);font-size:7pt}
   .mx-title{font-size:7.5pt}
   .mx-chip{background:none;font-size:7.5pt;border:1px solid var(--border);border-left:3px solid var(--jcol,var(--navy))}
@@ -477,7 +478,12 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 
   /* ── Tabelle: Kopfzeile wiederholt sich auf jeder Seite ── */
   .tabwrap{overflow:visible}
-  table.tab{min-width:0!important;width:100%;font-size:7.5pt}
+  /* Ein Pixel schmaler als der Satzspiegel: Chrome rundet die Spaltenbreiten
+     einer Tabelle auf ganze Pixel auf, die Summe wurde dadurch breiter als der
+     Druckbereich (gemessen 1040 gegen 1039,39 px). Der rechte Rahmenstrich fiel
+     zu 61 % in den Beschnitt und wirkte duenner als die uebrigen drei; mit dem
+     Abzug steht er wieder ganz auf der Seite (gemessen quer und hoch). */
+  table.tab{min-width:0!important;width:calc(100% - 1px);font-size:7.5pt}
   table.tab thead{display:table-header-group}
   table.tab th{background:none;color:var(--navy);border-bottom:1.5px solid var(--navy);font-size:6.5pt;padding:5px 5px}
   /* Die Trennlinie steht im Druck UEBER der Zeile, nicht darunter: eine

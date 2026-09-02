@@ -204,6 +204,13 @@ Druck ist der untere Rand des Tabellenrahmens abgeschaltet: sonst stünden dort
 zwei Linien dicht beieinander und der Abschluss wirkte doppelt so stark wie die
 übrigen Linien.
 
+Tabelle und Jahresmatrix sind im Druck ein Pixel schmaler als der Satzspiegel.
+Chrome rundet die Spaltenbreiten einer Tabelle auf ganze Pixel auf; die Summe
+war dadurch breiter als der Druckbereich (gemessen 1040 gegen 1039,39 px im
+Querformat). Der rechte Rahmenstrich fiel zu 61 % in den Beschnitt und wirkte
+deshalb dünner als die drei übrigen. Mit dem Abzug steht er wieder ganz auf der
+Seite — gemessen im Quer- und im Hochformat.
+
 ## Meldungen
 
 Meldungen erscheinen im Werkzeug, nicht im Browser. Der Dialog (`dialogZeigen`)
