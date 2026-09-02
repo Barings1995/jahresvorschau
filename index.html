@@ -515,8 +515,17 @@ table.tab tbody tr:hover td{background:var(--surface2)}
      Marcus verworfen: die Kongressspalte haette 118 mm und nur 10 Umbrueche,
      dafuer wuerden Titel und Schwerpunkt deutlich haeufiger umbrechen. Einzug
      36 px passt zur 6pt-Beschriftung, die Fortsetzungszeile steht damit genau
-     unter dem Namen. */
-  .t-kong{font-size:7pt;min-width:0;width:38%}
+     unter dem Namen.
+     Die 0,1 Prozentpunkte obendrauf holen zurueck, was das Pixel Luft am
+     Satzspiegel (siehe main weiter oben) dieser Spalte genommen hat: 38 % von
+     einem Pixel sind 0,38 px, und daran haengt der Zeilenumbruch, auch wenn die
+     gezeichnete Spaltenkante gerundet gleich bleibt. Im Jahrgang 2027 brachen
+     dadurch drei Kongresseintraege zusaetzlich um und die Tabelle wuchs von
+     sechs auf sieben Seiten. 38,1 % geben der Spalte gut 1 px zurueck, das
+     Zweieinhalbfache des Verlorenen; die Innenabstaende bleiben ueberall bei
+     5 px, sodass nichts unsymmetrisch wird. An der Abwaegung 38 gegen 45 %
+     aendert das nichts - die ging um 27 mm. */
+  .t-kong{font-size:7pt;min-width:0;width:38.1%}
   .t-kong .ke{padding-left:36px;text-indent:-36px}
   .t-kong .ke b{font-size:6pt;min-width:0}
   .t-thema{min-width:0}

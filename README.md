@@ -217,6 +217,16 @@ Ansichten. Der
 Abzug gehört an den Satzspiegel und nicht an die Tabelle; säße er an der Tabelle,
 endete sie 0,4 px vor den Linien darüber.
 
+Die Kongressspalte steht deshalb auf 38,1 % statt auf 38 %. Das Pixel Luft nimmt
+ihr 0,38 px, und daran hängt der Zeilenumbruch, auch wenn die gezeichnete
+Spaltenkante gerundet gleich bleibt: im Jahrgang 2027 brachen dadurch drei
+Kongresseinträge zusätzlich um, und die Tabelle wuchs von sechs auf sieben
+Seiten. 38,1 % geben der Spalte gut 1 px zurück — das Zweieinhalbfache des
+Verlorenen. Die Innenabstände bleiben überall bei 5 px, links wie rechts, damit
+nichts unsymmetrisch wird; die übrigen Spalten geben zusammen das eine Pixel ab.
+An der seinerzeit gemessenen Abwägung 38 gegen 45 % ändert das nichts — die ging
+um 27 mm Spaltenbreite.
+
 ## Meldungen
 
 Meldungen erscheinen im Werkzeug, nicht im Browser. Der Dialog (`dialogZeigen`)
