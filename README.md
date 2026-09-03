@@ -110,6 +110,15 @@ keine falsche Meldung: die zwei AEK-Schreibweisen, der MDS-Eintrag mit dem
 Termin aus 2026 im Jahrgang 2027, und über den Umweg des Abstands der
 Anzeigenschluss »25.10.2927« bei Im Fokus Onkologie Heft 11.
 
+Werden die gemeldeten Stellen vor dem Übernehmen von Hand berichtigt, wirkt das
+sofort: solange ein Jahrgang noch nicht umgestellt ist, ist seine Kongressliste
+nur eine Ableitung der beiden Textspalten, und ein Kongress, der beim Ändern
+einer Ausgabe seine letzte Zuordnung verliert, fällt mit weg. Sonst stünde er
+bis zum Neuladen weiter im Bericht und käme beim Umstellen sogar als Kongress
+ohne Ausgabe in die Datenbank. Nach der Umstellung fällt hier nichts mehr weg —
+dort ist ein Kongress ohne Ausgabe gewollt: ein aus dem Vorjahr übernommener
+oder ein neu angelegter, dem noch kein Heft zugeordnet ist.
+
 Sind alle Jahrgänge umgestellt und nachgesehen, können die beiden Spalten
 entfallen:
 

@@ -1125,6 +1125,27 @@ function setzeKongresse(jahrgang){
   KONG = new Map(((jahrgang && jahrgang.kongresse) || []).map(k=>[k.id,k]));
 }
 
+// Vor der Umstellung ist die Kongressliste nur eine Ableitung der beiden
+// Textspalten - ein Neuladen baut sie aus ihnen neu auf. Wird eine Ausgabe
+// geaendert oder entfernt, kann ein Satz dabei seine letzte Zuordnung
+// verlieren. Er stuende sonst bis zum Neuladen weiter im Umstellungsbericht
+// und wanderte beim Umstellen sogar als Kongress ohne Ausgabe in die
+// Datenbank. Nach der Umstellung wird hier nichts entfernt: dort ist ein
+// Kongress ohne Ausgabe gewollt - ein aus dem Vorjahr uebernommener oder ein
+// neu angelegter, dem noch kein Heft zugeordnet ist.
+function kongresseAufraeumen(){
+  const j = DATEN[jahr];
+  if(!j || j.umgestellt || !j.kongresse) return;
+  const benutzt = new Set();
+  (j.titel||[]).forEach(t=>(t.issues||[]).forEach(iss=>{
+    (iss.a||[]).forEach(id=>benutzt.add(id));
+    (iss.b||[]).forEach(id=>benutzt.add(id));
+  }));
+  if(j.kongresse.every(k=>benutzt.has(k.id))) return;
+  j.kongresse = j.kongresse.filter(k=>benutzt.has(k.id));
+  setzeKongresse(j);
+}
+
 const MONATE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const MON_KURZ=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 
@@ -3668,6 +3689,7 @@ function entwurfInAusgabe(iss){
   iss.top = entwurf.top; iss.sw = entwurf.sw;
   iss.a = kongressKennungen(entwurf.a);
   iss.b = kongressKennungen(entwurf.b);
+  kongresseAufraeumen();
   entwurf.a = iss.a.map(kongressText); entwurf.b = iss.b.map(kongressText);
   entwurfRein = JSON.stringify(entwurf);
 }
@@ -3781,6 +3803,7 @@ async function ausgabeEntfernen(){
     await dbAnfrage('/rest/v1/ausgabe?id=eq.'+encodeURIComponent(iss.id),
       { method:'DELETE', headers:{ Prefer:'return=minimal' } });
     t.issues.splice(bearbAuswahl.index,1);
+    kongresseAufraeumen();
     GESAMT = JOURNALS.reduce((n,j)=>n+j.issues.length,0);
     entwurf=null; entwurfRein=null; bearbAuswahl=null;
     mxSel.clear();
@@ -3850,6 +3873,7 @@ async function titelEntfernen(){
       +'&id=eq.'+encodeURIComponent(t.id),
       { method:'DELETE', headers:{ Prefer:'return=minimal' } });
     JOURNALS.splice(JOURNALS.indexOf(t),1);
+    kongresseAufraeumen();
     GESAMT = JOURNALS.reduce((x,j)=>x+j.issues.length,0);
     activeJ.delete(t.id);
     mxSel.clear();
