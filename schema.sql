@@ -101,6 +101,12 @@ create table if not exists kongress (
   unscharf     text        not null default '',
   ort          text        not null default '',
   geaendert_am timestamptz not null default now(),
+  -- Beim Jahreswechsel uebernommene Titelverteilung, solange keine Ausgabe
+  -- dafuer steht: [{"titel_id":3,"art":"auslage"}, ...]. Reine Anzeigehilfe -
+  -- die Matrix markiert ein Feld als offene Arbeit, wenn es hier steht und
+  -- noch keine Zeile in kongress_ausgabe dafuer existiert. Nichts anderes
+  -- liest dieses Feld; ausser beim Uebernehmen schreibt nichts hinein.
+  erwartet     jsonb       not null default '[]',
   check (bis is null or von is null or bis >= von),
   check (unscharf = '' or von is null)
 );

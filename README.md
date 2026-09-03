@@ -114,6 +114,46 @@ entfallen:
 alter table ausgabe drop column auslagen, drop column berichte;
 ```
 
+### Bearbeiten und Vorjahresübernahme
+
+In der Kongressmatrix öffnet ein Klick auf die Kongresszeile selbst — nicht auf
+ein Titelfeld — ein Formular für Name, Kurzname, Zeitraum (genau oder als
+Wortlaut wie »September 2027«) und Ort. Anders als die Heftzuordnung schreibt
+es nicht bei jedem Zeichen, sondern erst mit *Speichern*: mehrere Felder
+gehören zu einer Änderung. *Entfernen* steht nur, solange der Kongress keinem
+Heft zugeordnet ist — etwa bei einer doppelten Schreibweise.
+
+Ohne dieses Formular gäbe es keinen Weg, einem übernommenen Kongress ohne
+Termin nachträglich einen zu geben: die Ausgabenseite hätte bei jeder Änderung
+des zusammengesetzten Wortlauts einen zweiten Kongress angelegt statt den
+vorhandenen zu ändern.
+
+*Jahrgang anlegen* (Menü *Daten*) übernimmt auf Wunsch zusätzlich die
+Kongresse des gewählten Vorlage-Jahrgangs — Name, Kurzname, Ort; Zeitraum und
+Heftzuordnung bleiben offen. Mitgegeben wird auch, welcher Titel den Kongress
+zuletzt in welcher Art führte: Die Kongressmatrix zeigt das als hohles Dreieck
+oder Quadrat im sonst leeren Feld, solange keine Ausgabe gewählt ist — eine
+Erwartung, keine Zuordnung. Erst ein gewähltes Heft ersetzt sie durch die
+gefüllte Form. Die Kopfzeile der Matrix zählt die noch offenen Felder mit.
+
+### Ausgabe für die Datenpflege
+
+*Daten → Kongresse für die Datenpflege* gibt den Jahrgang als Excel-Datei aus,
+im Aufbau des Blattes »Termine« von `Angebotsdaten.xlsx` — Jahrgang, Titel,
+Heft, Monat, ET, AS, DU-Schluss, EH-Termin, Themenschwerpunkte und, in der
+letzten Spalte, die Kongresszeile in deren Schreibweise: `Kurzname (Auslage),
+Zeitraum, Ort`, mehrere Kongresse einer Ausgabe je eine eigene Zeile. Ein
+Kongress ohne Termin trägt kein Datum, das sich einsetzen ließe, und bleibt
+darin aus — der Bericht nennt, wie viele das betrifft.
+
+Innerhalb einer bearbeiteten Ausgabe kopiert *Kongresszeile für die
+Datenpflege kopieren* nur deren eigene Zeile in die Zwischenablage; das bezieht
+sich auf den gespeicherten Stand, nicht auf eine noch offene Änderung.
+
+Beides schreibt nicht in die Angebotswerkzeuge zurück — kein zweiter
+Datenbankschlüssel, kein Schreibzugriff über Projektgrenzen. Das Ergebnis wird
+abgelegt und von Hand übernommen.
+
 ## Bearbeiten
 
 Der Arbeitsschirm steht im Menü *Daten* an erster Stelle, nicht in der

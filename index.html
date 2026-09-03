@@ -697,6 +697,9 @@ p.bearb-stand:not(:empty){margin-top:9px}
   padding:9px 6px 7px;border-bottom:1px solid var(--border)}
 .mx-tab td{border-bottom:1px solid var(--surface3);vertical-align:top;padding:5px 4px}
 .mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;min-width:220px}
+.mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
+.mx-lblklick:hover{background:var(--navy-faint)}
+.mx-lblklick.offen{background:var(--navy-faint);box-shadow:inset 0 0 0 1.5px var(--navy)}
 .mx-name{color:var(--text)}
 .mx-info{font-size:.7rem;color:var(--muted);margin-top:1px}
 .mx-gruppe{padding:9px 10px 5px!important;font-size:.7rem;color:var(--muted);
@@ -707,8 +710,9 @@ p.bearb-stand:not(:empty){margin-top:9px}
   align-items:center;padding:3px;border-radius:4px;cursor:pointer}
 .mx-zelle:hover{background:var(--navy-faint)}
 .mx-zelle.offen{background:var(--navy-faint);box-shadow:inset 0 0 0 1.5px var(--navy)}
-.mx-chip{display:inline-flex;align-items:center;gap:2px;font-size:.72rem;
+.kmx-chip{display:inline-flex;align-items:center;gap:2px;font-size:.72rem;
   color:var(--text);white-space:nowrap}
+.mx-erwartet{display:inline-flex;align-items:center;opacity:.7}
 .mx-panel{margin-top:12px;background:var(--surface);border:1px solid var(--border);
   border-radius:6px;padding:14px 18px}
 .mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
@@ -842,6 +846,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
         <button class="ex-item" id="kongUmstellenBtn" role="menuitem" onclick="kongresseUmstellen()">
           <span class="ex-t" id="kongUmstellenText">Kongresse umstellen</span>
           <span class="ex-d">Legt jeden Kongress des Jahrgangs einmal an, statt ihn in jeder Ausgabe erneut zu f&uuml;hren. Zeigt vorher, was dabei auff&auml;llt; ein Sicherungspunkt entsteht ohne Zutun</span>
+        </button>
+        <button class="ex-item" role="menuitem" onclick="datenpflegeExport()">
+          <span class="ex-t">Kongresse für die Datenpflege</span>
+          <span class="ex-d">Gibt je Ausgabe die Kongresszeile in der Schreibweise der Angebotswerkzeuge aus, als Excel-Datei im Aufbau des Blattes &raquo;Termine&laquo;</span>
         </button>
         <button class="ex-item" id="entfernenBtn" role="menuitem" onclick="jahrgangEntfernen()" disabled>
           <span class="ex-t" id="entfernenText">Jahrgang entfernen</span>
@@ -2613,6 +2621,7 @@ async function jahrgangAnlegen(){
   const zahlen = da.map(Number).filter(n=>!isNaN(n));
   const vorschlag = String((zahlen.length ? Math.max(...zahlen) : new Date().getFullYear()) + 1);
   const anzahl = (DATEN[vorlage] ? DATEN[vorlage].titel.length : 0);
+  const kAnzahl = (DATEN[vorlage] ? (DATEN[vorlage].kongresse||[]).length : 0);
   dialogZeigen('Jahrgang anlegen',
     `<label class="dlg-feld">Jahr
        <input type="text" id="njJahr" inputmode="numeric" maxlength="4"
@@ -2629,6 +2638,15 @@ async function jahrgangAnlegen(){
            in der Bearbeiten-Ansicht.</div>`
       : `<div class="pr-hinw">Der gezeigte Jahrgang führt keine Titel, die zu
            übernehmen wären.</div>`)
+    +(kAnzahl
+      ? `<label class="dlg-haken"><input type="checkbox" id="njKongresse" checked>
+           <span>Die ${kAnzahl} Kongresse aus Jahrgang ${escA(vorlage)} übernehmen –
+           ohne Termin und ohne Heftzuordnung</span></label>
+         <div class="pr-hinw">Name und Ort kommen mit; Zeitraum und Anlage in ein
+           Heft bleiben offen und wollen recherchiert werden. Welcher Titel den
+           Kongress zuletzt führte, steht in der Kongressmatrix als Hinweis, bis
+           eine Ausgabe dafür gewählt ist.</div>`
+      : '')
     +`<div class="pr-stand">Hefte werden nicht übernommen: der Jahrgang
         entsteht leer und wird über »+ Ausgabe« gefüllt. Ein vollständiger
         Jahrgang ist über »Aus Excel laden« schneller angelegt.</div>`,
@@ -2666,6 +2684,11 @@ async function jahrgangAnlegenAusfuehren(vorlage){
         }catch(e2){}
         throw fehler;
       }
+    }
+    const kHaken = document.getElementById('njKongresse');
+    if(KONG_TABELLEN && kHaken && kHaken.checked && DATEN[vorlage]){
+      ladeStand(`Jahrgang ${y}: Kongresse werden übernommen …`);
+      await kongresseAusVorjahrUebernehmen(y, vorlage);
     }
     DATEN = await datenHolen();
     dialogSchliessen();
@@ -2944,26 +2967,26 @@ function excelBlaetter(q){
 
   const eintraege=[];
   items.forEach(({j,iss})=>{
-    if(zeigeA) iss.a.forEach(n=>{const t=kongressText(n);
-      eintraege.push({name:kongName(t),art:'Auslage',j,iss,roh:t});});
-    if(zeigeB) iss.b.forEach(n=>{const t=kongressText(n);
-      eintraege.push({name:kongName(t),art:'Bericht',j,iss,roh:t});});
+    if(zeigeA) iss.a.forEach(n=>{const k=KONG.get(n); if(!k) return;
+      eintraege.push({name:kongName(k.lang),art:'Auslage',j,iss,k});});
+    if(zeigeB) iss.b.forEach(n=>{const k=KONG.get(n); if(!k) return;
+      eintraege.push({name:kongName(k.lang),art:'Bericht',j,iss,k});});
   });
   const rubrik=n=>n.startsWith('»')?1:0;
   eintraege.sort((a,b)=>rubrik(a.name)-rubrik(b.name)
     || a.name.localeCompare(b.name,'de') || a.iss.et.localeCompare(b.iss.et));
 
-  // Spalte "Kongress" traegt den Wortlaut der Heftplanung – damit ist eine eigene
-  // Spalte dafuer entbehrlich. Anders als am Bildschirm steht bei der festen
-  // Rubrik auch hier die Planungsfassung samt Autor: in einer filterbaren
-  // Tabelle nuetzt sie mehr als der Hinweis "feste Rubrik".
-  const kopf2=['Kongress','Art','Titel','Heft','Erscheinungstermin (ET)',
-    'Anzeigenschluss (AS)','Druckunterlagen (DU)',
+  // Kongress, Zeitraum und Ort stehen in eigenen Spalten - anders als am
+  // Bildschirm, wo der zusammengesetzte Wortlaut steht. In einer Tabelle
+  // nuetzt getrennt mehr: sie laesst sich nach Ort oder Zeitraum filtern.
+  const kopf2=['Kongress','Zeitraum','Ort','Art','Titel','Heft',
+    'Erscheinungstermin (ET)','Anzeigenschluss (AS)','Druckunterlagen (DU)',
     'Ein-/Durchhefter und Beilagen (EH)','Auflage'];
-  const breiten2=[56,10,40,7,13,13,13,16,9];
+  const breiten2=[52,15,20,10,40,7,13,13,13,16,9];
   if(zeigeT){ kopf2.push('Schwerpunkt'); breiten2.push(44); }
   const zeilen2=eintraege.map(e=>{
-    const z=[{w:e.roh},{w:e.art},{w:e.j.short},{w:e.iss.heft},
+    const z=[{w:e.k.lang},{w:kongressZeitraum(e.k)},{w:e.k.ort||''},{w:e.art},
+      {w:e.j.short},{w:e.iss.heft},
       {w:excelDatum(e.iss.et),t:'n',s:2},{w:excelDatum(e.iss.as),t:'n',s:2},
       {w:excelDatum(e.iss.du),t:'n',s:2},{w:excelDatum(e.iss.eh),t:'n',s:2},
       {w:e.j.auflage,t:'n'}];
@@ -3028,6 +3051,142 @@ function baueXlsx(q){
 
   const enc=new TextEncoder();
   return zipBauen(teile.map(t=>({name:t.name,bytes:enc.encode(t.text)})));
+}
+
+// ─── Ausgabe fuer die Datenpflege ──────────────────────────────────────────
+// Die Kongresse stehen doppelt: hier vollstaendig mit langem Namen und
+// getrennt nach Auslage/Bericht, in der Datenpflege der Angebotswerkzeuge kurz
+// und in einer Zelle je Ausgabe. Dieser Weg erzeugt die Zelle - kein zweiter
+// Datenbankschluessel, kein Schreibzugriff ueber Projektgrenzen: das Ergebnis
+// wird abgelegt und von Hand uebernommen.
+//
+// Ein Kongress ohne Termin traegt kein Datum, das sich in die Zeile setzen
+// liesse - er faellt hier aus und zaehlt im Bericht mit.
+function dpZeile(k, art){
+  if(!k || (!k.von && !k.unscharf)) return null;
+  const teile = [`${k.kurz||k.lang} (${art})`, kongressZeitraum(k)];
+  if(k.ort) teile.push(k.ort);
+  return teile.join(', ');
+}
+
+function dpKongressText(iss){
+  const zeilen = [];
+  (iss.a||[]).forEach(id=>{ const z=dpZeile(KONG.get(id),'Auslage'); if(z) zeilen.push(z); });
+  (iss.b||[]).forEach(id=>{ const z=dpZeile(KONG.get(id),'Bericht'); if(z) zeilen.push(z); });
+  return zeilen.join('\n');
+}
+
+// TT.MM., ohne Jahr - wie in Angebotsdaten.xlsx, ausser der Termin liegt
+// ausserhalb des Jahrgangs: dann traegt er die zweistellige Jahreszahl.
+function dpTermin(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return y===jahr ? `${d}.${m}.` : `${d}.${m}.${y.slice(2)}`;
+}
+
+function dpMonat(iso){
+  if(!iso) return '';
+  return MONATE[Number(iso.slice(5,7))-1] || '';
+}
+
+function datenpflegeBlatt(){
+  const kopf = ['Jahrgang','Titel','Heft','Monat','ET','AS','DU-Schluss','EH-Termin',
+    'Themenschwerpunkte','Kongresse'];
+  const breiten = [9,40,7,10,9,9,10,10,40,60];
+  const zeilen = [];
+  let mitKongress=0, ohneTermin=0;
+  JOURNALS.forEach(t=>t.issues.forEach(iss=>{
+    const text = dpKongressText(iss);
+    if(text) mitKongress++;
+    [...(iss.a||[]),...(iss.b||[])].forEach(id=>{
+      const k=KONG.get(id); if(k && !k.von && !k.unscharf) ohneTermin++;
+    });
+    zeilen.push([{w:jahr},{w:t.short},{w:iss.heft},{w:dpMonat(iss.et)},
+      {w:dpTermin(iss.et)},{w:dpTermin(iss.as)},{w:dpTermin(iss.du)},{w:dpTermin(iss.eh)},
+      {w:themaText(iss)},{w:text}]);
+  }));
+  const vorspann=[
+    [`Kongresse für die Datenpflege — Jahrgang ${jahr}`,4],
+    [`Angebotswerkzeuge, Blatt „Termine", Spalte „Kongresse" (J)`,0],
+    [`Erzeugt aus der Jahresvorschau, Stand ${standText()}`,5]
+  ];
+  return {xml: blattXml(breiten,vorspann,kopf,zeilen), ausgaben:zeilen.length,
+    mitKongress, ohneTermin};
+}
+
+// Eigene, schlanke Zip-Verpackung statt baueXlsx wiederzuverwenden: ein Blatt,
+// kein zweites, keine Bedingungen - so bleibt der geprüfte Excel-Export
+// unangetastet.
+function baueDatenpflegeXlsx(blattXmlText){
+  const NS='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const teile=[
+    {name:'[Content_Types].xml', text:
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
+      `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">`+
+      `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>`+
+      `<Default Extension="xml" ContentType="application/xml"/>`+
+      `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>`+
+      `<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`+
+      `<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>`+
+      `</Types>`},
+    {name:'_rels/.rels', text:
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
+      `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`+
+      `<Relationship Id="rId1" Type="${NS}/officeDocument" Target="xl/workbook.xml"/>`+
+      `</Relationships>`},
+    {name:'xl/workbook.xml', text:
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
+      `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="${NS}">`+
+      `<sheets><sheet name="Termine" sheetId="1" r:id="rId1"/></sheets></workbook>`},
+    {name:'xl/_rels/workbook.xml.rels', text:
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
+      `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`+
+      `<Relationship Id="rId1" Type="${NS}/worksheet" Target="worksheets/sheet1.xml"/>`+
+      `<Relationship Id="rId9" Type="${NS}/styles" Target="styles.xml"/>`+
+      `</Relationships>`},
+    {name:'xl/styles.xml', text:XLSX_STYLES},
+    {name:'xl/worksheets/sheet1.xml', text:blattXmlText}
+  ];
+  const enc=new TextEncoder();
+  return zipBauen(teile.map(t=>({name:t.name,bytes:enc.encode(t.text)})));
+}
+
+async function datenpflegeExport(){
+  schliesseDaten();
+  const b = datenpflegeBlatt();
+  const bytes = baueDatenpflegeXlsx(b.xml);
+  const url = URL.createObjectURL(new Blob([bytes.buffer||bytes],
+    {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  const a = document.createElement('a');
+  a.href=url; a.download=`Kongresse_Datenpflege_${jahr}.xlsx`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  const hinweis = b.ohneTermin
+    ? ` ${b.ohneTermin} Kongresseintr${b.ohneTermin===1?'ag':'äge'} ohne Termin fehlen darin - sie lassen sich erst nach der Recherche mitgeben.`
+    : '';
+  dialogZeigen('Datenpflege',
+    `<p>${b.mitKongress} von ${b.ausgaben} Ausgaben tragen mindestens einen Kongress.</p>`+
+    `<p>Die Datei „Kongresse_Datenpflege_${esc(jahr)}.xlsx" steht im Download-Ordner bereit,`+
+    ` im Aufbau des Blattes „Termine": Jahrgang, Titel und Heft führen die Zeile,`+
+    ` die letzte Spalte trägt den Wortlaut für die Spalte „Kongresse".${hinweis}</p>`,
+    'Schließen');
+}
+
+// Zwischenablage fuer die gerade bearbeitete Ausgabe - der schnellere Weg,
+// wenn nur eine einzelne Zeile gebraucht wird.
+async function dpZeileKopieren(){
+  if(!bearbAuswahl || bearbAuswahl.art!=='ausgabe' || bearbAuswahl.neu) return;
+  const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
+  const iss = t && t.issues[bearbAuswahl.index];
+  if(!iss) return;
+  const text = dpKongressText(iss);
+  if(!text) return bearbStand('Diese Ausgabe führt keinen Kongress mit Termin.', 'schlecht');
+  try{
+    await navigator.clipboard.writeText(text);
+    bearbStand('In die Zwischenablage kopiert', 'gut');
+  }catch(fehler){
+    bearbStand('Kopieren nicht möglich - der Browser hat es verweigert.', 'schlecht');
+  }
 }
 
 function exportExcel(){
@@ -3887,6 +4046,9 @@ function formAusgabeHtml(){
 
     ${zeilenGruppe('a','Kongressauslagen','Diese Ausgabe liegt auf dem Kongress aus')}
     ${zeilenGruppe('b','Kongressberichte','Über den Kongress wird berichtet')}
+    ${neu ? '' : `<button type="button" class="bearb-zu" onclick="dpZeileKopieren()"
+        title="Kopiert die Kongresszeile dieser Ausgabe in der Schreibweise der Angebotswerkzeuge – bezieht sich auf den gespeicherten Stand, nicht auf eine noch offene Änderung">
+        Kongresszeile für die Datenpflege kopieren</button>`}
 
     ${bearbFussHtml(neu ? 'Anlegen' : 'Speichern', neu ? '' :
       `<button type="button" class="bearb-loeschen" onclick="ausgabeEntfernen()">
@@ -4005,20 +4167,42 @@ function mxZelle(k, t){
 
 const MX_AUSLAGE = '<svg width="7" height="7" viewBox="0 0 10 10" aria-hidden="true"><polygon points="0,0 10,5 0,10" fill="var(--accent)"/></svg>';
 const MX_BERICHT = '<svg width="6" height="6" viewBox="0 0 10 10" aria-hidden="true"><rect width="10" height="10" rx="1" fill="var(--navy)"/></svg>';
+// Hohle Fassung derselben Zeichen: die vom Vorjahr erwartete Titelverteilung,
+// solange noch kein Heft dafuer steht.
+const MX_AUSLAGE_OFFEN = '<svg width="7" height="7" viewBox="0 0 10 10" aria-hidden="true"><polygon points="0.8,1.2 9,5 0.8,8.8" fill="none" stroke="var(--muted)" stroke-width="1.3"/></svg>';
+const MX_BERICHT_OFFEN = '<svg width="6" height="6" viewBox="0 0 10 10" aria-hidden="true"><rect x="0.8" y="0.8" width="8.4" height="8.4" rx="1" fill="none" stroke="var(--muted)" stroke-width="1.3"/></svg>';
+
+// Welche vom Vorjahr erwarteten (Titel, Art)-Paare dieses Kongresses noch
+// kein Heft tragen. Nur diese - nicht jedes leere Feld - gelten als offene
+// Arbeit; ein leeres Feld ohne Erwartung ist schlicht nicht vorgesehen.
+function mxErwartetOffen(k, t){
+  const erwartet = (k.erwartet||[]).filter(e=>e.titel_id===t.id).map(e=>e.art);
+  if(!erwartet.length) return [];
+  const belegt = new Set(mxZelle(k,t).map(x=>x.art));
+  return [...new Set(erwartet)].filter(art=>!belegt.has(art));
+}
 
 function mxZeitraum(k){ return kongressZeitraum(k); }
 
 function mxZeileHtml(k, offen){
   const zellen = JOURNALS.map(t=>{
     const treffer = mxZelle(k,t);
-    const chips = treffer.map(x=>`<span class="mx-chip">${x.art==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(x.heft)}</span>`).join('');
+    const chips = treffer.map(x=>`<span class="kmx-chip">${x.art==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(x.heft)}</span>`).join('');
+    const erw = mxErwartetOffen(k,t).map(art=>
+      `<span class="mx-erwartet" title="${art==='auslage'?'Auslage':'Bericht'} vom Vorjahr erwartet, noch kein Heft">${
+        art==='auslage'?MX_AUSLAGE_OFFEN:MX_BERICHT_OFFEN}</span>`).join('');
     const on = offen && offen.kongressId===k.id && offen.titelId===t.id;
     return `<td style="text-align:center"><div class="mx-zelle${on?' offen':''}" role="button" tabindex="0"
       onclick="mxOeffnen('${k.id}',${t.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
-      aria-label="${escA(t.short)}, ${escA(k.lang)}">${chips}</div></td>`;
+      aria-label="${escA(t.short)}, ${escA(k.lang)}">${chips}${erw}</div></td>`;
   }).join('');
-  return `<tr><td class="mx-lbl"><div class="mx-name">${esc(k.lang)}</div>
-    <div class="mx-info">${esc(mxZeitraum(k))}${k.ort?' · '+esc(k.ort):''}</div></td>${zellen}</tr>`;
+  const lblOffen = offen && offen.kongressId===k.id && offen.titelId===null;
+  return `<tr><td class="mx-lbl"><div class="mx-lblklick${lblOffen?' offen':''}" role="button" tabindex="0"
+      onclick="mxOeffnenKongress('${k.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
+      title="Name, Zeitraum und Ort dieses Kongresses bearbeiten">
+      <div class="mx-name">${esc(k.lang)}</div>
+      <div class="mx-info">${esc(mxZeitraum(k))}${k.ort?' · '+esc(k.ort):''}</div>
+    </div></td>${zellen}</tr>`;
 }
 
 function renderKongressmatrix(){
@@ -4032,6 +4216,12 @@ function renderKongressmatrix(){
 
   const belegt = JOURNALS.reduce((s,t)=>s+t.issues.reduce((n,iss)=>
     n + (iss.a||[]).length + (iss.b||[]).length, 0), 0);
+  // Zaehlung fuer den Kopf: nur Felder mit einer noch offenen Erwartung aus
+  // dem Vorjahr - erscheint erst, sobald es sie gibt.
+  let offeneFelder = 0;
+  [...ohne, ...mit].forEach(k=>JOURNALS.forEach(t=>{
+    if(mxErwartetOffen(k,t).length) offeneFelder++;
+  }));
   const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map(t=>
     `<th style="border-bottom:2px solid ${escA(t.hex)}">${esc(t.short)}</th>`).join('')}</tr>`;
 
@@ -4049,7 +4239,8 @@ function renderKongressmatrix(){
   const panel = mxAuswahl ? mxPanelHtml() : '';
   return `<div class="mx-kopf">
       <div class="mx-titel-kl">Jahrgang ${esc(jahr)}</div>
-      <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} belegte Felder</div>
+      <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} belegte Felder${
+        offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
     </div>
     <div class="mx-scroll"><table class="mx-tab">
       <thead>${kopf}</thead><tbody>${zeilen}</tbody>
@@ -4059,6 +4250,7 @@ function renderKongressmatrix(){
 
 // ── Heftwahl ────────────────────────────────────────────────────────────────
 function mxOeffnen(kongressId, titelId){
+  mxKongEntwurf = null;
   mxAuswahl = (mxAuswahl && mxAuswahl.kongressId===kongressId && mxAuswahl.titelId===titelId)
     ? null : {kongressId, titelId};
   render();
@@ -4068,16 +4260,22 @@ function mxOeffnen(kongressId, titelId){
   }
 }
 
-function mxSchliessen(){ mxAuswahl = null; render(); }
+function mxSchliessen(){ mxAuswahl = null; mxKongEntwurf = null; render(); }
 
 function mxTage(a,b){ return Math.round((new Date(a) - new Date(b)) / 864e5); }
 
 function mxPanelHtml(){
   const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
+  if(!k){ mxAuswahl=null; return ''; }
+  if(mxAuswahl.titelId===null) return mxKongFormHtml(k);
   const t = JOURNALS.find(x=>x.id===mxAuswahl.titelId);
-  if(!k || !t){ mxAuswahl=null; return ''; }
+  if(!t){ mxAuswahl=null; return ''; }
 
+  const erwOffen = mxErwartetOffen(k,t);
   const kein = !k.von ? `<div class="mx-hinweis">Kein Tagesdatum hinterlegt — es wird kein Abstand gerechnet.</div>` : '';
+  const erwHinweis = erwOffen.length
+    ? `<div class="mx-hinweis">Vom Vorjahr erwartet: ${erwOffen.map(a=>a==='auslage'?'Auslage':'Bericht').join(', ')}
+        &ndash; noch kein Heft gewählt.</div>` : '';
   let vor='', nach='';
   t.issues.forEach(iss=>{
     const istA = (iss.a||[]).includes(k.id), istB = (iss.b||[]).includes(k.id);
@@ -4114,7 +4312,7 @@ function mxPanelHtml(){
         <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
       <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
     </div>
-    ${kein}${vor}${trenn}${nach}
+    ${kein}${erwHinweis}${vor}${trenn}${nach}
     <p class="bearb-stand" id="bearbStand"></p>
   </div>`;
 }
@@ -4140,7 +4338,116 @@ async function mxToggle(kongressId, titelId, heft, art){
     bearbStand(fehlertext(fehler), 'schlecht');
   }
 }
+// ── Kongress-Metadaten bearbeiten ───────────────────────────────────────────
+// Ohne dies gaebe es keinen Weg, einem uebernommenen Kongress ohne Termin
+// (siehe "Termin fehlt") Zeitraum und Ort nachzutragen: die Ausgabenseite
+// haette bei jeder Aenderung des Wortlauts einen zweiten Kongress angelegt,
+// statt den vorhandenen zu aendern. Ein Klick auf die Kongresszeile selbst
+// (nicht auf ein Titelfeld) oeffnet dieses Formular; anders als die
+// Heftzuordnung schreibt es nicht bei jedem Zeichen, sondern erst mit
+// "Speichern" - mehrere Felder gehoeren zu einer Aenderung.
+let mxKongEntwurf = null;
 
+function mxOeffnenKongress(kongressId){
+  mxKongEntwurf = null;
+  if(mxAuswahl && mxAuswahl.kongressId===kongressId && mxAuswahl.titelId===null){
+    mxAuswahl = null;
+  } else {
+    const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
+    if(!k) return;
+    mxAuswahl = {kongressId, titelId:null};
+    mxKongEntwurf = {lang:k.lang, kurz:k.kurz||'', von:k.von||'', bis:k.bis||'',
+      unscharf:k.unscharf||'', ort:k.ort||''};
+  }
+  render();
+}
+
+function mxKongFeld(feld, wert){
+  if(!mxKongEntwurf) return;
+  mxKongEntwurf[feld] = wert;
+  const btn = document.getElementById('mxKongSpeichern');
+  if(btn) btn.disabled = false;
+}
+
+function mxKongFormHtml(k){
+  const e = mxKongEntwurf;
+  const hatZuordnung = JOURNALS.some(t=>mxZelle(k,t).length>0);
+  return `<div class="mx-panel">
+    <div class="mx-panel-kopf">
+      <div><div class="mx-panel-titel">Kongress bearbeiten</div>
+        <div class="mx-panel-unter">Gilt nur für den Jahrgang ${esc(jahr)}</div></div>
+      <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
+    </div>
+    <label class="bearb-feld">Name
+      <input type="text" value="${escA(e.lang)}" oninput="mxKongFeld('lang',this.value)"></label>
+    <label class="bearb-feld">Kurzname
+      <input type="text" value="${escA(e.kurz)}" oninput="mxKongFeld('kurz',this.value)">
+      <span class="hinweis">Für die Ausgabe an die Datenpflege der Angebotswerkzeuge</span></label>
+    <div class="bearb-reihe zwei">
+      <label class="bearb-feld">Beginn
+        <input type="date" value="${escA(e.von)}" oninput="mxKongFeld('von',this.value)"></label>
+      <label class="bearb-feld">Ende
+        <input type="date" value="${escA(e.bis)}" oninput="mxKongFeld('bis',this.value)"></label>
+    </div>
+    <label class="bearb-feld">Ungefährer Zeitraum, wenn kein Tag feststeht
+      <input type="text" value="${escA(e.unscharf)}" oninput="mxKongFeld('unscharf',this.value)"
+             placeholder="etwa »September 2027«">
+      <span class="hinweis">Nur wenn Beginn und Ende leer bleiben – sonst gilt der genaue Zeitraum</span></label>
+    <label class="bearb-feld">Ort
+      <input type="text" value="${escA(e.ort)}" oninput="mxKongFeld('ort',this.value)"></label>
+    <div class="bearb-fuss">
+      <button type="button" class="bearb-speichern" id="mxKongSpeichern"
+              onclick="mxKongSpeichern()" disabled>Speichern</button>
+      <button type="button" class="bearb-verwerfen" onclick="mxSchliessen()">Abbrechen</button>
+      ${hatZuordnung ? '' : `<button type="button" class="bearb-loeschen" onclick="mxKongEntfernen()">Entfernen</button>`}
+    </div>
+    ${hatZuordnung ? '' : `<p class="mx-hinweis" style="margin-top:8px">Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.</p>`}
+  </div>`;
+}
+
+async function mxKongSpeichern(){
+  if(!mxKongEntwurf || !mxAuswahl) return;
+  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
+  if(!k) return;
+  const e = mxKongEntwurf;
+  const lang = e.lang.trim();
+  if(!lang) return bearbStand('Der Name darf nicht leer bleiben.', 'schlecht');
+  const von = e.von || null;
+  const bis = von ? (e.bis || null) : null;
+  const unscharf = von ? '' : (e.unscharf||'').trim();
+  const patch = {lang, kurz:(e.kurz||'').trim(), von, bis, unscharf, ort:(e.ort||'').trim()};
+  const btn = document.getElementById('mxKongSpeichern');
+  if(btn) btn.disabled = true;
+  bearbStand('Wird gespeichert …', '');
+  try{
+    await dbAnfrage('/rest/v1/kongress?id=eq.'+encodeURIComponent(k.id),
+      {method:'PATCH', headers:{Prefer:'return=minimal'}, body: JSON.stringify(patch)});
+    Object.assign(k, patch);
+    render();
+    bearbStand('Gespeichert', 'gut');
+  }catch(fehler){
+    if(btn) btn.disabled = false;
+    bearbStand(fehlertext(fehler), 'schlecht');
+  }
+}
+
+async function mxKongEntfernen(){
+  if(!mxAuswahl) return;
+  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
+  if(!k) return;
+  if(!await frage('Kongress entfernen?',
+    `<p>»${esc(k.lang)}« wird aus dem Jahrgang ${esc(jahr)} entfernt.</p>`,
+    'Entfernen')) return;
+  try{
+    await dbAnfrage('/rest/v1/kongress?id=eq.'+encodeURIComponent(k.id),
+      {method:'DELETE', headers:{Prefer:'return=minimal'}});
+    DATEN[jahr].kongresse = (DATEN[jahr].kongresse||[]).filter(x=>x.id!==k.id);
+    KONG.delete(k.id);
+    mxAuswahl=null; mxKongEntwurf=null;
+    render();
+    bearbStand('Entfernt', 'gut');
+  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+}
 function renderBearbeiten(){
   const umschalter = bearbUmschalterHtml();
   if(bearbAnsicht==='kongress') return umschalter + renderKongressmatrix();
@@ -4386,7 +4693,8 @@ function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
     if(!ergebnis[k.jahr]) return;
     if(!nachJahr.has(k.jahr)) nachJahr.set(k.jahr, []);
     nachJahr.get(k.jahr).push({id:k.id, lang:k.lang, kurz:k.kurz||'',
-      von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||''});
+      von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||'',
+      erwartet:k.erwartet||[]});
   });
   if(nachJahr.size){
     const jeAusgabe = new Map();
@@ -4430,7 +4738,7 @@ async function datenHolen(){
     dbAnfrage('/rest/v1/ausgabe?select=id,jahr,titel_id,reihenfolge,heft,erscheinung,'
             + 'anzeigenschluss,druckunterlagen,anlieferung,thema,sonderthema,'
             + 'auslagen,berichte&order=jahr,titel_id,reihenfolge&limit=5000'),
-    vielleicht('/rest/v1/kongress?select=id,jahr,lang,kurz,von,bis,unscharf,ort'
+    vielleicht('/rest/v1/kongress?select=id,jahr,lang,kurz,von,bis,unscharf,ort,erwartet'
              + '&order=jahr,von&limit=5000'),
     vielleicht('/rest/v1/kongress_ausgabe?select=kongress_id,ausgabe_id,art&limit=20000')
   ]);
@@ -4448,6 +4756,39 @@ async function datenHolen(){
 
 function istDbKennung(id){
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id));
+}
+
+// Beim Anlegen eines neuen Jahrgangs: die Kongresse des Vorlage-Jahrgangs als
+// leere Saetze anlegen (Name, Kurzname, Ort; kein Termin), dazu die
+// Titelverteilung des Vorjahres als Hinweis "erwartet" - ohne Heft, denn der
+// neue Jahrgang hat noch keine Ausgaben. Die Matrix markiert damit ein Feld
+// als offene Arbeit, bis eine echte Zuordnung es abloest.
+async function kongresseAusVorjahrUebernehmen(y, vorlageJahr){
+  const alt = DATEN[vorlageJahr];
+  if(!alt || !alt.kongresse || !alt.kongresse.length) return {saetze:0};
+
+  const verteilung = new Map();   // Kongress-Kennung (Vorjahr) -> Set("titelId|art")
+  alt.titel.forEach(t=>t.issues.forEach(iss=>{
+    (iss.a||[]).forEach(kid=>{
+      if(!verteilung.has(kid)) verteilung.set(kid,new Set());
+      verteilung.get(kid).add(t.id+'|auslage');
+    });
+    (iss.b||[]).forEach(kid=>{
+      if(!verteilung.has(kid)) verteilung.set(kid,new Set());
+      verteilung.get(kid).add(t.id+'|bericht');
+    });
+  }));
+
+  const zeilen = alt.kongresse.map(k=>({
+    jahr:y, lang:k.lang, kurz:k.kurz||'', von:null, bis:null, unscharf:'', ort:k.ort||'',
+    erwartet: [...(verteilung.get(k.id)||[])].map(p=>{
+      const [titel_id,art] = p.split('|');
+      return {titel_id:Number(titel_id), art};
+    })
+  }));
+  await dbAnfrage('/rest/v1/kongress',
+    {method:'POST', headers:{Prefer:'return=minimal'}, body: JSON.stringify(zeilen)});
+  return {saetze: zeilen.length};
 }
 
 async function kongresseUebernehmen(y){
