@@ -59,6 +59,61 @@ Konten werden im Supabase-Verwaltungsbereich angelegt, nicht im Werkzeug:
   Excel-Eingang schreibt in die Datenbank; Ausgaben und Titel lassen sich
   anlegen und entfernen, ebenso ein ganzer Jahrgang.
 
+## Kongresse
+
+Ein Kongress steht einmal je Jahrgang, nicht einmal je Ausgabe. Zuvor stand er
+als Zeichenkette in jeder Ausgabe erneut — im Jahrgang 2027 bis zu neunmal
+wortgleich. Verschob sich ein Termin, waren es neun Änderungen; der
+AEK-Kongress war dadurch bereits in zwei Schreibweisen auseinandergelaufen.
+
+Tabelle `kongress` je Jahrgang (`lang`, `kurz`, `von`, `bis`, `unscharf`, `ort`)
+und `kongress_ausgabe` für die Zuordnung mit `art` (Auslage oder Bericht). Die
+Art steht mit im Schlüssel: eine Ausgabe kann beides zu demselben Kongress
+führen — die Ärzte Zeitung tut das beim DGP 2027 nicht, wohl aber Heft 1 mit der
+Auslage und Heft 3 mit dem Bericht.
+
+`von` und `bis` sind `date` wie die übrigen Termine, die Datenbank weist damit
+einen unmöglichen Termin selbst zurück. `unscharf` führt die Fälle ohne Tag
+(»September 2027«, »September«); dort bleiben `von`/`bis` leer und die Angabe
+erscheint unverändert. Auf den Monatsersten zu raten wäre schlechter als nichts.
+
+Angezeigt wird der zusammengesetzte Wortlaut `Langname, Zeitraum, Ort` — genau
+der, der zuvor als Zeichenkette dastand. Nachgemessen an beiden Jahrgängen: in
+allen fünf Ansichten Zeichen für Zeichen dasselbe.
+
+### Umstellen
+
+Die Spalten `ausgabe.auslagen` und `ausgabe.berichte` bleiben vorerst stehen.
+Das Werkzeug liest die Kongresse eines Jahrgangs aus den neuen Tabellen, sobald
+dort Zeilen stehen, und fällt sonst auf die beiden Spalten zurück — so lässt
+sich Jahrgang für Jahrgang umstellen. Fehlt das Schema ganz, ändert sich nichts.
+
+*Daten → Kongresse umstellen* legt jeden Kongress des gezeigten Jahrgangs einmal
+an. Vorher entsteht ein Sicherungspunkt ohne Zutun, und ein Bericht zeigt, was
+auffällt — bereinigt wird nichts von selbst:
+
+* **Gleicher Zeitraum, gleicher Ort, zwei Schreibweisen.** Sie bleiben zwei
+  Kongresse; sie zusammenzuführen ist eine Entscheidung, keine Rechnung.
+* **Zeitlich nicht schlüssig.** Geprüft wird gegen das Heft, an dem der Eintrag
+  hängt, nicht gegen den Jahrgang: ein Bericht über einen Kongress des Vorjahres
+  ist richtig und häufig, einer über einen Kongress von vor dreizehn Monaten
+  nicht. Nachgemessen am Jahrgang 2027 liegen zwischen Kongressende und
+  Anzeigenschluss des berichtenden Hefts 3 bis 70 Tage (Median 30), zwischen
+  Erscheinen und Kongressbeginn beim Ausliegen 11 bis 99 (Median 33). Die
+  Schwelle von 180 Tagen liegt weit über beidem.
+
+Im Bestand traf der Bericht damit drei Stellen — alle drei echte Fehler und
+keine falsche Meldung: die zwei AEK-Schreibweisen, der MDS-Eintrag mit dem
+Termin aus 2026 im Jahrgang 2027, und über den Umweg des Abstands der
+Anzeigenschluss »25.10.2927« bei Im Fokus Onkologie Heft 11.
+
+Sind alle Jahrgänge umgestellt und nachgesehen, können die beiden Spalten
+entfallen:
+
+```sql
+alter table ausgabe drop column auslagen, drop column berichte;
+```
+
 ## Bearbeiten
 
 Der Arbeitsschirm steht im Menü *Daten* an erster Stelle, nicht in der

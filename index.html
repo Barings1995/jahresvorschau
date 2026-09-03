@@ -344,6 +344,10 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .dlg-ok.dlg-warnung:hover{background:#d96f0a;border-color:#d96f0a}
 .pr-hinw{margin-top:7px;padding:7px 9px;font-size:.72rem;line-height:1.45;color:var(--navy);background:var(--navy-faint);border-left:3px solid var(--sblue);border-radius:0 3px 3px 0}
 .pr-stand{margin-top:6px;font-size:.72rem;color:var(--muted)}
+/* Die zweite Zeile eines Befundes: welches Heft es betrifft und um wie viel
+   der Abstand danebenliegt. Sie steht unter dem Kongressnamen und soll ihn
+   nicht ueberstimmen. */
+.pr-klein{font-size:.70rem;color:var(--muted)}
 /* Eingabefelder im Dialog - bisher trug er nur Berichte, jetzt auch das
    Formular fuer einen neuen Jahrgang. */
 /* Der Erklaerungssatz ueber dem Feld im Eingabefenster. Ohne den Abstand klebt
@@ -772,6 +776,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
         <button class="ex-item" role="menuitem" onclick="jahrgangAnlegen()">
           <span class="ex-t">Jahrgang anlegen</span>
           <span class="ex-d">Legt ein weiteres Jahr an, auf Wunsch mit den Titeln des gezeigten Jahrgangs. Die Hefte kommen einzeln dazu</span>
+        </button>
+        <button class="ex-item" id="kongUmstellenBtn" role="menuitem" onclick="kongresseUmstellen()">
+          <span class="ex-t" id="kongUmstellenText">Kongresse umstellen</span>
+          <span class="ex-d">Legt jeden Kongress des Jahrgangs einmal an, statt ihn in jeder Ausgabe erneut zu f&uuml;hren. Zeigt vorher, was dabei auff&auml;llt; ein Sicherungspunkt entsteht ohne Zutun</span>
         </button>
         <button class="ex-item" id="entfernenBtn" role="menuitem" onclick="jahrgangEntfernen()" disabled>
           <span class="ex-t" id="entfernenText">Jahrgang entfernen</span>
@@ -2460,6 +2468,13 @@ async function ladenUebernehmen(){
     // nicht bearbeiten liesse.
     ladeStand('Der Bestand wird neu geladen …');
     DATEN = await datenHolen();
+    // Erst jetzt stehen die Zeilenkennungen der neuen Ausgaben bereit, ohne die
+    // sich keine Zuordnung schreiben laesst.
+    if(KONG_TABELLEN)
+      for(const y of jahre){
+        ladeStand(`Jahrgang ${y}: Kongresse werden übernommen …`);
+        await kongresseUebernehmen(y);
+      }
     dialogSchliessen();
     waehleJahrgang(jahre.includes(jahr) ? jahr : jahre[0]);
     sicherungenHolen();
@@ -2500,6 +2515,17 @@ async function jahrgangSchreiben(y, stand, titel){
   if(zeilen.length)
     await dbAnfrage('/rest/v1/ausgabe',
       {method:'POST', headers:{Prefer:'return=minimal'}, body: JSON.stringify(zeilen)});
+
+  // Die Zuordnungen hingen an den eben geloeschten Ausgaben und sind mit
+  // gefallen; die Kongresssaetze haengen dagegen am Jahrgang und stuenden noch
+  // da - ohne eine einzige Zuordnung. Der Jahrgang saehe dann aus, als fuehre
+  // er keine Kongresse mehr. Deshalb kommen auch sie weg: es gelten wieder die
+  // Spalten an der Ausgabe, und kongresseUebernehmen baut danach neu auf.
+  if(KONG_TABELLEN)
+    try{
+      await dbAnfrage('/rest/v1/kongress?jahr=eq.' + encodeURIComponent(y),
+        {method:'DELETE', headers:{Prefer:'return=minimal'}});
+    }catch(fehler){ /* Schema noch nicht eingespielt */ }
 }
 
 // ── Jahrgang entfernen ──
@@ -2581,6 +2607,113 @@ async function jahrgangAnlegenAusfuehren(vorlage){
     render();
     sicherungenHolen();
   }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
+}
+
+// ── Kongresse umstellen ─────────────────────────────────────────────────────
+// Einmal je Jahrgang. Der Bericht zeigt vorher, was auffaellt, und bereinigt
+// nichts von selbst: zwei Schreibweisen desselben Kongresses zusammenzufuehren
+// ist eine Entscheidung, keine Rechnung.
+
+function kongressBefunde(y){
+  const j = DATEN[y] || {titel:[]};
+  const saetze = j.kongresse || [];
+  const zaehl = new Map();
+  j.titel.forEach(t=>t.issues.forEach(iss=>
+    [...(iss.a||[]), ...(iss.b||[])].forEach(id=>zaehl.set(id,(zaehl.get(id)||0)+1))));
+
+  // Aehnliche Schreibweisen: gleicher Zeitraum und gleicher Ort, aber zwei
+  // Saetze. Genau so steht der AEK-Kongress 2027 zweimal da.
+  const nachTermin = new Map();
+  saetze.forEach(k=>{
+    const schl = (k.von||k.unscharf||'') + '|' + (k.ort||'');
+    if(!schl.replace('|','')) return;
+    if(!nachTermin.has(schl)) nachTermin.set(schl, []);
+    nachTermin.get(schl).push(k);
+  });
+  const doppelt = [...nachTermin.values()].filter(g=>g.length>1);
+
+  // Zuordnungen, die zeitlich nicht aufgehen. Geprueft wird gegen das Heft, an
+  // dem der Eintrag haengt, nicht gegen den Jahrgang: ein Bericht ueber einen
+  // Kongress des Vorjahres ist richtig und haeufig, ein Bericht ueber einen
+  // Kongress von vor dreizehn Monaten nicht.
+  //
+  // Nachgemessen am Jahrgang 2027: zwischen Kongressende und Anzeigenschluss
+  // des berichtenden Hefts liegen ueblicherweise 3 bis 70 Tage (Median 30),
+  // zwischen Erscheinen und Kongressbeginn beim Ausliegen 11 bis 99 (Median 33).
+  // Die Schwelle von 180 Tagen liegt weit ueber beidem und trifft im Bestand
+  // genau zwei Stellen - beide sind echte Fehler: der MDS-Eintrag mit dem
+  // Termin aus 2026 und der Anzeigenschluss "25.10.2927" bei Im Fokus Heft 11.
+  const SCHWELLE = 180;
+  const tage = (a,b) => Math.round((new Date(a) - new Date(b)) / 864e5);
+  const fremd = [];
+  j.titel.forEach(t=>t.issues.forEach(iss=>{
+    const pruefe = (id, art) => {
+      const k = saetze.find(x=>x.id===id);
+      if(!k || !k.von) return;                      // ohne Termin nichts zu pruefen
+      const d = art==='bericht'
+        ? (iss.as ? tage(iss.as, k.bis || k.von) : null)   // Kongress, dann Redaktion
+        : (iss.et ? tage(k.von, iss.et)          : null);  // Heft, dann Kongress
+      if(d === null || (d >= 0 && d <= SCHWELLE)) return;
+      fremd.push({k, art, titel:t.short, heft:iss.heft, tage:d});
+    };
+    (iss.a||[]).forEach(id=>pruefe(id,'auslage'));
+    (iss.b||[]).forEach(id=>pruefe(id,'bericht'));
+  }));
+
+  const ohneTermin = saetze.filter(k=>!k.von && !k.unscharf);
+  return {saetze, zaehl, doppelt, fremd, ohneTermin,
+          zuordnungen: [...zaehl.values()].reduce((n,x)=>n+x,0)};
+}
+
+async function kongresseUmstellen(){
+  schliesseDaten();
+  const y = jahrgang();
+  const b = kongressBefunde(y);
+  const zeile = (t,w) => `<tr><td>${t}</td><td>${w}</td></tr>`;
+  let html = `<div class="pr-jahr"><b>${esc(y)}</b> <span>`
+    + (DATEN[y] && DATEN[y].umgestellt ? 'bereits umgestellt, wird neu aufgebaut'
+                                       : 'wird umgestellt') + `</span></div>`
+    + `<table class="pr-tab"><tbody>`
+    + zeile('Kongresse', b.saetze.length)
+    + zeile('Zuordnungen zu Ausgaben', b.zuordnungen)
+    + `<tr${b.ohneTermin.length?' class="pr-merk"':''}><td>ohne Zeitraum</td><td>${b.ohneTermin.length}</td></tr>`
+    + `</tbody></table>`;
+  if(b.doppelt.length)
+    html += `<div class="pr-warn"><div class="pr-warn-kopf">Gleicher Zeitraum, gleicher Ort &ndash; zwei Schreibweisen</div>`
+      + b.doppelt.map(g=>g.map(k=>esc(k.lang)).join('<br>')).join('<hr>')
+      + `<br>Sie bleiben zwei Kong&shy;resse. Zusammengef&uuml;hrt wird von Hand.</div>`;
+  if(b.fremd.length)
+    html += `<div class="pr-warn"><div class="pr-warn-kopf">Zeitlich nicht schl&uuml;ssig</div>`
+      + b.fremd.map(f=>esc(f.k.lang) + ' &middot; ' + esc(kongressZeitraum(f.k))
+          + '<br><span class="pr-klein">' + esc(f.titel) + ' Heft ' + esc(f.heft)
+          + ' &middot; ' + (f.art==='bericht'
+              ? (f.tage<0 ? 'Anzeigenschluss ' + Math.abs(f.tage) + ' Tage vor Kongressende'
+                          : 'Bericht ' + f.tage + ' Tage nach dem Kongress')
+              : (f.tage<0 ? 'Heft erscheint ' + Math.abs(f.tage) + ' Tage nach Kongressbeginn'
+                          : 'Auslage ' + f.tage + ' Tage nach Erscheinen'))
+          + '</span>').join('<br>') + `</div>`;
+  html += `<div class="pr-stand">Die beiden Spalten an der Ausgabe bleiben stehen und werden weiter mitgeschrieben.</div>`;
+
+  dialogZeigen('Kongresse umstellen', html, 'Übernehmen',
+    () => kongresseUmstellenAusfuehren(y), b.doppelt.length>0 || b.fremd.length>0);
+}
+
+async function kongresseUmstellenAusfuehren(y){
+  ladeKnoepfe(true);
+  try{
+    ladeStand(`Jahrgang ${y}: Sicherungspunkt wird angelegt …`);
+    await sicherungSchreiben(y, 'Vor dem Umstellen der Kongresse');
+    ladeStand('Die Kongresse werden übernommen …');
+    const erg = await kongresseUebernehmen(y);
+    ladeStand('Der Bestand wird neu geladen …');
+    DATEN = await datenHolen();
+    dialogSchliessen();
+    waehleJahrgang(y);
+    if(bearbOffen) sicherungenHolen();
+  }catch(fehler){
+    ladeStand(fehlertext(fehler), true);
+    ladeKnoepfe(false);
+  }
 }
 
 async function jahrgangEntfernen(){
@@ -3320,7 +3453,9 @@ async function ausgabeAendern(){
       body: JSON.stringify(ausgabeAusEntwurf())
     });
     const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
-    entwurfInAusgabe(t.issues[bearbAuswahl.index]);
+    const iss = t.issues[bearbAuswahl.index];
+    entwurfInAusgabe(iss);
+    await zuordnungSchreiben(iss);
     render();
     bearbStand('Gespeichert', 'gut');
   }catch(fehler){
@@ -3359,6 +3494,7 @@ async function ausgabeAnlegen(){
     const iss = { id: zeile.id, reihenfolge: zeile.reihenfolge };
     t.issues.push(iss);
     entwurfInAusgabe(iss);
+    await zuordnungSchreiben(iss);
     GESAMT = JOURNALS.reduce((n,j)=>n+j.issues.length,0);
     await reihenfolgeOrdnen(t);
     const platz = t.issues.indexOf(iss);
@@ -3574,6 +3710,7 @@ async function sicherungZurueck(id, wie){
 
     entwurf = null; entwurfRein = null; bearbAuswahl = null;
     DATEN = await datenHolen();
+    if(KONG_TABELLEN) await kongresseUebernehmen(j);
     waehleJahrgang(j);
     await sicherungenHolen();
     bearbStand('Auf den gesicherten Stand zurückgesetzt', 'gut');
@@ -3961,7 +4098,7 @@ async function sitzungAuffrischen(){
 //   DATEN[Jahrgang] = { stand, titel:[ {id,short,full,auflage,color,hex,issues} ] }
 // Deshalb bleiben Ansichten, Suche, Druck und Excel-Ausgabe unberuehrt.
 
-function inDatenForm(jahrgaenge, titel, ausgaben){
+function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
   const ergebnis = {};
   for(const j of jahrgaenge) ergebnis[j.jahr] = { stand: j.stand || '', titel: [] };
 
@@ -3989,21 +4126,156 @@ function inDatenForm(jahrgaenge, titel, ausgaben){
       top: a.thema || '', sw: a.sonderthema || ''
     });
   }
-  // Die Datenbank liefert die Kongresse noch als Zeichenketten je Ausgabe.
-  // Hier entstehen daraus die Saetze des Jahrgangs.
+  // Umgestellte Jahrgaenge fuehren ihre Kongresse in eigenen Tabellen. Steht
+  // dort noch keine Zeile, gelten weiter die beiden Spalten an der Ausgabe -
+  // so laesst sich Jahrgang fuer Jahrgang umstellen, ohne dass das Werkzeug
+  // zwischendurch eine unvollstaendige Anzeige liefert.
+  const nachJahr = new Map();
+  (kongresse||[]).forEach(k=>{
+    if(!ergebnis[k.jahr]) return;
+    if(!nachJahr.has(k.jahr)) nachJahr.set(k.jahr, []);
+    nachJahr.get(k.jahr).push({id:k.id, lang:k.lang, kurz:k.kurz||'',
+      von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||''});
+  });
+  if(nachJahr.size){
+    const jeAusgabe = new Map();
+    (zuordnungen||[]).forEach(z=>{
+      if(!jeAusgabe.has(z.ausgabe_id)) jeAusgabe.set(z.ausgabe_id, {a:[], b:[]});
+      jeAusgabe.get(z.ausgabe_id)[z.art==='bericht'?'b':'a'].push(z.kongress_id);
+    });
+    // Die Reihenfolge innerhalb einer Ausgabe richtet sich nach dem Zeitraum
+    // des Kongresses: die Zuordnungstabelle kennt keine.
+    for(const [y, liste] of nachJahr){
+      const rang = new Map(liste.map(k=>[k.id, k.von || ('~'+(k.unscharf||k.lang))]));
+      const ordnen = ids => ids.sort((x,z)=>
+        String(rang.get(x)||'').localeCompare(String(rang.get(z)||'')));
+      ergebnis[y].kongresse = liste;
+      ergebnis[y].umgestellt = true;
+      ergebnis[y].titel.forEach(t=>t.issues.forEach(iss=>{
+        const z = jeAusgabe.get(iss.id) || {a:[], b:[]};
+        iss.a = ordnen(z.a); iss.b = ordnen(z.b);
+      }));
+    }
+  }
+  // Die uebrigen Jahrgaenge: Zeichenketten je Ausgabe, wie bisher.
   Object.keys(ergebnis).forEach(y=>kongressAufloesen(ergebnis[y]));
   return ergebnis;
 }
 
+// Die beiden Kongresstabellen duerfen fehlen: solange das Schema nicht
+// eingespielt ist, antwortet die Schnittstelle mit einem Fehler, und der
+// Jahrgang gilt schlicht als noch nicht umgestellt.
+let KONG_TABELLEN = false;
+
+async function vielleicht(pfad){
+  try{ const r = await dbAnfrage(pfad); KONG_TABELLEN = true; return r; }
+  catch(fehler){ return []; }
+}
+
 async function datenHolen(){
-  const [jahrgaenge, titel, ausgaben] = await Promise.all([
+  const [jahrgaenge, titel, ausgaben, kongresse, zuordnungen] = await Promise.all([
     dbAnfrage('/rest/v1/jahrgang?select=jahr,stand&order=jahr'),
     dbAnfrage('/rest/v1/titel?select=jahr,id,kurz,voll,auflage,hex&order=jahr,id'),
     dbAnfrage('/rest/v1/ausgabe?select=id,jahr,titel_id,reihenfolge,heft,erscheinung,'
             + 'anzeigenschluss,druckunterlagen,anlieferung,thema,sonderthema,'
-            + 'auslagen,berichte&order=jahr,titel_id,reihenfolge&limit=5000')
+            + 'auslagen,berichte&order=jahr,titel_id,reihenfolge&limit=5000'),
+    vielleicht('/rest/v1/kongress?select=id,jahr,lang,kurz,von,bis,unscharf,ort'
+             + '&order=jahr,von&limit=5000'),
+    vielleicht('/rest/v1/kongress_ausgabe?select=kongress_id,ausgabe_id,art&limit=20000')
   ]);
-  return inDatenForm(jahrgaenge, titel, ausgaben);
+  return inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen);
+}
+
+
+// ── Kongresse in die Datenbank ──────────────────────────────────────────────
+// Geschrieben wird aus dem Stand im Speicher heraus, im Ganzen und wiederholbar.
+// Damit taugt dieselbe Funktion fuer die einmalige Umstellung eines Jahrgangs
+// und fuer jeden Weg, der einen Jahrgang ersetzt (Excel-Eingang,
+// Sicherungspunkt). Ein Abgleich Zeile fuer Zeile waere feiner, aber auch die
+// Stelle, an der die beiden Bestaende auseinanderlaufen koennten - und genau das
+// soll hier aufhoeren.
+
+function istDbKennung(id){
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id));
+}
+
+async function kongresseUebernehmen(y){
+  const j = DATEN[y];
+  if(!j) throw new Error('Der Jahrgang ' + y + ' ist nicht geladen.');
+  const saetze = j.kongresse || [];
+
+  // Alles Alte weg: die Zuordnungen haengen an den Kongressen und gehen mit.
+  await dbAnfrage('/rest/v1/kongress?jahr=eq.' + encodeURIComponent(y),
+    {method:'DELETE', headers:{Prefer:'return=minimal'}});
+
+  if(!saetze.length){ j.umgestellt = true; return {saetze:0, zuordnungen:0}; }
+
+  const angelegt = await dbAnfrage('/rest/v1/kongress',
+    {method:'POST', headers:{Prefer:'return=representation'},
+     body: JSON.stringify(saetze.map(k=>({jahr:y, lang:k.lang, kurz:k.kurz||'',
+       von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||''})))});
+
+  // Zugeordnet wird ueber den zusammengesetzten Wortlaut, nicht ueber die
+  // Reihenfolge der Antwort: derselbe Wortlaut ist derselbe Kongress, und
+  // zweimal derselbe kann es nicht geben - kongressAufloesen fasst sie zusammen.
+  const nachText = new Map();
+  (angelegt||[]).forEach(k=>nachText.set(kongressAus(k), k.id));
+  const alteKennung = new Map();
+  saetze.forEach(k=>{
+    const neu = nachText.get(kongressAus(k));
+    if(neu){ alteKennung.set(k.id, neu); k.id = neu; }
+  });
+  setzeKongresse(j);
+
+  const zeilen = [];
+  j.titel.forEach(t=>t.issues.forEach(iss=>{
+    iss.a = (iss.a||[]).map(id=>alteKennung.get(id)||id);
+    iss.b = (iss.b||[]).map(id=>alteKennung.get(id)||id);
+    if(!iss.id) return;                       // Ausgabe ohne Zeilenkennung
+    iss.a.forEach(id=>zeilen.push({kongress_id:id, ausgabe_id:iss.id, art:'auslage'}));
+    iss.b.forEach(id=>zeilen.push({kongress_id:id, ausgabe_id:iss.id, art:'bericht'}));
+  }));
+  if(zeilen.length)
+    await dbAnfrage('/rest/v1/kongress_ausgabe',
+      {method:'POST', headers:{Prefer:'return=minimal'}, body: JSON.stringify(zeilen)});
+
+  j.umgestellt = true;
+  return {saetze:saetze.length, zuordnungen:zeilen.length};
+}
+
+// Eine einzelne Ausgabe. Neu entstandene Saetze bekommen zuerst ihre Kennung
+// aus der Datenbank, danach werden die Zuordnungen dieser Ausgabe ersetzt.
+async function zuordnungSchreiben(iss){
+  const j = DATEN[jahr];
+  if(!j || !j.umgestellt || !iss.id) return;
+
+  const neue = [...new Set([...iss.a, ...iss.b])].filter(id=>!istDbKennung(id));
+  if(neue.length){
+    const saetze = neue.map(id=>KONG.get(id)).filter(Boolean);
+    const angelegt = await dbAnfrage('/rest/v1/kongress',
+      {method:'POST', headers:{Prefer:'return=representation'},
+       body: JSON.stringify(saetze.map(k=>({jahr:jahr, lang:k.lang, kurz:k.kurz||'',
+         von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||''})))});
+    const nachText = new Map();
+    (angelegt||[]).forEach(k=>nachText.set(kongressAus(k), k.id));
+    saetze.forEach(k=>{
+      const neuId = nachText.get(kongressAus(k));
+      if(!neuId) return;
+      const alt = k.id; k.id = neuId;
+      KONG.delete(alt); KONG.set(neuId, k);
+      iss.a = iss.a.map(x=>x===alt?neuId:x);
+      iss.b = iss.b.map(x=>x===alt?neuId:x);
+    });
+  }
+
+  await dbAnfrage('/rest/v1/kongress_ausgabe?ausgabe_id=eq.' + encodeURIComponent(iss.id),
+    {method:'DELETE', headers:{Prefer:'return=minimal'}});
+  const zeilen = [];
+  iss.a.forEach(id=>zeilen.push({kongress_id:id, ausgabe_id:iss.id, art:'auslage'}));
+  iss.b.forEach(id=>zeilen.push({kongress_id:id, ausgabe_id:iss.id, art:'bericht'}));
+  if(zeilen.length)
+    await dbAnfrage('/rest/v1/kongress_ausgabe',
+      {method:'POST', headers:{Prefer:'return=minimal'}, body: JSON.stringify(zeilen)});
 }
 
 // ── Ablauf ──────────────────────────────────────────────────────────────────
