@@ -183,6 +183,32 @@ Funktionen einzeln, und beim Holen der Sicherungspunkte fehlte sie; dieser eine
 Weg scheiterte dann an der Sitzung statt an den Daten. Während des Abrufs steht
 im Kasten »Die Sicherungspunkte werden geladen …«, nicht der Leerhinweis.
 
+### Nach Kongress
+
+Im Arbeitsschirm steht oben ein Umschalter *Nach Ausgabe · Nach Kongress* — dieselbe
+Arbeitskopie, zwei Seiten. *Nach Kongress* zeigt eine Zeile je Kongress und eine
+Spalte je Titel; im Feld stehen Heft und Art der bereits zugeordneten Ausgaben.
+Kongresse ohne Termin (noch zu recherchieren, oder mit unscharfer Angabe wie
+»September«) stehen oben in einer eigenen Gruppe.
+
+Ein Klick auf ein Feld öffnet die Heftwahl darunter: alle Hefte des Titels **in
+Heftfolge**, mit Erscheinungstermin und dessen Abstand zum Kongressbeginn, dazu
+dem Anzeigenschluss und dessen Abstand zum Kongressende — letzterer nur, wenn er
+positiv ist, sonst stünde eine irreführende negative Zahl da. Zwischen den
+Heften, die vor Kongressbeginn erscheinen, und denen danach steht eine
+Trennlinie. Zwei kleine Knöpfe je Heft — Auslage, Bericht — ordnen zu oder nehmen
+zurück; ein bereits zugeordnetes Heft ist als solches zu erkennen. Es gibt
+keinen Vorschlag: Ein Rechenweg, an den 2027er Zuordnungen gemessen, träfe zu
+84–90 % — der Rest sähe wie eine geprüfte Angabe aus, wäre aber geraten.
+
+Anders als beim Bearbeiten einer Ausgabe gibt es hier keinen Speichern-Knopf:
+jeder Klick schreibt sofort. Schlägt das Schreiben fehl, nimmt die Anzeige die
+Zuordnung sichtbar zurück, statt einen Stand zu zeigen, der in der Datenbank
+nicht steht.
+
+Die Matrix setzt einen umgestellten Jahrgang voraus (siehe *Kongresse* oben);
+ohne eigene Kongresssätze verweist sie auf *Daten → Kongresse umstellen*.
+
 ## Anlegen und Entfernen
 
 In der Ansicht *Bearbeiten*:

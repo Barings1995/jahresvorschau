@@ -403,8 +403,10 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   body{zoom:1;font-size:12px}
   header{position:static;box-shadow:none;background:none}
   .sm-hero,.controls,.stats,.clear-btn,.export-wrap,.daten-wrap,.daten-dialog,.mx-hint,.lchev{display:none!important}
-  /* Die Bearbeiten-Ansicht ist Werkzeug, keine Druckvorlage. */
-  .bearb,.bearb-sicherung{display:none!important}
+  /* Die Bearbeiten-Ansicht ist Werkzeug, keine Druckvorlage. druckeMit schliesst
+     sie vorher; die Klasse am Ergebnisbereich traegt beide Unteransichten
+     (nach Ausgabe wie nach Kongress) und ist das Sicherheitsnetz dafuer. */
+  #results.bearbansicht,.bearb,.bearb-sicherung{display:none!important}
   /* Ein Pixel Luft rechts fuer den gesamten Satzspiegel. Chrome zeichnet jede
      Kante auf ganze Pixel und rundet dabei auf: der Druckbereich ist 1039,39 px
      breit (quer, A4, 11 mm Rand), gezeichnet wurde bis 1040. Bei den waagerechten
@@ -673,6 +675,66 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-sich-weg:hover{color:var(--warm);border-color:var(--warm)}
 .sich-fehler{color:var(--warm)}
 .sich-fehler .bearb-zu{margin-left:8px;vertical-align:middle}
+
+/* ── Umschalter nach Ausgabe / nach Kongress ── */
+.bearb-umschalter{display:flex;gap:2px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:6px;padding:3px;margin-bottom:14px;
+  width:fit-content}
+.bu-btn{padding:6px 14px;font-family:inherit;font-size:.78rem;font-weight:600;
+  color:var(--muted);background:none;border:none;border-radius:4px;cursor:pointer}
+.bu-btn:hover{color:var(--navy)}
+.bu-btn.aktiv{color:#ffffff;background:var(--navy)}
+
+/* ── Kongressmatrix ── */
+.mx-kopf{display:flex;justify-content:space-between;align-items:baseline;
+  gap:12px;margin-bottom:10px}
+.mx-titel-kl{font-size:.85rem;font-weight:600;color:var(--navy)}
+.mx-zahl{font-size:.76rem;color:var(--muted)}
+.mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px}
+.mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px}
+.mx-tab th{font-weight:600;font-size:.7rem;color:var(--muted);text-align:center;
+  padding:9px 6px 7px;border-bottom:1px solid var(--border)}
+.mx-tab td{border-bottom:1px solid var(--surface3);vertical-align:top;padding:5px 4px}
+.mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;min-width:220px}
+.mx-name{color:var(--text)}
+.mx-info{font-size:.7rem;color:var(--muted);margin-top:1px}
+.mx-gruppe{padding:9px 10px 5px!important;font-size:.7rem;color:var(--muted);
+  border-bottom:none!important}
+.mx-warn{display:inline-block;padding:2px 9px;font-weight:600;color:var(--warm);
+  background:#fdf1e3;border-radius:4px}
+.mx-zelle{min-height:22px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;
+  align-items:center;padding:3px;border-radius:4px;cursor:pointer}
+.mx-zelle:hover{background:var(--navy-faint)}
+.mx-zelle.offen{background:var(--navy-faint);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.mx-chip{display:inline-flex;align-items:center;gap:2px;font-size:.72rem;
+  color:var(--text);white-space:nowrap}
+.mx-panel{margin-top:12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:14px 18px}
+.mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
+.mx-panel-titel{font-size:.88rem;font-weight:600;color:var(--navy)}
+.mx-panel-unter{font-size:.74rem;color:var(--muted);margin-top:2px}
+.mx-panel-zu{flex:none;width:26px;height:26px;font-family:inherit;font-size:1.05rem;
+  line-height:1;color:var(--muted);background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
+.mx-panel-zu:hover{color:var(--warm);border-color:var(--warm)}
+.mx-hinweis{font-size:.74rem;color:var(--accent);margin-bottom:8px}
+.mx-hf{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:6px 2px;border-top:1px solid var(--surface3);font-size:.78rem}
+.mx-hf:first-of-type{border-top:none}
+.mx-hf-heft{font-weight:600;color:var(--text);margin-right:8px}
+.mx-hf-ab{color:var(--muted);font-size:.72rem;margin-right:10px}
+.mx-hf-knoepfe{display:flex;gap:6px;flex:none}
+.mx-toggle{display:flex;align-items:center;gap:5px;padding:4px 9px;font-family:inherit;
+  font-size:.72rem;font-weight:600;color:var(--muted);background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
+.mx-toggle:hover{border-color:var(--navy-light)}
+.mx-toggle.an{color:#ffffff}
+.mx-toggle.auslage.an{background:var(--accent);border-color:var(--accent)}
+.mx-toggle.bericht.an{background:var(--navy);border-color:var(--navy)}
+.mx-trenn{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:.68rem;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.mx-trenn span{flex:1;border-top:1px solid var(--border)}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
@@ -1074,6 +1136,7 @@ function waehleJahrgang(y){
   jahr     = y;
   JOURNALS = DATEN[y].titel;
   setzeKongresse(DATEN[y]);
+  mxAuswahl = null;
   GESAMT   = JOURNALS.reduce((s,j)=>s+j.issues.length,0);
   activeJ.clear();
   mxSel.clear();
@@ -1180,6 +1243,10 @@ let view = 'cards';
 // Dokumentkopf, Formatempfehlung und die Kopie sehen nie einen Wert, den es
 // als Druckbild nicht gibt.
 let bearbOffen = false;
+// Zwei Seiten desselben Bestands: von der Ausgabe her (wie bisher) oder vom
+// Kongress her. mxAuswahl haelt die gerade geoeffnete Zelle der Matrix.
+let bearbAnsicht = 'ausgabe';
+let mxAuswahl = null;
 let ohneVerstrichene = false;   // Schalter in der Legendenzeile
 const activeJ = new Set();
 let sortKey = 'et', sortDir = 1;
@@ -1270,6 +1337,7 @@ async function bearbBeenden(){
   bearbAuswahl = null; entwurf = null; entwurfRein = null;
   bearbStandText = ''; bearbStandArt = '';
   bearbOffen = false;
+  bearbAnsicht = 'ausgabe'; mxAuswahl = null;
   return true;
 }
 
@@ -3893,7 +3961,190 @@ function sicherungListeHtml(){
   }).join('');
 }
 
+// ─── Bearbeiten: Umschalter nach Ausgabe / nach Kongress ───────────────────
+async function bearbAnsichtSetzen(v){
+  if(bearbAnsicht===v) return;
+  if(!await bearbFrei()) return;
+  bearbAnsicht = v;
+  bearbAuswahl = null; entwurf = null; entwurfRein = null;
+  mxAuswahl = null;
+  bearbStandText=''; bearbStandArt='';
+  render();
+}
+
+function bearbUmschalterHtml(){
+  const btn = (v,t) => `<button type="button" class="bu-btn${bearbAnsicht===v?' aktiv':''}"
+    onclick="bearbAnsichtSetzen('${v}')">${t}</button>`;
+  return `<div class="bearb-umschalter">${btn('ausgabe','Nach Ausgabe')}${btn('kongress','Nach Kongress')}</div>`;
+}
+
+// ─── Kongressmatrix ─────────────────────────────────────────────────────────
+// Vom Kongress her statt von der Ausgabe her: eine Zeile je Kongress, eine
+// Spalte je Titel. Kein Vorschlag - das Feld zeigt nur, was schon zugeordnet
+// ist; verteilt wird von Hand ueber die Heftwahl.
+
+function mxZeilen(){
+  const j = DATEN[jahr];
+  const alle = (j && j.kongresse) || [];
+  const mit  = alle.filter(k=>k.von).sort((a,b)=>
+    a.von===b.von ? (a.bis||'').localeCompare(b.bis||'') : a.von.localeCompare(b.von));
+  const ohne = alle.filter(k=>!k.von).sort((a,b)=>
+    (a.unscharf||a.lang).localeCompare(b.unscharf||b.lang,'de'));
+  return {ohne, mit};
+}
+
+// Alle (Heft, Art)-Paare eines Titels zu einem Kongress.
+function mxZelle(k, t){
+  const treffer = [];
+  t.issues.forEach(iss=>{
+    if((iss.a||[]).includes(k.id)) treffer.push({heft:iss.heft, art:'auslage'});
+    if((iss.b||[]).includes(k.id)) treffer.push({heft:iss.heft, art:'bericht'});
+  });
+  return treffer;
+}
+
+const MX_AUSLAGE = '<svg width="7" height="7" viewBox="0 0 10 10" aria-hidden="true"><polygon points="0,0 10,5 0,10" fill="var(--accent)"/></svg>';
+const MX_BERICHT = '<svg width="6" height="6" viewBox="0 0 10 10" aria-hidden="true"><rect width="10" height="10" rx="1" fill="var(--navy)"/></svg>';
+
+function mxZeitraum(k){ return kongressZeitraum(k); }
+
+function mxZeileHtml(k, offen){
+  const zellen = JOURNALS.map(t=>{
+    const treffer = mxZelle(k,t);
+    const chips = treffer.map(x=>`<span class="mx-chip">${x.art==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(x.heft)}</span>`).join('');
+    const on = offen && offen.kongressId===k.id && offen.titelId===t.id;
+    return `<td style="text-align:center"><div class="mx-zelle${on?' offen':''}" role="button" tabindex="0"
+      onclick="mxOeffnen('${k.id}',${t.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
+      aria-label="${escA(t.short)}, ${escA(k.lang)}">${chips}</div></td>`;
+  }).join('');
+  return `<tr><td class="mx-lbl"><div class="mx-name">${esc(k.lang)}</div>
+    <div class="mx-info">${esc(mxZeitraum(k))}${k.ort?' · '+esc(k.ort):''}</div></td>${zellen}</tr>`;
+}
+
+function renderKongressmatrix(){
+  const j = DATEN[jahr];
+  if(!j || !j.umgestellt)
+    return `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
+      Über <b>Daten &rarr; Kongresse umstellen</b> lässt sich das nachholen.</div>`;
+  const {ohne, mit} = mxZeilen();
+  if(!ohne.length && !mit.length)
+    return `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>`;
+
+  const belegt = JOURNALS.reduce((s,t)=>s+t.issues.reduce((n,iss)=>
+    n + (iss.a||[]).length + (iss.b||[]).length, 0), 0);
+  const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map(t=>
+    `<th style="border-bottom:2px solid ${escA(t.hex)}">${esc(t.short)}</th>`).join('')}</tr>`;
+
+  let zeilen = '';
+  if(ohne.length){
+    zeilen += `<tr><td colspan="${JOURNALS.length+1}" class="mx-gruppe">
+      <span class="mx-warn">Termin fehlt — noch zu recherchieren</span></td></tr>`;
+    zeilen += ohne.map(k=>mxZeileHtml(k, mxAuswahl)).join('');
+  }
+  if(mit.length){
+    if(ohne.length) zeilen += `<tr><td colspan="${JOURNALS.length+1}" class="mx-gruppe">Nach Zeitraum sortiert</td></tr>`;
+    zeilen += mit.map(k=>mxZeileHtml(k, mxAuswahl)).join('');
+  }
+
+  const panel = mxAuswahl ? mxPanelHtml() : '';
+  return `<div class="mx-kopf">
+      <div class="mx-titel-kl">Jahrgang ${esc(jahr)}</div>
+      <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} belegte Felder</div>
+    </div>
+    <div class="mx-scroll"><table class="mx-tab">
+      <thead>${kopf}</thead><tbody>${zeilen}</tbody>
+    </table></div>
+    <div id="mxPanel">${panel}</div>`;
+}
+
+// ── Heftwahl ────────────────────────────────────────────────────────────────
+function mxOeffnen(kongressId, titelId){
+  mxAuswahl = (mxAuswahl && mxAuswahl.kongressId===kongressId && mxAuswahl.titelId===titelId)
+    ? null : {kongressId, titelId};
+  render();
+  if(mxAuswahl){
+    const p=document.getElementById('mxPanel');
+    if(p) p.scrollIntoView({block:'nearest'});
+  }
+}
+
+function mxSchliessen(){ mxAuswahl = null; render(); }
+
+function mxTage(a,b){ return Math.round((new Date(a) - new Date(b)) / 864e5); }
+
+function mxPanelHtml(){
+  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
+  const t = JOURNALS.find(x=>x.id===mxAuswahl.titelId);
+  if(!k || !t){ mxAuswahl=null; return ''; }
+
+  const kein = !k.von ? `<div class="mx-hinweis">Kein Tagesdatum hinterlegt — es wird kein Abstand gerechnet.</div>` : '';
+  let vor='', nach='';
+  t.issues.forEach(iss=>{
+    const istA = (iss.a||[]).includes(k.id), istB = (iss.b||[]).includes(k.id);
+    let ab = iss.et ? `ET ${fmt(iss.et)}` : 'ET –';
+    if(k.von && iss.et){
+      const d = mxTage(k.von, iss.et);
+      ab += d>=0 ? ` — ${d} Tage vor Beginn` : ` — ${-d} Tage nach Beginn`;
+    }
+    // Der Abstand steht nur dabei, wenn er etwas Wahres sagt: ein Anzeigenschluss
+    // vor Kongressende (die Hefte vor Beginn, aber auch manches fruehe Heft
+    // danach) liesse als "N Tage nach Ende" eine negative Zahl erwarten -
+    // dort bleibt es beim reinen Datum.
+    let ab2 = iss.as ? `AS ${fmt(iss.as)}` : 'AS –';
+    if((k.bis||k.von) && iss.as){
+      const d = mxTage(iss.as, k.bis||k.von);
+      if(d>=0) ab2 += ` — ${d} Tage nach Ende`;
+    }
+    const knopf = (art,istDrin,icon) => `<button type="button" class="mx-toggle ${art}${istDrin?' an':''}"
+      onclick="mxToggle('${k.id}',${t.id},'${esc(iss.heft)}','${art}')"
+      title="${art==='auslage'?'Auslage':'Bericht'}${istDrin?' entfernen':' zuordnen'}">${icon}<span>${art==='auslage'?'Auslage':'Bericht'}</span></button>`;
+    const row = `<div class="mx-hf">
+        <div><span class="mx-hf-heft">Heft ${esc(iss.heft)}</span>
+          <span class="mx-hf-ab">${ab}</span><span class="mx-hf-ab">${ab2}</span></div>
+        <div class="mx-hf-knoepfe">${knopf('auslage',istA,MX_AUSLAGE)}${knopf('bericht',istB,MX_BERICHT)}</div>
+      </div>`;
+    if(k.von && iss.et && iss.et < k.von) vor += row; else nach += row;
+  });
+  const trenn = (vor && nach)
+    ? `<div class="mx-trenn"><span></span><b>Kongressbeginn</b><span></span></div>` : '';
+
+  return `<div class="mx-panel">
+    <div class="mx-panel-kopf">
+      <div><div class="mx-panel-titel">${esc(t.short)}</div>
+        <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
+      <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
+    </div>
+    ${kein}${vor}${trenn}${nach}
+    <p class="bearb-stand" id="bearbStand"></p>
+  </div>`;
+}
+
+async function mxToggle(kongressId, titelId, heft, art){
+  const t = JOURNALS.find(x=>x.id===titelId);
+  const iss = t && t.issues.find(x=>x.heft===heft);
+  if(!iss) return;
+  if(!iss.a) iss.a=[]; if(!iss.b) iss.b=[];
+  const arr = art==='auslage' ? iss.a : iss.b;
+  const war = arr.includes(kongressId);
+  if(war){ arr.splice(arr.indexOf(kongressId),1); } else { arr.push(kongressId); }
+  render();
+  bearbStand('Wird gespeichert …', '');
+  try{
+    await zuordnungSchreiben(iss);
+    bearbStand('Gespeichert', 'gut');
+  }catch(fehler){
+    // Fehlgeschlagen: die Zuordnung wieder zuruecknehmen, damit die Anzeige
+    // nicht etwas zeigt, das in der Datenbank nicht steht.
+    if(war) arr.push(kongressId); else arr.splice(arr.indexOf(kongressId),1);
+    render();
+    bearbStand(fehlertext(fehler), 'schlecht');
+  }
+}
+
 function renderBearbeiten(){
+  const umschalter = bearbUmschalterHtml();
+  if(bearbAnsicht==='kongress') return umschalter + renderKongressmatrix();
+
   const gewaehltIst = (art, titelId, index) => !!bearbAuswahl
     && bearbAuswahl.art===art && !bearbAuswahl.neu
     && bearbAuswahl.titelId===titelId
@@ -3929,7 +4180,7 @@ function renderBearbeiten(){
   // Der Knopf fuer einen neuen Titel steht ausserhalb der Liste: in ihr haette
   // er hinter allen Heften gestanden und waere erst nach langem Blaettern zu
   // sehen gewesen.
-  return `<div class="bearb">
+  return umschalter + `<div class="bearb">
     <div class="bearb-spalte">
       <div class="bearb-liste">${liste}</div>
       <button type="button" class="bearb-titelknopf${titelNeu?' gewaehlt':''}"
