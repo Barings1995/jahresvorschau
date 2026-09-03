@@ -363,6 +363,11 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .dlg-haken{display:flex;align-items:flex-start;gap:7px;font-size:.79rem;
   color:var(--text);margin-bottom:4px;cursor:pointer}
 .dlg-haken input{margin-top:2px;flex:none}
+/* Der Hinweiskasten gehoert zum Haekchen darueber. Folgt darunter das
+   naechste Haekchen, stossen beide sonst ohne Luft aneinander und die
+   Zusammengehoerigkeit ist nicht mehr zu sehen: der Abstand zwischen den
+   Gruppen muss groesser sein als der innerhalb einer. */
+.pr-hinw + .dlg-haken{margin-top:16px}
 .pr-fehler{font-size:.79rem;line-height:1.55;color:var(--text)}
 .export-btn{display:flex;align-items:center;gap:7px;padding:6px 12px;font-family:inherit;font-size:.78rem;font-weight:600;color:#ffffff;background:var(--navy);border:1.5px solid var(--navy);border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s}
 .export-btn:hover{background:var(--navy-light);border-color:var(--navy-light)}
