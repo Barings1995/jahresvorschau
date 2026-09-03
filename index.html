@@ -854,7 +854,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
       <div class="export-menu" id="datenMenu" role="menu">
         <button class="ex-item" id="bearbMenuBtn" role="menuitem" onclick="bearbeitenKlick()">
           <span class="ex-t">Bearbeiten</span>
-          <span class="ex-d">&Ouml;ffnet die Arbeitsansicht: Ausgaben und Titel anlegen, &auml;ndern und entfernen</span>
+          <span class="ex-d">&Ouml;ffnet die Arbeitsansicht: Ausgaben, Titel und Kongresse anlegen, &auml;ndern und entfernen</span>
         </button>
         <button class="ex-item" role="menuitem" onclick="datenLadenKlick()">
           <span class="ex-t">Aus Excel laden</span>
@@ -1354,7 +1354,7 @@ function bearbAnzeige(){
     if(t) t.textContent = bearbOffen ? 'Bearbeiten beenden' : 'Bearbeiten';
     if(d) d.innerHTML = bearbOffen
       ? `Schlie&szlig;t die Arbeitsansicht und f&uuml;hrt zur Ansicht &raquo;${VIEW_TEXT[view]}&laquo; zur&uuml;ck`
-      : '&Ouml;ffnet die Arbeitsansicht: Ausgaben und Titel anlegen, &auml;ndern und entfernen';
+      : '&Ouml;ffnet die Arbeitsansicht: Ausgaben, Titel und Kongresse anlegen, &auml;ndern und entfernen';
   }
   document.body.classList.toggle('bearbmodus', bearbOffen);
   standFeldModus();
