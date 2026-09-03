@@ -698,6 +698,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
 /* ── Kongressmatrix ── */
 .mx-kopf{display:flex;justify-content:space-between;align-items:baseline;
   gap:12px;margin-bottom:10px}
+.mx-kopf-re{display:flex;align-items:baseline;gap:14px}
 .mx-titel-kl{font-size:.85rem;font-weight:600;color:var(--navy)}
 .mx-zahl{font-size:.76rem;color:var(--muted)}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
@@ -4251,8 +4252,11 @@ function renderKongressmatrix(){
     return `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
       Über <b>Daten &rarr; Kongresse umstellen</b> lässt sich das nachholen.</div>`;
   const {ohne, mit} = mxZeilen();
+  const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()">+ Neuer Kongress</button>`;
   if(!ohne.length && !mit.length)
-    return `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>`;
+    return `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>
+      ${neuKnopf}
+      <div id="mxPanel">${mxAuswahl ? mxPanelHtml() : ''}</div>`;
 
   const belegt = JOURNALS.reduce((s,t)=>s+t.issues.reduce((n,iss)=>
     n + (iss.a||[]).length + (iss.b||[]).length, 0), 0);
@@ -4279,8 +4283,11 @@ function renderKongressmatrix(){
   const panel = mxAuswahl ? mxPanelHtml() : '';
   return `<div class="mx-kopf">
       <div class="mx-titel-kl">Jahrgang ${esc(jahr)}</div>
-      <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} belegte Felder${
-        offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
+      <div class="mx-kopf-re">
+        <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} belegte Felder${
+          offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
+        ${neuKnopf}
+      </div>
     </div>
     <div class="mx-scroll"><table class="mx-tab">
       <thead>${kopf}</thead><tbody>${zeilen}</tbody>
@@ -4305,6 +4312,7 @@ function mxSchliessen(){ mxAuswahl = null; mxKongEntwurf = null; render(); }
 function mxTage(a,b){ return Math.round((new Date(a) - new Date(b)) / 864e5); }
 
 function mxPanelHtml(){
+  if(mxAuswahl.kongressId==='__neu__') return mxKongFormHtml(null);
   const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
   if(!k){ mxAuswahl=null; return ''; }
   if(mxAuswahl.titelId===null) return mxKongFormHtml(k);
@@ -4402,6 +4410,17 @@ function mxOeffnenKongress(kongressId){
   render();
 }
 
+// Ueber dem Kopf der Matrix: ein Kongress ohne Ausgabe - Name steht schon
+// fest, Termin und Verteilung noch nicht. Dieselbe Kennung '__neu__' wie beim
+// Sentinel in mxPanelHtml markiert, dass es noch keinen Datenbanksatz gibt.
+function mxKongNeu(){
+  mxAuswahl = {kongressId:'__neu__', titelId:null};
+  mxKongEntwurf = {lang:'', kurz:'', von:'', bis:'', unscharf:'', ort:''};
+  render();
+  const p=document.getElementById('mxPanel');
+  if(p) p.scrollIntoView({block:'nearest'});
+}
+
 function mxKongFeld(feld, wert){
   if(!mxKongEntwurf) return;
   mxKongEntwurf[feld] = wert;
@@ -4410,11 +4429,12 @@ function mxKongFeld(feld, wert){
 }
 
 function mxKongFormHtml(k){
+  const neu = !k;
   const e = mxKongEntwurf;
-  const hatZuordnung = JOURNALS.some(t=>mxZelle(k,t).length>0);
+  const hatZuordnung = !neu && JOURNALS.some(t=>mxZelle(k,t).length>0);
   return `<div class="mx-panel">
     <div class="mx-panel-kopf">
-      <div><div class="mx-panel-titel">Kongress bearbeiten</div>
+      <div><div class="mx-panel-titel">${neu ? 'Neuer Kongress' : 'Kongress bearbeiten'}</div>
         <div class="mx-panel-unter">Gilt nur für den Jahrgang ${esc(jahr)}</div></div>
       <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
     </div>
@@ -4437,18 +4457,19 @@ function mxKongFormHtml(k){
       <input type="text" value="${escA(e.ort)}" oninput="mxKongFeld('ort',this.value)"></label>
     <div class="bearb-fuss">
       <button type="button" class="bearb-speichern" id="mxKongSpeichern"
-              onclick="mxKongSpeichern()" disabled>Speichern</button>
+              onclick="mxKongSpeichern()" disabled>${neu ? 'Anlegen' : 'Speichern'}</button>
       <button type="button" class="bearb-verwerfen" onclick="mxSchliessen()">Abbrechen</button>
-      ${hatZuordnung ? '' : `<button type="button" class="bearb-loeschen" onclick="mxKongEntfernen()">Entfernen</button>`}
+      ${(!neu && !hatZuordnung) ? `<button type="button" class="bearb-loeschen" onclick="mxKongEntfernen()">Entfernen</button>` : ''}
     </div>
-    ${hatZuordnung ? '' : `<p class="mx-hinweis" style="margin-top:8px">Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.</p>`}
+    ${(!neu && !hatZuordnung) ? `<p class="mx-hinweis" style="margin-top:8px">Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.</p>` : ''}
   </div>`;
 }
 
 async function mxKongSpeichern(){
   if(!mxKongEntwurf || !mxAuswahl) return;
-  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
-  if(!k) return;
+  const neu = mxAuswahl.kongressId==='__neu__';
+  const k = neu ? null : (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
+  if(!neu && !k) return;
   const e = mxKongEntwurf;
   const lang = e.lang.trim();
   if(!lang) return bearbStand('Der Name darf nicht leer bleiben.', 'schlecht');
@@ -4458,13 +4479,34 @@ async function mxKongSpeichern(){
   const patch = {lang, kurz:(e.kurz||'').trim(), von, bis, unscharf, ort:(e.ort||'').trim()};
   const btn = document.getElementById('mxKongSpeichern');
   if(btn) btn.disabled = true;
-  bearbStand('Wird gespeichert …', '');
+  bearbStand(neu ? 'Wird angelegt …' : 'Wird gespeichert …', '');
   try{
-    await dbAnfrage('/rest/v1/kongress?id=eq.'+encodeURIComponent(k.id),
-      {method:'PATCH', headers:{Prefer:'return=minimal'}, body: JSON.stringify(patch)});
-    Object.assign(k, patch);
-    render();
-    bearbStand('Gespeichert', 'gut');
+    if(neu){
+      // Ohne Ausgabe, deshalb ueber dieselbe Tabelle wie jede andere Neuanlage,
+      // aber ohne den Umweg ueber eine Heftzuordnung (zuordnungSchreiben).
+      const angelegt = await dbAnfrage('/rest/v1/kongress',
+        {method:'POST', headers:{Prefer:'return=representation'},
+         body: JSON.stringify([Object.assign({jahr}, patch)])});
+      const roh = Array.isArray(angelegt) ? angelegt[0] : angelegt;
+      if(!roh || !roh.id) throw new Error('Der Kongress wurde nicht angelegt.');
+      const satz = Object.assign({kurz:''}, roh);
+      if(!DATEN[jahr].kongresse) DATEN[jahr].kongresse = [];
+      DATEN[jahr].kongresse.push(satz);
+      KONG.set(satz.id, satz);
+      // Bleibt offen - als Kongress-bearbeiten-Ansicht desselben, jetzt
+      // echten Satzes, damit sich gleich ein Tippfehler korrigieren liesse.
+      // mxKongEntwurf bleibt dabei stehen (entspricht dem gerade Gespeicherten) -
+      // mxKongFormHtml liest ihn bei jedem Aufruf, auch im Bearbeiten-Zweig.
+      mxAuswahl = {kongressId:satz.id, titelId:null};
+      render();
+      bearbStand('Angelegt', 'gut');
+    } else {
+      await dbAnfrage('/rest/v1/kongress?id=eq.'+encodeURIComponent(k.id),
+        {method:'PATCH', headers:{Prefer:'return=minimal'}, body: JSON.stringify(patch)});
+      Object.assign(k, patch);
+      render();
+      bearbStand('Gespeichert', 'gut');
+    }
   }catch(fehler){
     if(btn) btn.disabled = false;
     bearbStand(fehlertext(fehler), 'schlecht');

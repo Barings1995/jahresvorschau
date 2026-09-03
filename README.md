@@ -135,6 +135,12 @@ es nicht bei jedem Zeichen, sondern erst mit *Speichern*: mehrere Felder
 gehören zu einer Änderung. *Entfernen* steht nur, solange der Kongress keinem
 Heft zugeordnet ist — etwa bei einer doppelten Schreibweise.
 
+*+ Neuer Kongress* über der Matrix öffnet dasselbe Formular leer: ein
+Kongress, dessen Name bereits feststeht, dessen Termin und Titelverteilung
+aber noch offen sind. Angelegt wird er stets ohne Heftzuordnung; bleibt dabei
+auch der Zeitraum leer, steht er in der Matrix unter *Termin fehlt*, bis
+Recherche und Heftwahl ihn füllen.
+
 Ohne dieses Formular gäbe es keinen Weg, einem übernommenen Kongress ohne
 Termin nachträglich einen zu geben: die Ausgabenseite hätte bei jeder Änderung
 des zusammengesetzten Wortlauts einen zweiten Kongress angelegt statt den
