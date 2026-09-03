@@ -933,6 +933,119 @@ function kongName(s){
   return t ? t.name : s;
 }
 
+// ─── Kongresse als eigene Saetze ───────────────────────────────────────────
+// Ein Kongress steht einmal je Jahrgang, nicht einmal je Ausgabe. Zuvor stand
+// er als Zeichenkette in jeder Ausgabe erneut - im Jahrgang 2027 bis zu neunmal
+// wortgleich. Verschob sich ein Termin, waren es neun Aenderungen, und der
+// AEK-Kongress war bereits in zwei Schreibweisen auseinandergelaufen.
+// DATEN[jahr].kongresse haelt die Saetze; iss.a und iss.b fuehren nur noch
+// deren Kennung.
+let KONG = new Map();
+let KONG_NEU = 0;
+
+const K_MONATE = {Januar:1,Februar:2,'März':3,April:4,Mai:5,Juni:6,Juli:7,
+  August:8,September:9,Oktober:10,November:11,Dezember:12};
+
+// Liest einen Teil als Zeitraum: "17.06.–19.06.2027", "12.03.2027",
+// "September 2027" oder "September". Fuer die Monatsangaben gibt es keinen Tag;
+// sie bleiben als Wortlaut stehen (unscharf) statt auf den Monatsersten geraten
+// zu werden.
+function zeitraumTeil(s){
+  let m = s.match(/^(\d{2})\.(\d{2})\.?\s*[–\-−]\s*(\d{2})\.(\d{2})\.(\d{4})$/);
+  if(m) return {von:`${m[5]}-${m[2]}-${m[1]}`, bis:`${m[5]}-${m[4]}-${m[3]}`, unscharf:''};
+  m = s.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if(m) return {von:`${m[3]}-${m[2]}-${m[1]}`, bis:`${m[3]}-${m[2]}-${m[1]}`, unscharf:''};
+  m = s.match(/^([A-Za-zÄÖÜäöüß]+)(?:\s+(\d{4}))?$/);
+  if(m && K_MONATE[m[1]]) return {von:null, bis:null, unscharf:s};
+  return null;
+}
+
+// Zerlegt "Langname, Zeitraum, Ort". Der Name selbst darf Kommas fuehren
+// ("Jahrestagung der Deutschen, Oesterreichischen und Schweizerischen
+// Gesellschaften ..."), deshalb wird von links gesammelt, bis ein Teil als
+// Zeitraum lesbar ist. Findet sich keiner, ist die ganze Zeichenkette der Name:
+// so kommt der Jahrgang 2026, der keine Termine fuehrt, unveraendert durch.
+function zerlegeKongress(roh){
+  const teile = String(roh).split(',').map(s=>s.trim());
+  let lang = teile[0];
+  for(let i=1;i<teile.length;i++){
+    const z = zeitraumTeil(teile[i]);
+    if(z) return Object.assign({lang}, z, {ort: teile.slice(i+1).join(', ')});
+    lang += ', ' + teile[i];
+  }
+  return {lang: String(roh).trim(), von:null, bis:null, unscharf:'', ort:''};
+}
+
+function tagMonat(iso){ return iso.slice(8,10) + '.' + iso.slice(5,7) + '.'; }
+
+function kongressZeitraum(k){
+  if(!k) return '';
+  if(k.unscharf) return k.unscharf;
+  if(!k.von) return '';
+  if(!k.bis || k.bis === k.von) return tagMonat(k.von) + k.von.slice(0,4);
+  return tagMonat(k.von) + '–' + tagMonat(k.bis) + k.bis.slice(0,4);
+}
+
+// Setzt den Wortlaut wieder zusammen, in dem der Kongress in allen fuenf
+// Ansichten und im Excel-Ausgang erscheint. Nachgemessen an beiden Jahrgaengen:
+// die Zusammensetzung ergibt Zeichen fuer Zeichen dasselbe wie zuvor. Der
+// Bestand fuehrt durchgehend denselben Gedankenstrich (U+2013); die zwei
+// verschiedenen Striche stehen in Angebotsdaten.xlsx, nicht hier.
+function kongressAus(k){
+  if(!k) return '';
+  return [k.lang, kongressZeitraum(k), k.ort].filter(Boolean).join(', ');
+}
+
+function kongressText(id){
+  const k = KONG.get(id);
+  return k ? kongressAus(k) : String(id);
+}
+
+// Traegt einen Wortlaut in den gezeigten Jahrgang ein und gibt die Kennung
+// zurueck. Steht derselbe Wortlaut schon da, ist es derselbe Kongress.
+function kongressEintragen(roh){
+  const text = String(roh == null ? '' : roh).trim();
+  if(!text) return null;
+  for(const k of KONG.values()) if(kongressAus(k) === text) return k.id;
+  const liste = (DATEN[jahr] && DATEN[jahr].kongresse) || [];
+  // Eigenes Praefix: die beim Laden vergebenen Kennungen heissen k1, k2 ...,
+  // ein hier gezaehlter Anhang koennte sonst auf eine davon fallen.
+  const k = Object.assign({id:'n'+(++KONG_NEU), kurz:''}, zerlegeKongress(text));
+  liste.push(k); KONG.set(k.id, k);
+  return k.id;
+}
+
+function kongressKennungen(texte){
+  return (texte||[]).map(t=>kongressEintragen(t)).filter(Boolean);
+}
+
+// Beim Laden und beim Excel-Eingang: Zeichenketten auf Saetze abbilden.
+// Gleiche Zeichenkette = ein Kongress. Zwei Schreibweisen desselben Kongresses
+// bleiben damit zwei Saetze - sie zusammenzufuehren ist eine Entscheidung und
+// geschieht von Hand, nicht beim Laden.
+function kongressAufloesen(jahrgang){
+  if(!jahrgang || jahrgang.kongresse) return jahrgang;
+  const nach = new Map(), liste = [];
+  const holen = roh => {
+    const text = String(roh == null ? '' : roh).trim();
+    if(!text) return null;
+    if(nach.has(text)) return nach.get(text);
+    const k = Object.assign({id:'k'+(liste.length+1), kurz:''}, zerlegeKongress(text));
+    liste.push(k); nach.set(text, k.id);
+    return k.id;
+  };
+  (jahrgang.titel||[]).forEach(t=>(t.issues||[]).forEach(iss=>{
+    iss.a = (iss.a||[]).map(holen).filter(Boolean);
+    iss.b = (iss.b||[]).map(holen).filter(Boolean);
+  }));
+  jahrgang.kongresse = liste;
+  return jahrgang;
+}
+
+function setzeKongresse(jahrgang){
+  KONG = new Map(((jahrgang && jahrgang.kongresse) || []).map(k=>[k.id,k]));
+}
+
 const MONATE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const MON_KURZ=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 
@@ -952,6 +1065,7 @@ function waehleJahrgang(y){
   if(!DATEN[y]) return;
   jahr     = y;
   JOURNALS = DATEN[y].titel;
+  setzeKongresse(DATEN[y]);
   GESAMT   = JOURNALS.reduce((s,j)=>s+j.issues.length,0);
   activeJ.clear();
   mxSel.clear();
@@ -1222,8 +1336,8 @@ function zeigeThema(){ return modus.size===0 || modus.has('thema'); }
 // ohne sichtbaren Grund.
 function sichtbareFelder(iss){
   const f=[];
-  if(zeigtA())     f.push(...iss.a);
-  if(zeigtB())     f.push(...iss.b);
+  if(zeigtA())     f.push(...iss.a.map(kongressText));
+  if(zeigtB())     f.push(...iss.b.map(kongressText));
   if(zeigeThema()) f.push(iss.top||'', iss.sw||'');
   return f;
 }
@@ -1305,8 +1419,8 @@ function themaZelle(iss,q){       // Tabellenansicht
 }
 
 function inhaltBloecke(iss,q){
-  const a = zeigtA() ? kongBlock(iss.a,q,'auslage') : '';
-  const b = zeigtB() ? kongBlock(iss.b,q,'bericht') : '';
+  const a = zeigtA() ? kongBlock(iss.a.map(kongressText),q,'auslage') : '';
+  const b = zeigtB() ? kongBlock(iss.b.map(kongressText),q,'bericht') : '';
   return a+b+(zeigeThema() ? themaBlock(iss,q) : '');
 }
 
@@ -1440,8 +1554,8 @@ function tabZelle(s,j,iss,q){
       // Schraegstriche und Klammern enthalten, war die Grenze nicht erkennbar.
       const zeile=(n,cls,lbl)=>`<div class="ke"><b class="${cls}">${lbl}</b> ${hl(n,q)}</div>`;
       let kong='';
-      if(zeigtA()) kong+=iss.a.map(n=>zeile(n,'au','Auslage')).join('');
-      if(zeigtB()) kong+=iss.b.map(n=>zeile(n,'','Bericht')).join('');
+      if(zeigtA()) kong+=iss.a.map(n=>zeile(kongressText(n),'au','Auslage')).join('');
+      if(zeigtB()) kong+=iss.b.map(n=>zeile(kongressText(n),'','Bericht')).join('');
       return`<td class="t-kong">${kong||'–'}</td>`;
     }
     default:        return`<td class="t-num dv">${fmt(iss[s.k])}</td>`;   // ET/AS/DU/EH
@@ -1486,8 +1600,8 @@ function sammleKongresse(q){
       // Kongresseintraegen heraus.
       if(ohneVerstrichene && verstrichen(iss)) return;
       const eintraege=[];
-      if(zeigtA()) iss.a.forEach(n=>eintraege.push([n,'auslage']));
-      if(zeigtB()) iss.b.forEach(n=>eintraege.push([n,'bericht']));
+      if(zeigtA()) iss.a.forEach(n=>eintraege.push([kongressText(n),'auslage']));
+      if(zeigtB()) iss.b.forEach(n=>eintraege.push([kongressText(n),'bericht']));
       // Nur wenn das Thema in diesem Modus ueberhaupt angezeigt wird, darf es
       // Eintraege durch die Suche lassen – sonst staenden hier Kongresse ohne
       // erkennbaren Bezug zum Suchbegriff.
@@ -1762,7 +1876,12 @@ function baueKopie(){
   const ohneKennung = JOURNALS.map(j=>({...j, issues: j.issues.map(iss=>{
     const {id, reihenfolge, ...rest} = iss; return rest;
   })}));
-  schreibeDaten(klon,{[jahrgang()]:{stand:standText(),titel:ohneKennung}});
+  // Die Kongresssaetze gehoeren mit in die Kopie: die Ausgaben fuehren nur noch
+  // deren Kennung. Sie fallen dabei kaum ins Gewicht - 41 Saetze gegenueber
+  // 169 wortgleich wiederholten Zeilen zuvor.
+  const kongresse = (DATEN[jahrgang()] && DATEN[jahrgang()].kongresse) || [];
+  schreibeDaten(klon,{[jahrgang()]:
+    {stand:standText(), kongresse:kongresse, titel:ohneKennung}});
 
   // Der Stand wandert als Text mit, ist in der Kopie aber nicht mehr aenderbar.
   // Ohne die Klasse faellt auch die Beschreibbar-Optik weg (helleres Weiss,
@@ -2617,15 +2736,17 @@ function excelBlaetter(q){
       {w:excelDatum(iss.du),t:'n',s:2},{w:excelDatum(iss.eh),t:'n',s:2},
       {w:j.auflage,t:'n'}];
     if(zeigeT) z.push({w:themaText(iss),s:3});
-    if(zeigeA) z.push({w:iss.a.join('\n'),s:3});
-    if(zeigeB) z.push({w:iss.b.join('\n'),s:3});
+    if(zeigeA) z.push({w:iss.a.map(kongressText).join('\n'),s:3});
+    if(zeigeB) z.push({w:iss.b.map(kongressText).join('\n'),s:3});
     return z;
   });
 
   const eintraege=[];
   items.forEach(({j,iss})=>{
-    if(zeigeA) iss.a.forEach(n=>eintraege.push({name:kongName(n),art:'Auslage',j,iss,roh:n}));
-    if(zeigeB) iss.b.forEach(n=>eintraege.push({name:kongName(n),art:'Bericht',j,iss,roh:n}));
+    if(zeigeA) iss.a.forEach(n=>{const t=kongressText(n);
+      eintraege.push({name:kongName(t),art:'Auslage',j,iss,roh:t});});
+    if(zeigeB) iss.b.forEach(n=>{const t=kongressText(n);
+      eintraege.push({name:kongName(t),art:'Bericht',j,iss,roh:t});});
   });
   const rubrik=n=>n.startsWith('»')?1:0;
   eintraege.sort((a,b)=>rubrik(a.name)-rubrik(b.name)
@@ -2813,6 +2934,10 @@ function render(){
 // Beim Oeffnen wird der laufende Jahrgang gezeigt, sofern er vorliegt –
 // sonst der erste vorhandene. In einer Kopie gibt es nur einen.
 function starteAnsicht(){
+  // Eine eigenstaendige Kopie traegt den Jahrgang im Dokument. Stammt sie aus
+  // einer aelteren Fassung, stehen dort noch Zeichenketten statt Kennungen -
+  // hier werden sie einmalig aufgeloest.
+  Object.keys(DATEN).forEach(y=>kongressAufloesen(DATEN[y]));
   waehleJahrgang(jahrgaenge().includes(String(TODAY.getFullYear()))
     ? String(TODAY.getFullYear()) : jahrgaenge()[0]);
 }
@@ -3060,7 +3185,8 @@ async function bearbWaehle(titelId, index){
   bearbBeginn({ art:'ausgabe', titelId, index },
     { id: iss.id, heft: iss.heft, et: iss.et||'', as: iss.as||'',
       du: iss.du||'', eh: iss.eh||'', top: iss.top||'', sw: iss.sw||'',
-      a: [...(iss.a||[])], b: [...(iss.b||[])] });
+      a: (iss.a||[]).map(kongressText),
+      b: (iss.b||[]).map(kongressText) });
 }
 
 // Eine neue Ausgabe ist zunaechst nur ein leerer Entwurf. Angelegt wird sie
@@ -3173,9 +3299,9 @@ function entwurfInAusgabe(iss){
   iss.et = entwurf.et; iss.as = entwurf.as;
   iss.du = entwurf.du; iss.eh = entwurf.eh;
   iss.top = entwurf.top; iss.sw = entwurf.sw;
-  iss.a = entwurf.a.map(x=>x.trim()).filter(Boolean);
-  iss.b = entwurf.b.map(x=>x.trim()).filter(Boolean);
-  entwurf.a = [...iss.a]; entwurf.b = [...iss.b];
+  iss.a = kongressKennungen(entwurf.a);
+  iss.b = kongressKennungen(entwurf.b);
+  entwurf.a = iss.a.map(kongressText); entwurf.b = iss.b.map(kongressText);
   entwurfRein = JSON.stringify(entwurf);
 }
 
@@ -3378,7 +3504,8 @@ function jahrgangAlsBlock(y){
     id:j.id, kurz:j.short, voll:j.full, auflage:j.auflage, hex:j.hex,
     issues: j.issues.map(iss=>({
       heft:iss.heft, et:iss.et, as:iss.as, du:iss.du, eh:iss.eh,
-      top:iss.top, sw:iss.sw, a:iss.a, b:iss.b }))
+      top:iss.top, sw:iss.sw,
+      a:iss.a.map(kongressText), b:iss.b.map(kongressText) }))
   })) };
 }
 
@@ -3479,10 +3606,9 @@ function bearbFormNeu(){
 
 function kongVorschlaege(){
   const namen = new Set();
-  Object.values(DATEN).forEach(j=>j.titel.forEach(t=>t.issues.forEach(iss=>{
-    (iss.a||[]).forEach(s=>namen.add(s));
-    (iss.b||[]).forEach(s=>namen.add(s));
-  })));
+  Object.values(DATEN).forEach(j=>(j.kongresse||[]).forEach(k=>{
+    const t = kongressAus(k); if(t) namen.add(t);
+  }));
   return [...namen].sort((a,b)=>a.localeCompare(b,'de'));
 }
 
@@ -3863,6 +3989,9 @@ function inDatenForm(jahrgaenge, titel, ausgaben){
       top: a.thema || '', sw: a.sonderthema || ''
     });
   }
+  // Die Datenbank liefert die Kongresse noch als Zeichenketten je Ausgabe.
+  // Hier entstehen daraus die Saetze des Jahrgangs.
+  Object.keys(ergebnis).forEach(y=>kongressAufloesen(ergebnis[y]));
   return ergebnis;
 }
 
