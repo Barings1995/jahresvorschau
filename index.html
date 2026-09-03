@@ -686,7 +686,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .sich-fehler{color:var(--warm)}
 .sich-fehler .bearb-zu{margin-left:8px;vertical-align:middle}
 
-/* ── Umschalter nach Ausgabe / nach Kongress ── */
+/* ── Umschalter: aussen Blickwinkel, innen Art der Zuordnung ── */
 .bearb-umschalter{display:flex;gap:2px;background:var(--surface2);
   border:1px solid var(--border);border-radius:6px;padding:3px;margin-bottom:14px;
   width:fit-content}
@@ -694,11 +694,19 @@ p.bearb-stand:not(:empty){margin-top:9px}
   color:var(--muted);background:none;border:none;border-radius:4px;cursor:pointer}
 .bu-btn:hover{color:var(--navy)}
 .bu-btn.aktiv{color:#ffffff;background:var(--navy)}
+/* Der innere Umschalter (Auslagen/Berichte) haelt dem aeusseren bewusst nicht
+   die Waage: kleiner, ohne eigenen Abstand nach unten, mit dem Symbol der
+   Matrix im Knopf, damit Umschalter und Zelleninhalt dieselbe Sprache sprechen. */
+.bearb-umschalter.klein{margin-bottom:0;padding:2px}
+.bearb-umschalter.klein .bu-btn{display:flex;align-items:center;gap:5px;
+  padding:4px 10px;font-size:.72rem}
+.bearb-umschalter.klein .bu-btn.aktiv svg polygon,
+.bearb-umschalter.klein .bu-btn.aktiv svg rect{fill:#ffffff}
 
 /* ── Kongressmatrix ── */
 .mx-kopf{display:flex;justify-content:space-between;align-items:baseline;
   gap:12px;margin-bottom:10px}
-.mx-kopf-re{display:flex;align-items:baseline;gap:14px}
+.mx-kopf-re{display:flex;align-items:center;gap:14px}
 .mx-titel-kl{font-size:.85rem;font-weight:600;color:var(--navy)}
 .mx-zahl{font-size:.76rem;color:var(--muted)}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
@@ -1295,6 +1303,12 @@ let bearbOffen = false;
 // Kongress her. mxAuswahl haelt die gerade geoeffnete Zelle der Matrix.
 let bearbAnsicht = 'ausgabe';
 let mxAuswahl = null;
+// Auslage und Bericht sind zwei verschiedene Planungen - die Auslage liegt
+// beim Kongress aus und muss davor erscheinen, der Bericht kommt danach. Die
+// Matrix zeigt darum immer nur eine der beiden Arten. Der Wert wird nirgends
+// zurueckgesetzt: wer mitten in der Berichtsplanung kurz zur Ausgabenseite
+// schaut, findet sie beim Zurueckkommen unveraendert vor.
+let mxArt = 'auslage';
 let ohneVerstrichene = false;   // Schalter in der Legendenzeile
 const activeJ = new Set();
 let sortKey = 'et', sortDir = 1;
@@ -4177,6 +4191,25 @@ async function bearbAnsichtSetzen(v){
   render();
 }
 
+// Der aeussere Umschalter oben unterscheidet den Blickwinkel, dieser hier die
+// Art der Zuordnung - zwei Achsen, darum zwei Umschalter statt einer Reihe aus
+// drei Knoepfen. Keine Rueckfrage noetig: anders als auf der Ausgabenseite
+// gibt es in der Matrix keinen Entwurf, mxToggle schreibt sofort.
+function mxArtSetzen(v){
+  if(mxArt===v) return;
+  mxArt = v;
+  mxAuswahl = null;
+  bearbStandText=''; bearbStandArt='';
+  render();
+}
+
+function mxArtUmschalterHtml(){
+  const btn = (v,t,icon) => `<button type="button" class="bu-btn${mxArt===v?' aktiv':''}"
+    onclick="mxArtSetzen('${v}')">${icon}<span>${t}</span></button>`;
+  return `<div class="bearb-umschalter klein">${
+    btn('auslage','Auslagen',MX_AUSLAGE)}${btn('bericht','Berichte',MX_BERICHT)}</div>`;
+}
+
 function bearbUmschalterHtml(){
   const btn = (v,t) => `<button type="button" class="bu-btn${bearbAnsicht===v?' aktiv':''}"
     onclick="bearbAnsichtSetzen('${v}')">${t}</button>`;
@@ -4198,7 +4231,12 @@ function mxZeilen(){
   return {ohne, mit};
 }
 
-// Alle (Heft, Art)-Paare eines Titels zu einem Kongress.
+// Alle (Heft, Art)-Paare eines Titels zu einem Kongress - bewusst ueber beide
+// Arten hinweg, obwohl die Matrix nur eine zeigt. Ausgewertet wird das naemlich
+// auch von der Loeschsperre in mxKongDialog: filterte diese Funktion nach
+// mxArt, liesse sich ein Kongress, der nur Berichte traegt, aus der
+// Auslagenansicht heraus entfernen - samt seiner Berichte. Gefiltert wird
+// deshalb erst dort, wo tatsaechlich gezeichnet wird.
 function mxZelle(k, t){
   const treffer = [];
   t.issues.forEach(iss=>{
@@ -4219,7 +4257,8 @@ const MX_BERICHT_OFFEN = '<svg width="6" height="6" viewBox="0 0 10 10" aria-hid
 // kein Heft tragen. Nur diese - nicht jedes leere Feld - gelten als offene
 // Arbeit; ein leeres Feld ohne Erwartung ist schlicht nicht vorgesehen.
 function mxErwartetOffen(k, t){
-  const erwartet = (k.erwartet||[]).filter(e=>e.titel_id===t.id).map(e=>e.art);
+  const erwartet = (k.erwartet||[])
+    .filter(e=>e.titel_id===t.id && e.art===mxArt).map(e=>e.art);
   if(!erwartet.length) return [];
   const belegt = new Set(mxZelle(k,t).map(x=>x.art));
   return [...new Set(erwartet)].filter(art=>!belegt.has(art));
@@ -4229,8 +4268,9 @@ function mxZeitraum(k){ return kongressZeitraum(k); }
 
 function mxZeileHtml(k, offen){
   const zellen = JOURNALS.map(t=>{
-    const treffer = mxZelle(k,t);
-    const chips = treffer.map(x=>`<span class="kmx-chip">${x.art==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(x.heft)}</span>`).join('');
+    const treffer = mxZelle(k,t).filter(x=>x.art===mxArt);
+    const chips = treffer.map(x=>`<span class="kmx-chip">${
+      mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(x.heft)}</span>`).join('');
     const erw = mxErwartetOffen(k,t).map(art=>
       `<span class="mx-erwartet" title="${art==='auslage'?'Auslage':'Bericht'} vom Vorjahr erwartet, noch kein Heft">${
         art==='auslage'?MX_AUSLAGE_OFFEN:MX_BERICHT_OFFEN}</span>`).join('');
@@ -4266,8 +4306,10 @@ function renderKongressmatrix(){
     return `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>
       ${neuKnopf}`;
 
+  // Gezaehlt wird nur, was die Ansicht auch zeigt - eine Zahl, die zur Haelfte
+  // unsichtbare Felder mitfuehrt, orientiert nicht, sie verwirrt.
   const belegt = JOURNALS.reduce((s,t)=>s+t.issues.reduce((n,iss)=>
-    n + (iss.a||[]).length + (iss.b||[]).length, 0), 0);
+    n + ((mxArt==='auslage' ? iss.a : iss.b)||[]).length, 0), 0);
   // Zaehlung fuer den Kopf: nur Felder mit einer noch offenen Erwartung aus
   // dem Vorjahr - erscheint erst, sobald es sie gibt.
   let offeneFelder = 0;
@@ -4291,8 +4333,10 @@ function renderKongressmatrix(){
   return `<div class="mx-kopf">
       <div class="mx-titel-kl">Jahrgang ${esc(jahr)}</div>
       <div class="mx-kopf-re">
-        <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} belegte Felder${
+        <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} ${
+          mxArt==='auslage'?'Auslagen':'Berichte'}${
           offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
+        ${mxArtUmschalterHtml()}
         ${neuKnopf}
       </div>
     </div>
@@ -4320,6 +4364,7 @@ function mxTage(a,b){ return Math.round((new Date(a) - new Date(b)) / 864e5); }
 // Dialogfenster (siehe mxKongDialog), unabhaengig vom Render-Takt der Matrix.
 function mxHeftwahlHtml(k, t){
   const erwOffen = mxErwartetOffen(k,t);
+  const ende = k.bis || k.von;
   const kein = !k.von ? `<div class="mx-hinweis">Kein Tagesdatum hinterlegt — es wird kein Abstand gerechnet.</div>` : '';
   const erwHinweis = erwOffen.length
     ? `<div class="mx-hinweis">Vom Vorjahr erwartet: ${erwOffen.map(a=>a==='auslage'?'Auslage':'Bericht').join(', ')}
@@ -4337,25 +4382,38 @@ function mxHeftwahlHtml(k, t){
     // danach) liesse als "N Tage nach Ende" eine negative Zahl erwarten -
     // dort bleibt es beim reinen Datum.
     let ab2 = iss.as ? `AS ${fmt(iss.as)}` : 'AS –';
-    if((k.bis||k.von) && iss.as){
-      const d = mxTage(iss.as, k.bis||k.von);
+    if(ende && iss.as){
+      const d = mxTage(iss.as, ende);
       if(d>=0) ab2 += ` — ${d} Tage nach Ende`;
     }
-    const knopf = (art,istDrin,icon) => `<button type="button" class="mx-toggle ${art}${istDrin?' an':''}"
-      onclick="mxToggle('${k.id}',${t.id},'${esc(iss.heft)}','${art}')"
-      title="${art==='auslage'?'Auslage':'Bericht'}${istDrin?' entfernen':' zuordnen'}">${icon}<span>${art==='auslage'?'Auslage':'Bericht'}</span></button>`;
+    // Nur die Art, die gerade geplant wird: sonst waere ausgerechnet an der
+    // Stelle, an der geklickt wird, die Verwechslung wieder moeglich, die die
+    // getrennten Ansichten vermeiden sollen.
+    const istDrin = mxArt==='auslage' ? istA : istB;
+    const wort = mxArt==='auslage' ? 'Auslage' : 'Bericht';
+    const knopf = `<button type="button" class="mx-toggle ${mxArt}${istDrin?' an':''}"
+      onclick="mxToggle('${k.id}',${t.id},'${esc(iss.heft)}','${mxArt}')"
+      title="${wort}${istDrin?' entfernen':' zuordnen'}">${
+      mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}<span>${wort}</span></button>`;
     const row = `<div class="mx-hf">
         <div><span class="mx-hf-heft">Heft ${esc(iss.heft)}</span>
           <span class="mx-hf-ab">${ab}</span><span class="mx-hf-ab">${ab2}</span></div>
-        <div class="mx-hf-knoepfe">${knopf('auslage',istA,MX_AUSLAGE)}${knopf('bericht',istB,MX_BERICHT)}</div>
+        <div class="mx-hf-knoepfe">${knopf}</div>
       </div>`;
-    if(k.von && iss.et && iss.et < k.von) vor += row; else nach += row;
+    // Die Schwelle ist je Art eine andere: die Auslage muss vor Beginn
+    // erscheinen, ueber den Kongress berichten laesst sich erst, wenn der
+    // Anzeigenschluss nach seinem Ende liegt.
+    if(mxArt==='auslage'
+        ? (k.von && iss.et && iss.et < k.von)
+        : (ende && iss.as && iss.as < ende)) vor += row; else nach += row;
   });
   const trenn = (vor && nach)
-    ? `<div class="mx-trenn"><span></span><b>Kongressbeginn</b><span></span></div>` : '';
+    ? `<div class="mx-trenn"><span></span><b>${
+        mxArt==='auslage'?'Kongressbeginn':'Kongressende'}</b><span></span></div>` : '';
 
   return `<div class="mx-panel-kopf">
-      <div><div class="mx-panel-titel">${esc(t.short)}</div>
+      <div><div class="mx-panel-titel">${esc(t.short)} &middot; ${
+        mxArt==='auslage'?'Auslage':'Bericht'}</div>
         <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
       <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
     </div>

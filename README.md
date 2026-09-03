@@ -126,6 +126,51 @@ entfallen:
 alter table ausgabe drop column auslagen, drop column berichte;
 ```
 
+### Auslagen und Berichte getrennt
+
+Die Matrix zeigt immer nur **eine** der beiden Arten; ein Umschalter über der
+Tabelle wechselt zwischen *Auslagen* und *Berichte*. Es sind zwei verschiedene
+Planungen: die Auslage liegt beim Kongress aus und muss vorher erscheinen, der
+Bericht kommt danach. Im Jahrgang 2027 tragen von 148 belegten Feldern nur 21
+beide Arten, und von 41 Kongressen betreffen 30 überhaupt nur eine der beiden —
+gemeinsam gezeigt stand also größtenteils beieinander, was nie zusammen geplant
+wird.
+
+Die beiden Umschalter sind absichtlich geschachtelt statt zu einer Reihe aus
+drei Knöpfen verschmolzen: *Nach Ausgabe / Nach Kongress* ist der Blickwinkel,
+*Auslagen / Berichte* die Art der Zuordnung — zwei Achsen, nicht drei
+gleichrangige Zustände. Die Wahl der Art bleibt für die Sitzung erhalten, auch
+über einen Abstecher zur Ausgabenseite und über einen Jahrgangswechsel hinweg.
+
+Beide Ansichten führen **dieselben Zeilen** in derselben Reihenfolge. Ein
+Kongress ohne Auslage steht in der Auslagenansicht als leere, aber anklickbare
+Zeile — die Matrix ist eine Planungsfläche, und gerade die leere Zeile sagt,
+dass hier noch zu entscheiden ist. Wären solche Zeilen ausgeblendet, gäbe es
+keinen Weg mehr, ihnen eine erste Zuordnung zu geben. Die Zählung im Kopf und
+die hohlen Formen der Vorjahresübernahme folgen ebenfalls der gewählten Art;
+eine Zahl, die zur Hälfte unsichtbare Felder mitführte, orientiert nicht.
+
+Auch die Heftwahl zeigt nur den Knopf der gewählten Art. Blieben dort beide
+stehen, wäre ausgerechnet an der Stelle, an der geklickt wird, die
+Verwechslung wieder möglich, die die Trennung vermeiden soll.
+
+Die Trennlinie zwischen den Heften folgt der Art, weil die Schwelle eine andere
+ist: bei der Auslage muss der **Erscheinungstermin vor Kongressbeginn** liegen,
+beim Bericht der **Anzeigenschluss nach Kongressende** — vorher lässt sich über
+den Kongress noch gar nicht berichten. Die Linie heißt entsprechend
+*Kongressbeginn* oder *Kongressende*. Beide Abstandsangaben je Heft bleiben in
+beiden Ansichten stehen; sie sind Information, keine Wertung.
+
+Die Trennung betrifft allein die Planungsfläche. Die fünf Ansichten, der Druck,
+die Excel-Strecke und die Ausgabe für die Datenpflege zeigen Auslagen und
+Berichte weiterhin gemeinsam je Ausgabe — dort ist gerade der vollständige
+Blick gefragt.
+
+Eine Fangfrage steckt in der Löschsperre: ob ein Kongress noch irgendwo hängt,
+wird **über beide Arten hinweg** geprüft, nicht nur über die gezeigte. Sonst
+ließe sich ein Kongress, der nur Berichte trägt, aus der Auslagenansicht heraus
+entfernen — samt seiner Berichte, deren Zeile dort leer aussah.
+
 ### Bearbeiten und Vorjahresübernahme
 
 Zwei Klickziele, zwei Wege — je nachdem, wie oft und wie kurz der Vorgang ist:
@@ -161,7 +206,8 @@ vorhandenen zu ändern.
 Kongresse des gewählten Vorlage-Jahrgangs — Name, Kurzname, Ort; Zeitraum und
 Heftzuordnung bleiben offen. Mitgegeben wird auch, welcher Titel den Kongress
 zuletzt in welcher Art führte: Die Kongressmatrix zeigt das als hohles Dreieck
-oder Quadrat im sonst leeren Feld, solange keine Ausgabe gewählt ist — eine
+in der Auslagen- bzw. hohles Quadrat in der Berichteansicht, solange keine
+Ausgabe gewählt ist — eine
 Erwartung, keine Zuordnung. Erst ein gewähltes Heft ersetzt sie durch die
 gefüllte Form. Die Kopfzeile der Matrix zählt die noch offenen Felder mit.
 
