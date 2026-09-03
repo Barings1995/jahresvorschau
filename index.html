@@ -638,6 +638,10 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   color:var(--navy);background:var(--surface2);border:1.5px solid var(--border);
   border-radius:4px;cursor:pointer}
 .bearb-zu:hover{background:var(--navy-faint);border-color:var(--navy-light)}
+/* Folgt der Fuss unmittelbar auf diesen Knopf, sass seine Trennlinie ohne
+   Luft darunter. Nur dieser Fall, damit die uebrigen Formulare - dort steht
+   ueber dem Fuss ein Eingabefeld mit eigenem Abstand - unberuehrt bleiben. */
+.bearb-zu + .bearb-fuss{margin-top:14px}
 .bearb-leerhinweis{font-size:.76rem;color:var(--muted);margin-bottom:5px}
 
 .bearb-fuss{display:flex;align-items:center;gap:9px;padding-top:13px;
@@ -4084,7 +4088,7 @@ function formAusgabeHtml(){
     ${zeilenGruppe('b','Kongressberichte','Über den Kongress wird berichtet')}
     ${neu ? '' : `<button type="button" class="bearb-zu" onclick="dpZeileKopieren()"
         title="Kopiert die Kongresszeile dieser Ausgabe in der Schreibweise der Angebotswerkzeuge – bezieht sich auf den gespeicherten Stand, nicht auf eine noch offene Änderung">
-        Kongresszeile für die Datenpflege kopieren</button>`}
+        Kongresszeile für die <em>Datenpflege</em> kopieren</button>`}
 
     ${bearbFussHtml(neu ? 'Anlegen' : 'Speichern', neu ? '' :
       `<button type="button" class="bearb-loeschen" onclick="ausgabeEntfernen()">
