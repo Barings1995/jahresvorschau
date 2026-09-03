@@ -89,8 +89,11 @@ dort Zeilen stehen, und fällt sonst auf die beiden Spalten zurück — so läss
 sich Jahrgang für Jahrgang umstellen. Fehlt das Schema ganz, ändert sich nichts.
 
 *Daten → Kongresse umstellen* legt jeden Kongress des gezeigten Jahrgangs einmal
-an. Vorher entsteht ein Sicherungspunkt ohne Zutun, und ein Bericht zeigt, was
-auffällt — bereinigt wird nichts von selbst:
+an. Der Punkt steht nur, solange der Jahrgang noch keine eigenen Kongresssätze
+führt — danach verschwindet er wieder: normale Änderungen (Matrix,
+Ausgabe bearbeiten) schreiben unmittelbar in die neuen Tabellen und brauchen
+ihn nicht erneut. Vorher entsteht ein Sicherungspunkt ohne Zutun, und ein
+Bericht zeigt, was auffällt — bereinigt wird nichts von selbst:
 
 * **Gleicher Zeitraum, gleicher Ort, zwei Schreibweisen.** Sie bleiben zwei
   Kongresse; sie zusammenzuführen ist eine Entscheidung, keine Rechnung.

@@ -373,6 +373,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .export-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:200;min-width:300px;background:var(--surface);border:1px solid var(--border);border-radius:6px;box-shadow:0 8px 28px rgba(0,40,90,.16);overflow:hidden}
 .export-menu.open{display:block}
 .ex-item{display:block;width:100%;text-align:left;padding:9px 13px;background:none;border:none;border-bottom:1px solid var(--surface3);font-family:inherit;cursor:pointer;transition:background .12s}
+.ex-item[hidden]{display:none}
 .ex-item:last-child{border-bottom:none}
 .ex-item:hover:not(:disabled){background:var(--navy-faint)}
 .ex-item:disabled{cursor:default;opacity:.55}
@@ -1159,6 +1160,12 @@ function waehleJahrgang(y){
   const et=document.getElementById('entfernenText'), eb=document.getElementById('entfernenBtn');
   if(et) et.textContent=`Jahrgang ${y} entfernen`;
   if(eb) eb.disabled = jahrgaenge().length<2;
+  // "Kongresse umstellen" ist ein einmaliger Schritt je Jahrgang: fuehrt er
+  // schon eigene Kongresssaetze, verschwindet der Punkt wieder. Normale
+  // Aenderungen (Matrix, Ausgabe bearbeiten) schreiben danach unmittelbar in
+  // die neuen Tabellen und brauchen ihn nicht erneut.
+  const ku=document.getElementById('kongUmstellenBtn');
+  if(ku) ku.hidden = !!(DATEN[y] && DATEN[y].umgestellt);
   render();
   // Die Sicherungspunkte haengen am Jahrgang; oben sind sie geleert worden.
   if(bearbOffen) sicherungenHolen();
