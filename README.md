@@ -128,20 +128,31 @@ alter table ausgabe drop column auslagen, drop column berichte;
 
 ### Bearbeiten und Vorjahresübernahme
 
-In der Kongressmatrix öffnet ein Klick auf die Kongresszeile selbst — nicht auf
-ein Titelfeld — ein Formular für Name, Kurzname, Zeitraum (genau oder als
-Wortlaut wie »September 2027«) und Ort. Anders als die Heftzuordnung schreibt
-es nicht bei jedem Zeichen, sondern erst mit *Speichern*: mehrere Felder
-gehören zu einer Änderung. *Entfernen* steht nur, solange der Kongress keinem
-Heft zugeordnet ist — etwa bei einer doppelten Schreibweise.
+Zwei Klickziele, zwei Wege — je nachdem, wie oft und wie kurz der Vorgang ist:
 
-*+ Neuer Kongress* über der Matrix öffnet dasselbe Formular leer: ein
+Ein Klick auf die Kongresszeile selbst — nicht auf ein Titelfeld — öffnet ein
+Dialogfenster für Name, Kurzname, Zeitraum (genau oder als Wortlaut wie
+»September 2027«) und Ort, im selben Aufbau wie *Jahrgang anlegen*: gelesen
+werden die Felder erst mit *Speichern*, nicht bei jedem Zeichen. *Entfernen*
+steht nur, solange der Kongress keinem Heft zugeordnet ist — etwa bei einer
+doppelten Schreibweise; die Rückfrage dazu legt sich über das noch offene
+Dialogfenster. Ein Dialog passt hierher, weil an einer Kongresszeile meist nur
+einmal etwas zu ändern ist.
+
+*+ Neuer Kongress* über der Matrix öffnet dasselbe Dialogfenster leer: ein
 Kongress, dessen Name bereits feststeht, dessen Termin und Titelverteilung
 aber noch offen sind. Angelegt wird er stets ohne Heftzuordnung; bleibt dabei
 auch der Zeitraum leer, steht er in der Matrix unter *Termin fehlt*, bis
 Recherche und Heftwahl ihn füllen.
 
-Ohne dieses Formular gäbe es keinen Weg, einem übernommenen Kongress ohne
+Ein Klick auf ein Titelfeld dagegen öffnet die Heftwahl nicht als Dialog,
+sondern **direkt unter der angeklickten Zeile** — dort wird oft mehrfach
+hintereinander in derselben Zeile zugeordnet, ein Dialogfenster, das dabei bei
+jedem Klick auf- und zuginge, wäre im Weg. Bei einer langen Liste bleibt das
+Formular so an der Stelle, wo gerade gearbeitet wird, statt unabhängig von der
+Zeilenzahl an einer festen Stelle zu erscheinen.
+
+Ohne das Dialogfenster gäbe es keinen Weg, einem übernommenen Kongress ohne
 Termin nachträglich einen zu geben: die Ausgabenseite hätte bei jeder Änderung
 des zusammengesetzten Wortlauts einen zweiten Kongress angelegt statt den
 vorhandenen zu ändern.

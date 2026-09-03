@@ -710,7 +710,6 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;min-width:220px}
 .mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
 .mx-lblklick:hover{background:var(--navy-faint)}
-.mx-lblklick.offen{background:var(--navy-faint);box-shadow:inset 0 0 0 1.5px var(--navy)}
 .mx-name{color:var(--text)}
 .mx-info{font-size:.7rem;color:var(--muted);margin-top:1px}
 .mx-gruppe{padding:9px 10px 5px!important;font-size:.7rem;color:var(--muted);
@@ -724,8 +723,11 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .kmx-chip{display:inline-flex;align-items:center;gap:2px;font-size:.72rem;
   color:var(--text);white-space:nowrap}
 .mx-erwartet{display:inline-flex;align-items:center;opacity:.7}
-.mx-panel{margin-top:12px;background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;padding:14px 18px}
+/* Die Heftwahl klappt als eigene Tabellenzeile unter dem angeklickten
+   Kongress auf statt in einem Panel weit unter einer langen Liste - der
+   linke Streifen haelt die Zugehoerigkeit zur Zeile darueber sichtbar. */
+.mx-inline-zelle{background:var(--navy-faint);border-left:3px solid var(--navy);
+  padding:12px 16px 14px;text-align:left}
 .mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
 .mx-panel-titel{font-size:.88rem;font-weight:600;color:var(--navy)}
 .mx-panel-unter{font-size:.74rem;color:var(--muted);margin-top:2px}
@@ -4237,13 +4239,20 @@ function mxZeileHtml(k, offen){
       onclick="mxOeffnen('${k.id}',${t.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
       aria-label="${escA(t.short)}, ${escA(k.lang)}">${chips}${erw}</div></td>`;
   }).join('');
-  const lblOffen = offen && offen.kongressId===k.id && offen.titelId===null;
-  return `<tr><td class="mx-lbl"><div class="mx-lblklick${lblOffen?' offen':''}" role="button" tabindex="0"
+  const hauptzeile = `<tr><td class="mx-lbl"><div class="mx-lblklick" role="button" tabindex="0"
       onclick="mxOeffnenKongress('${k.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
       title="Name, Zeitraum und Ort dieses Kongresses bearbeiten">
       <div class="mx-name">${esc(k.lang)}</div>
       <div class="mx-info">${esc(mxZeitraum(k))}${k.ort?' · '+esc(k.ort):''}</div>
     </div></td>${zellen}</tr>`;
+  // Die Heftwahl klappt direkt unter dieser Zeile auf statt in einem
+  // gemeinsamen Panel ganz unten - bei vielen Kongressen sonst weit weg vom
+  // Klick. Nur eine Zeile ist je Kongress offen (mxAuswahl ist ein Singleton).
+  const auf = offen && offen.kongressId===k.id ? JOURNALS.find(x=>x.id===offen.titelId) : null;
+  const inline = auf ? `<tr id="mxInline"><td colspan="${JOURNALS.length+1}" class="mx-inline-zelle">
+      ${mxHeftwahlHtml(k, auf)}
+    </td></tr>` : '';
+  return hauptzeile + inline;
 }
 
 function renderKongressmatrix(){
@@ -4255,8 +4264,7 @@ function renderKongressmatrix(){
   const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()">+ Neuer Kongress</button>`;
   if(!ohne.length && !mit.length)
     return `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>
-      ${neuKnopf}
-      <div id="mxPanel">${mxAuswahl ? mxPanelHtml() : ''}</div>`;
+      ${neuKnopf}`;
 
   const belegt = JOURNALS.reduce((s,t)=>s+t.issues.reduce((n,iss)=>
     n + (iss.a||[]).length + (iss.b||[]).length, 0), 0);
@@ -4280,7 +4288,6 @@ function renderKongressmatrix(){
     zeilen += mit.map(k=>mxZeileHtml(k, mxAuswahl)).join('');
   }
 
-  const panel = mxAuswahl ? mxPanelHtml() : '';
   return `<div class="mx-kopf">
       <div class="mx-titel-kl">Jahrgang ${esc(jahr)}</div>
       <div class="mx-kopf-re">
@@ -4291,34 +4298,27 @@ function renderKongressmatrix(){
     </div>
     <div class="mx-scroll"><table class="mx-tab">
       <thead>${kopf}</thead><tbody>${zeilen}</tbody>
-    </table></div>
-    <div id="mxPanel">${panel}</div>`;
+    </table></div>`;
 }
 
 // ── Heftwahl ────────────────────────────────────────────────────────────────
 function mxOeffnen(kongressId, titelId){
-  mxKongEntwurf = null;
   mxAuswahl = (mxAuswahl && mxAuswahl.kongressId===kongressId && mxAuswahl.titelId===titelId)
     ? null : {kongressId, titelId};
   render();
   if(mxAuswahl){
-    const p=document.getElementById('mxPanel');
-    if(p) p.scrollIntoView({block:'nearest'});
+    const z=document.getElementById('mxInline');
+    if(z) z.scrollIntoView({block:'nearest'});
   }
 }
 
-function mxSchliessen(){ mxAuswahl = null; mxKongEntwurf = null; render(); }
+function mxSchliessen(){ mxAuswahl = null; render(); }
 
 function mxTage(a,b){ return Math.round((new Date(a) - new Date(b)) / 864e5); }
 
-function mxPanelHtml(){
-  if(mxAuswahl.kongressId==='__neu__') return mxKongFormHtml(null);
-  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
-  if(!k){ mxAuswahl=null; return ''; }
-  if(mxAuswahl.titelId===null) return mxKongFormHtml(k);
-  const t = JOURNALS.find(x=>x.id===mxAuswahl.titelId);
-  if(!t){ mxAuswahl=null; return ''; }
-
+// Nur noch die Heftwahl - die Kongress-Metadaten haben ein eigenes
+// Dialogfenster (siehe mxKongDialog), unabhaengig vom Render-Takt der Matrix.
+function mxHeftwahlHtml(k, t){
   const erwOffen = mxErwartetOffen(k,t);
   const kein = !k.von ? `<div class="mx-hinweis">Kein Tagesdatum hinterlegt — es wird kein Abstand gerechnet.</div>` : '';
   const erwHinweis = erwOffen.length
@@ -4354,15 +4354,13 @@ function mxPanelHtml(){
   const trenn = (vor && nach)
     ? `<div class="mx-trenn"><span></span><b>Kongressbeginn</b><span></span></div>` : '';
 
-  return `<div class="mx-panel">
-    <div class="mx-panel-kopf">
+  return `<div class="mx-panel-kopf">
       <div><div class="mx-panel-titel">${esc(t.short)}</div>
         <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
       <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
     </div>
     ${kein}${erwHinweis}${vor}${trenn}${nach}
-    <p class="bearb-stand" id="bearbStand"></p>
-  </div>`;
+    <p class="bearb-stand" id="bearbStand"></p>`;
 }
 
 async function mxToggle(kongressId, titelId, heft, art){
@@ -4391,95 +4389,64 @@ async function mxToggle(kongressId, titelId, heft, art){
 // (siehe "Termin fehlt") Zeitraum und Ort nachzutragen: die Ausgabenseite
 // haette bei jeder Aenderung des Wortlauts einen zweiten Kongress angelegt,
 // statt den vorhandenen zu aendern. Ein Klick auf die Kongresszeile selbst
-// (nicht auf ein Titelfeld) oeffnet dieses Formular; anders als die
-// Heftzuordnung schreibt es nicht bei jedem Zeichen, sondern erst mit
-// "Speichern" - mehrere Felder gehoeren zu einer Aenderung.
-let mxKongEntwurf = null;
-
+// (nicht auf ein Titelfeld) oeffnet ein Dialogfenster - dasselbe Muster wie
+// "Jahrgang anlegen": ein einmaliger, mehrfeldriger Vorgang, im Unterschied
+// zur Heftwahl oben, die oft in schneller Folge in derselben Zeile passiert
+// und deshalb inline dort bleibt statt in einem Dialog aufzupoppen.
 function mxOeffnenKongress(kongressId){
-  mxKongEntwurf = null;
-  if(mxAuswahl && mxAuswahl.kongressId===kongressId && mxAuswahl.titelId===null){
-    mxAuswahl = null;
-  } else {
-    const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
-    if(!k) return;
-    mxAuswahl = {kongressId, titelId:null};
-    mxKongEntwurf = {lang:k.lang, kurz:k.kurz||'', von:k.von||'', bis:k.bis||'',
-      unscharf:k.unscharf||'', ort:k.ort||''};
-  }
-  render();
+  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
+  if(!k) return;
+  mxKongDialog(k);
 }
 
-// Ueber dem Kopf der Matrix: ein Kongress ohne Ausgabe - Name steht schon
-// fest, Termin und Verteilung noch nicht. Dieselbe Kennung '__neu__' wie beim
-// Sentinel in mxPanelHtml markiert, dass es noch keinen Datenbanksatz gibt.
-function mxKongNeu(){
-  mxAuswahl = {kongressId:'__neu__', titelId:null};
-  mxKongEntwurf = {lang:'', kurz:'', von:'', bis:'', unscharf:'', ort:''};
-  render();
-  const p=document.getElementById('mxPanel');
-  if(p) p.scrollIntoView({block:'nearest'});
-}
+function mxKongNeu(){ mxKongDialog(null); }
 
-function mxKongFeld(feld, wert){
-  if(!mxKongEntwurf) return;
-  mxKongEntwurf[feld] = wert;
-  const btn = document.getElementById('mxKongSpeichern');
-  if(btn) btn.disabled = false;
-}
-
-function mxKongFormHtml(k){
+// k=null fuer einen neuen Kongress, sonst der zu bearbeitende Satz. Gelesen
+// werden die Felder erst beim Klick auf Speichern/Anlegen (wie bei
+// "Jahrgang anlegen"), nicht bei jedem Zeichen - das erspart eine eigene
+// Entwurfs-Verwaltung, die jetzt ohnehin nur der Dialog selbst braucht.
+function mxKongDialog(k){
   const neu = !k;
-  const e = mxKongEntwurf;
   const hatZuordnung = !neu && JOURNALS.some(t=>mxZelle(k,t).length>0);
-  return `<div class="mx-panel">
-    <div class="mx-panel-kopf">
-      <div><div class="mx-panel-titel">${neu ? 'Neuer Kongress' : 'Kongress bearbeiten'}</div>
-        <div class="mx-panel-unter">Gilt nur für den Jahrgang ${esc(jahr)}</div></div>
-      <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
-    </div>
+  const html = `<p class="dlg-erklaerung">Gilt nur für den Jahrgang ${esc(jahr)}</p>
     <label class="bearb-feld">Name
-      <input type="text" value="${escA(e.lang)}" oninput="mxKongFeld('lang',this.value)"></label>
+      <input type="text" id="mkLang" value="${neu?'':escA(k.lang)}"></label>
     <label class="bearb-feld">Kurzname
-      <input type="text" value="${escA(e.kurz)}" oninput="mxKongFeld('kurz',this.value)">
+      <input type="text" id="mkKurz" value="${neu?'':escA(k.kurz||'')}">
       <span class="hinweis">Für die Ausgabe an die Datenpflege der Angebotswerkzeuge</span></label>
     <div class="bearb-reihe zwei">
       <label class="bearb-feld">Beginn
-        <input type="date" value="${escA(e.von)}" oninput="mxKongFeld('von',this.value)"></label>
+        <input type="date" id="mkVon" value="${neu?'':escA(k.von||'')}"></label>
       <label class="bearb-feld">Ende
-        <input type="date" value="${escA(e.bis)}" oninput="mxKongFeld('bis',this.value)"></label>
+        <input type="date" id="mkBis" value="${neu?'':escA(k.bis||'')}"></label>
     </div>
     <label class="bearb-feld">Ungefährer Zeitraum, wenn kein Tag feststeht
-      <input type="text" value="${escA(e.unscharf)}" oninput="mxKongFeld('unscharf',this.value)"
+      <input type="text" id="mkUnscharf" value="${neu?'':escA(k.unscharf||'')}"
              placeholder="etwa »September 2027«">
       <span class="hinweis">Nur wenn Beginn und Ende leer bleiben – sonst gilt der genaue Zeitraum</span></label>
     <label class="bearb-feld">Ort
-      <input type="text" value="${escA(e.ort)}" oninput="mxKongFeld('ort',this.value)"></label>
-    <div class="bearb-fuss">
-      <button type="button" class="bearb-speichern" id="mxKongSpeichern"
-              onclick="mxKongSpeichern()" disabled>${neu ? 'Anlegen' : 'Speichern'}</button>
-      <button type="button" class="bearb-verwerfen" onclick="mxSchliessen()">Abbrechen</button>
-      ${(!neu && !hatZuordnung) ? `<button type="button" class="bearb-loeschen" onclick="mxKongEntfernen()">Entfernen</button>` : ''}
-    </div>
-    ${(!neu && !hatZuordnung) ? `<p class="mx-hinweis" style="margin-top:8px">Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.</p>` : ''}
-  </div>`;
+      <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>
+    ${(!neu && !hatZuordnung) ? `<div style="display:flex">
+        <button type="button" class="bearb-loeschen" onclick="mxKongDialogEntfernen('${k.id}')">Entfernen</button>
+      </div>
+      <p class="mx-hinweis" style="margin-top:8px">Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.</p>` : ''}`;
+  dialogZeigen(neu ? 'Neuer Kongress' : 'Kongress bearbeiten', html,
+    neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id));
 }
 
-async function mxKongSpeichern(){
-  if(!mxKongEntwurf || !mxAuswahl) return;
-  const neu = mxAuswahl.kongressId==='__neu__';
-  const k = neu ? null : (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
-  if(!neu && !k) return;
-  const e = mxKongEntwurf;
-  const lang = e.lang.trim();
-  if(!lang) return bearbStand('Der Name darf nicht leer bleiben.', 'schlecht');
-  const von = e.von || null;
-  const bis = von ? (e.bis || null) : null;
-  const unscharf = von ? '' : (e.unscharf||'').trim();
-  const patch = {lang, kurz:(e.kurz||'').trim(), von, bis, unscharf, ort:(e.ort||'').trim()};
-  const btn = document.getElementById('mxKongSpeichern');
-  if(btn) btn.disabled = true;
-  bearbStand(neu ? 'Wird angelegt …' : 'Wird gespeichert …', '');
+async function mxKongDialogAusfuehren(kongressId){
+  const neu = kongressId===null;
+  const k = neu ? null : (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
+  if(!neu && !k) return dialogSchliessen();
+  const lang = (document.getElementById('mkLang').value||'').trim();
+  if(!lang) return ladeStand('Der Name darf nicht leer bleiben.', true);
+  const von = document.getElementById('mkVon').value || null;
+  const bis = von ? (document.getElementById('mkBis').value || null) : null;
+  const unscharf = von ? '' : (document.getElementById('mkUnscharf').value||'').trim();
+  const patch = {lang, kurz:(document.getElementById('mkKurz').value||'').trim(), von, bis,
+    unscharf, ort:(document.getElementById('mkOrt').value||'').trim()};
+  ladeKnoepfe(true);
+  ladeStand(neu ? 'Wird angelegt …' : 'Wird gespeichert …');
   try{
     if(neu){
       // Ohne Ausgabe, deshalb ueber dieselbe Tabelle wie jede andere Neuanlage,
@@ -4493,42 +4460,35 @@ async function mxKongSpeichern(){
       if(!DATEN[jahr].kongresse) DATEN[jahr].kongresse = [];
       DATEN[jahr].kongresse.push(satz);
       KONG.set(satz.id, satz);
-      // Bleibt offen - als Kongress-bearbeiten-Ansicht desselben, jetzt
-      // echten Satzes, damit sich gleich ein Tippfehler korrigieren liesse.
-      // mxKongEntwurf bleibt dabei stehen (entspricht dem gerade Gespeicherten) -
-      // mxKongFormHtml liest ihn bei jedem Aufruf, auch im Bearbeiten-Zweig.
-      mxAuswahl = {kongressId:satz.id, titelId:null};
-      render();
-      bearbStand('Angelegt', 'gut');
     } else {
       await dbAnfrage('/rest/v1/kongress?id=eq.'+encodeURIComponent(k.id),
         {method:'PATCH', headers:{Prefer:'return=minimal'}, body: JSON.stringify(patch)});
       Object.assign(k, patch);
-      render();
-      bearbStand('Gespeichert', 'gut');
     }
-  }catch(fehler){
-    if(btn) btn.disabled = false;
-    bearbStand(fehlertext(fehler), 'schlecht');
-  }
+    dialogSchliessen();
+    render();
+  }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
 }
 
-async function mxKongEntfernen(){
-  if(!mxAuswahl) return;
-  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===mxAuswahl.kongressId);
+// Die Rueckfrage legt ihr eigenes Blatt ueber das noch offene Dialogfenster
+// (hoeherer z-Wert, siehe frage()) - dasselbe Zusammenspiel wie an anderer
+// Stelle im Werkzeug, wo eine Rueckfrage aus einem offenen Dialog kommt.
+async function mxKongDialogEntfernen(kongressId){
+  const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
   if(!k) return;
   if(!await frage('Kongress entfernen?',
     `<p>»${esc(k.lang)}« wird aus dem Jahrgang ${esc(jahr)} entfernt.</p>`,
     'Entfernen')) return;
+  ladeKnoepfe(true);
+  ladeStand('Wird entfernt …');
   try{
     await dbAnfrage('/rest/v1/kongress?id=eq.'+encodeURIComponent(k.id),
       {method:'DELETE', headers:{Prefer:'return=minimal'}});
     DATEN[jahr].kongresse = (DATEN[jahr].kongresse||[]).filter(x=>x.id!==k.id);
     KONG.delete(k.id);
-    mxAuswahl=null; mxKongEntwurf=null;
+    dialogSchliessen();
     render();
-    bearbStand('Entfernt', 'gut');
-  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+  }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
 }
 function renderBearbeiten(){
   const umschalter = bearbUmschalterHtml();
