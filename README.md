@@ -66,8 +66,8 @@ als Zeichenkette in jeder Ausgabe erneut — im Jahrgang 2027 bis zu neunmal
 wortgleich. Verschob sich ein Termin, waren es neun Änderungen; der
 AEK-Kongress war dadurch bereits in zwei Schreibweisen auseinandergelaufen.
 
-Tabelle `kongress` je Jahrgang (`lang`, `kurz`, `von`, `bis`, `unscharf`, `ort`)
-und `kongress_ausgabe` für die Zuordnung mit `art` (Auslage oder Bericht). Die
+Tabelle `kongress` je Jahrgang (`lang`, `kurz`, `von`, `bis`, `unscharf`, `ort`,
+`dach`) und `kongress_ausgabe` für die Zuordnung mit `art` (Auslage oder Bericht). Die
 Art steht mit im Schlüssel: eine Ausgabe kann beides zu demselben Kongress
 führen — die Ärzte Zeitung tut das beim DGP 2027 nicht, wohl aber Heft 1 mit der
 Auslage und Heft 3 mit dem Bericht.
@@ -76,6 +76,9 @@ Auslage und Heft 3 mit dem Bericht.
 einen unmöglichen Termin selbst zurück. `unscharf` führt die Fälle ohne Tag
 (»September 2027«, »September«); dort bleiben `von`/`bis` leer und die Angabe
 erscheint unverändert. Auf den Monatsersten zu raten wäre schlechter als nichts.
+`dach` sagt, ob der Kongress in Deutschland, Österreich oder der Schweiz
+stattfindet; voreingestellt ist `true`. Gelesen wird die Spalte allein vom
+Schalter *Nur deutschsprachiger Raum* in der Kongressansicht.
 
 Angezeigt wird der zusammengesetzte Wortlaut `Langname, Zeitraum, Ort` — genau
 der, der zuvor als Zeichenkette dastand. Nachgemessen an beiden Jahrgängen: in
@@ -369,27 +372,34 @@ Kongresse ohne Termin (noch zu recherchieren, oder mit unscharfer Angabe wie
 »September«) stehen oben in einer eigenen Gruppe.
 
 In derselben Zeile steht der Schalter **Nur deutschsprachiger Raum**. Er nimmt
-die Kongresse aus der Tabelle, die außerhalb von Deutschland, Österreich und
-der Schweiz stattfinden — im Jahrgang 2027 zwölf von vierzig, und mit
-ihnen dreißig der einundsiebzig Berichte; die Auslagen bleiben vollzählig, denn
-ausgelegt wird ohnehin nur im deutschsprachigen Raum. Die Zählung sagt dann
-»28 von 40 Kongressen« und zählt allein die Felder der gezeigten Zeilen.
-Der Schalter gilt nur hier: die fünf Leseansichten und jeder Export führen
-weiter den ganzen Jahrgang, damit ein Auszug beim Empfänger nicht heimlich
-kürzer ist als der Jahrgang.
+die Kongresse aus der Tabelle, bei denen im Dialog *Kongress bearbeiten* das
+Häkchen »Findet in Deutschland, Österreich oder der Schweiz statt« nicht
+gesetzt ist — im Jahrgang 2027 zwölf von vierzig, und mit ihnen dreißig der
+einundsiebzig Berichte; die Auslagen bleiben vollzählig, denn ausgelegt wird
+ohnehin nur im deutschsprachigen Raum. Die Zählung sagt dann »28 von 40
+Kongressen« und zählt allein die Felder der gezeigten Zeilen. Der Schalter gilt
+nur hier: die fünf Leseansichten und jeder Export führen weiter den ganzen
+Jahrgang, damit ein Auszug beim Empfänger nicht heimlich kürzer ist als der
+Jahrgang.
 
-Beurteilt wird allein das Feld *Ort*. Ein eigenes Merkmal daneben wäre eine
-zweite Stelle für dieselbe Aussage — und bei einem Kongress, der den Ort
-wechselt, die eine, die niemand nachzieht. Das Werkzeug führt dafür zwei
-Ortslisten: eine für Deutschland, Österreich und die Schweiz (ganze Länder,
-Lugano und Genf also mit), eine für die gebräuchlichen Kongressorte im Ausland.
-Ein Ort, den keine der beiden kennt — und ein leeres Feld —, gilt als
-**unklar** und bleibt stehen; die Kopfzeile zählt diese Fälle als »25 ohne
-eindeutigen Ort«. Mit nur einer Inlandsliste hieße »Ort gefüllt, aber nicht
-darin« zwangsläufig Ausland, und ein deutscher Kongressort, den die Liste noch
-nicht führt, verschwände still aus der Planung — in einem Planungswerkzeug der
-schlechtere Fehler. Wird ein Kongress gespeichert, den der Schalter im selben
-Zug wegnimmt, sagt eine Zeile unter dem Kopf, warum seine Zeile fehlt.
+Das Häkchen ist eine eigene Spalte am Kongress (`kongress.dach`), keine
+Auslegung des Ortsfeldes. Zwischenzeitlich las das Werkzeug den Ort gegen zwei
+Ortslisten — das ging an drei Stellen daneben: bei leerem Ortsfeld (im Jahrgang
+2026 fünfundzwanzig von einundvierzig Sätzen, darunter ASCO, ASH, ESMO und
+EHA), bei einem Ort, den keine Liste führte, und bei einem Anhang am Namen
+(»New York City«, »Orlando (FL)«). Wer den Kongress anlegt, weiß es dagegen
+sicher.
+
+Bei einem neuen Kongress ist das Häkchen **gesetzt**; wegzunehmen ist es bei
+einem Kongress im Ausland. Ausgeblendet wird damit allein, was jemand
+ausdrücklich so gekennzeichnet hat — ein vergessenes Häkchen kostet nichts, ein
+deutscher Kongress verschwindet nie von selbst aus der Planung. Dieselbe Regel
+gilt rückwärts: fehlt das Merkmal ganz (ein Sicherungspunkt von vor dieser
+Spalte, eine ältere Kopie im Dokument), gilt der Kongress als deutschsprachig.
+Beim Anlegen eines Jahrgangs aus dem Vorjahr wandert das Merkmal mit — der ASCO
+bleibt auch im nächsten Jahrgang im Ausland. Wird ein Kongress gespeichert, den
+der Schalter im selben Zug wegnimmt, sagt eine Zeile unter dem Kopf, warum
+seine Zeile fehlt.
 
 Ein Klick auf ein Feld öffnet darunter die Heftleiste: der ganze Jahrgang **in
 Heftfolge** als eine Reihe, je Heft ein Feld mit Nummer, Termin und Abstand zum

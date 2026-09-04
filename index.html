@@ -630,6 +630,13 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 
 .bearb-gruppe{margin-bottom:14px}
 .bearb-gruppe > .bearb-feld{margin-bottom:6px}
+/* Haekchen im Kongressdialog: eine Zeile, Kaestchen und Text nebeneinander -
+   anders als die uebrigen Felder, bei denen die Beschriftung darueber steht */
+.bearb-haken{display:flex;align-items:center;gap:8px;font-size:.72rem;
+  font-weight:600;color:var(--navy);cursor:pointer}
+.bearb-haken input{width:15px;height:15px;margin:0;flex:none;accent-color:var(--navy)}
+.bearb-hakenhinweis{display:block;margin-top:3px;font-size:.68rem;
+  font-weight:400;color:var(--muted);line-height:1.35}
 .bearb-zeile{display:flex;gap:6px;margin-bottom:5px}
 .bearb-zeile input{flex:1;padding:6px 8px;font-family:inherit;font-size:.82rem;
   color:var(--text);background:var(--surface);
@@ -1161,7 +1168,7 @@ function kongressEintragen(roh){
   const liste = (DATEN[jahr] && DATEN[jahr].kongresse) || [];
   // Eigenes Praefix: die beim Laden vergebenen Kennungen heissen k1, k2 ...,
   // ein hier gezaehlter Anhang koennte sonst auf eine davon fallen.
-  const k = Object.assign({id:'n'+(++KONG_NEU), kurz:''}, zerlegeKongress(text));
+  const k = Object.assign({id:'n'+(++KONG_NEU), kurz:'', dach:true}, zerlegeKongress(text));
   liste.push(k); KONG.set(k.id, k);
   return k.id;
 }
@@ -1181,7 +1188,7 @@ function kongressAufloesen(jahrgang){
     const text = String(roh == null ? '' : roh).trim();
     if(!text) return null;
     if(nach.has(text)) return nach.get(text);
-    const k = Object.assign({id:'k'+(liste.length+1), kurz:''}, zerlegeKongress(text));
+    const k = Object.assign({id:'k'+(liste.length+1), kurz:'', dach:true}, zerlegeKongress(text));
     liste.push(k); nach.set(text, k.id);
     return k.id;
   };
@@ -4384,133 +4391,18 @@ function bearbUmschalterHtml(){
 // Spalte je Titel. Kein Vorschlag - das Feld zeigt nur, was schon zugeordnet
 // ist; verteilt wird von Hand ueber die Heftwahl.
 
-// ── Ort: deutschsprachiger Raum oder nicht ─────────────────────────────────
-// Beurteilt wird allein das Feld "Ort" des Kongresssatzes. Ein eigenes Merkmal
-// daneben waere eine zweite Pflegestelle fuer dieselbe Aussage - und bei einem
-// Kongress, der den Ort wechselt, die eine, die niemand nachzieht.
+// ── Deutschsprachiger Raum ─────────────────────────────────────────────────
+// Ein Merkmal am Kongresssatz, gesetzt im Dialog "Kongress bearbeiten". Zuvor
+// las diese Stelle das Ortsfeld gegen zwei Ortslisten - das ging an drei
+// Stellen daneben: bei leerem Ortsfeld (im Jahrgang 2026 fuenfundzwanzig von
+// einundvierzig Saetzen), bei einem Ort, den keine Liste fuehrt, und bei einem
+// Anhang am Namen ("New York City", "Orlando (FL)"). Wer den Kongress anlegt,
+// weiss es dagegen sicher.
 //
-// Zwei Listen statt einer: mit nur einer Inlandsliste hiesse "Ort gefuellt,
-// aber nicht darin" zwangslaeufig Ausland, und ein deutscher Kongressort, den
-// die Liste noch nicht fuehrt, verschwaende still aus der Planung. Was keine
-// der beiden Listen kennt, bleibt deshalb stehen und wird im Kopf gezaehlt.
-//
-// Zum deutschsprachigen Raum zaehlen Deutschland, Oesterreich und die Schweiz
-// als ganze Laender - Lugano und Genf also mit. Die Frage nach der dort
-// gesprochenen Sprache muss so beim Pflegen eines Orts nie gestellt werden.
-
-// Vergleichsform eines Ortsnamens: Kleinschreibung, ohne Akzente, ohne
-// Satzzeichen, und "ue/oe/ae" auf den blossen Vokal zurueckgefuehrt. Damit
-// findet dieselbe Zeile "Muenchen", "München" und "Munchen".
-function ortSchl(s){
-  return String(s == null ? '' : s).toLowerCase().replace(/ß/g,'ss')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u')
-    .replace(/[^a-z0-9]+/g,' ').trim();
-}
-
-// "Erlangen/Nürnberg", "Wien, Österreich", "Basel & Zürich" - der Ort ist ein
-// Freitextfeld und traegt gelegentlich mehr als einen Namen. Erkannt wird der
-// Kongress schon dann als Inland, wenn einer der Teile dazugehoert.
-function ortTeile(ort){
-  return String(ort == null ? '' : ort).split(/[\/,;&+]|\bund\b/)
-    .map(ortSchl).filter(Boolean);
-}
-
-const KONG_DACH = new Set([
-  // Deutschland - grosszuegig gehalten: jeder Ort, der hier fehlt, waere sonst
-  // ein Kongress, der beim Planen unbemerkt fortfiele.
-  'Aachen','Aalen','Ahlen','Amberg','Ansbach','Arnsberg','Aschaffenburg','Augsburg',
-  'Bad Homburg','Bad Kissingen','Bad Nauheim','Bad Oeynhausen','Bad Salzuflen',
-  'Bad Segeberg','Baden-Baden','Bamberg','Bayreuth','Bergisch Gladbach','Berlin',
-  'Bernau','Bielefeld','Bocholt','Bochum','Bonn','Bottrop','Brandenburg',
-  'Braunschweig','Bremen','Bremerhaven','Bruchsal','Chemnitz','Coburg','Cottbus',
-  'Cuxhaven','Darmstadt','Deggendorf','Delmenhorst','Dessau','Detmold','Dinslaken',
-  'Dormagen','Dorsten','Dortmund','Dresden','Duisburg','Düren','Düsseldorf',
-  'Eberswalde','Eisenach','Elmshorn','Emden','Erding','Erfurt','Erlangen','Essen',
-  'Esslingen','Flensburg','Frankfurt','Frankfurt am Main','Frankfurt (Oder)',
-  'Freiberg','Freiburg','Freising','Friedrichshafen','Fulda','Fürth',
-  'Garmisch-Partenkirchen','Gelsenkirchen','Gera','Gießen','Gotha','Göppingen',
-  'Göttingen','Greifswald','Gummersbach','Gütersloh','Hagen','Halle','Hamburg',
-  'Hameln','Hamm','Hanau','Hannover','Hanover','Heidelberg','Heidenheim','Heilbronn',
-  'Herford','Herne','Herzogenaurach','Hildesheim','Hof','Homburg','Ingolstadt',
-  'Iserlohn','Jena','Kaiserslautern','Karlsruhe','Kassel','Kaufbeuren','Kempten',
-  'Kiel','Kleve','Koblenz','Konstanz','Krefeld','Köln','Cologne','Landau','Landshut',
-  'Leipzig','Leverkusen','Lippstadt','Ludwigsburg','Ludwigshafen','Lübeck','Lüneburg',
-  'Magdeburg','Mainz','Mannheim','Marburg','Meerbusch','Memmingen','Minden','Moers',
-  'Mönchengladbach','Mülheim','München','Munich','Münster','Neubrandenburg',
-  'Neumünster','Neuss','Neustadt','Neu-Ulm','Norderstedt','Nordhausen','Nürnberg',
-  'Nuremberg','Oberhausen','Offenbach','Offenburg','Oldenburg','Osnabrück',
-  'Paderborn','Passau','Pforzheim','Plauen','Potsdam','Ratingen','Ravensburg',
-  'Recklinghausen','Regensburg','Remscheid','Reutlingen','Rheine','Rosenheim',
-  'Rostock','Rüsselsheim','Saarbrücken','Salzgitter','Schweinfurt','Schwerin',
-  'Siegburg','Siegen','Sindelfingen','Solingen','Speyer','Stade','Stralsund',
-  'Straubing','Stuttgart','Sylt','Timmendorfer Strand','Trier','Troisdorf',
-  'Tübingen','Tuttlingen','Ulm','Unna','Velbert','Viersen','Villingen-Schwenningen',
-  'Waiblingen','Warnemünde','Weimar','Weiden','Wesel','Westerland','Wetzlar',
-  'Wiesbaden','Wilhelmshaven','Willingen','Wismar','Witten','Wolfsburg','Worms',
-  'Wuppertal','Würzburg','Zwickau',
-  // Oesterreich
-  'Wien','Vienna','Graz','Linz','Salzburg','Innsbruck','Igls','Klagenfurt','Villach',
-  'Wels','Steyr','Dornbirn','Bregenz','Feldkirch','Eisenstadt','Krems','St. Pölten',
-  'Sankt Pölten','Leoben','Baden bei Wien','Alpbach','Bad Gastein','Bad Hofgastein',
-  'Kitzbühel','Lech','Mayrhofen','Obergurgl','Pörtschach','Saalfelden','Schladming',
-  'Seefeld','Sölden','Velden','Zell am See','Hall in Tirol','Gmunden','Wörgl',
-  // Schweiz
-  'Zürich','Zurich','Basel','Basle','Bern','Berne','Genf','Genève','Geneva',
-  'Lausanne','Luzern','Lucerne','St. Gallen','Sankt Gallen','Winterthur','Lugano',
-  'Locarno','Ascona','Davos','Interlaken','Montreux','Zug','Chur','Thun','Biel',
-  'Bienne','Fribourg','Neuenburg','Neuchâtel','Sion','Schaffhausen','Baden','Olten',
-  'Solothurn','Rapperswil','Lenzerheide','Grindelwald','Weggis','Bad Ragaz',
-  'Crans-Montana','Verbier','Zermatt','Arosa','Engelberg','Wengen','Vitznau',
-  // Laendernamen, falls sie im Ortsfeld mitstehen
-  'Deutschland','Germany','Österreich','Austria','Schweiz','Switzerland','Suisse',
-  'Svizzera'
-].map(ortSchl));
-
-const KONG_AUSSEN = new Set([
-  // Die Orte des Bestands, dazu die gebraeuchlichen Kongressorte. Was hier
-  // fehlt, bleibt stehen und wird als "ohne eindeutigen Ort" gezaehlt - die
-  // Liste laesst sich dann gezielt ergaenzen.
-  'Amsterdam','Antwerpen','Athen','Athens','Atlanta','Auckland','Bangkok',
-  'Barcelona','Belgrad','Bergen','Birmingham','Bologna','Bordeaux','Boston',
-  'Brighton','Brüssel','Brussels','Bruxelles','Budapest','Buenos Aires','Cannes',
-  'Chicago','Cleveland','Dallas','Denver','Detroit','Dubai','Dublin','Edinburgh',
-  'Florenz','Florence','Firenze','Genua','Genova','Glasgow','Göteborg','Granada',
-  'Helsinki','Hongkong','Hong Kong','Honolulu','Houston','Istanbul','Jerusalem',
-  'Kopenhagen','Copenhagen','Krakau','Krakow','Kyoto','Las Vegas','Leiden','Lille',
-  'Lissabon','Lisbon','Lisboa','Liverpool','Ljubljana','London','Los Angeles','Lyon',
-  'Madrid','Mailand','Milan','Milano','Malmö','Manchester','Marseille','Melbourne',
-  'Mexico City','Miami','Minneapolis','Montpellier','Montreal','Moskau','Moscow',
-  'Mumbai','Nantes','Neapel','Naples','New Delhi','New Orleans','New York','Nizza',
-  'Nice','Orlando','Oslo','Ottawa','Oxford','Paris','Peking','Beijing',
-  'Philadelphia','Phoenix','Pittsburgh','Porto','Portland','Posen','Poznan','Prag',
-  'Prague','Praha','Reykjavik','Riga','Rom','Rome','Roma','Rotterdam',
-  'Salt Lake City','San Antonio','San Diego','San Francisco','Santiago','Sao Paulo',
-  'Sapporo','Seattle','Seoul','Sevilla','Seville','Shanghai','Singapur','Singapore',
-  'Sofia','Stockholm','Straßburg','Strasbourg','Sydney','Taipeh','Taipei','Tel Aviv',
-  'Tokio','Tokyo','Toronto','Toulouse','Turin','Torino','Utrecht','Valencia',
-  'Vancouver','Venedig','Venice','Venezia','Warschau','Warsaw','Warszawa',
-  'Washington','Wroclaw','Zagreb',
-  // Laendernamen
-  'USA','United States','Vereinigte Staaten','Spanien','Spain','Italien','Italy',
-  'Frankreich','France','Niederlande','Netherlands','Belgien','Belgium',
-  'Großbritannien','United Kingdom','England','Schottland','Irland','Ireland',
-  'Dänemark','Denmark','Schweden','Sweden','Norwegen','Norway','Finnland','Finland',
-  'Portugal','Griechenland','Greece','Polen','Poland','Tschechien','Ungarn',
-  'Hungary','Kanada','Canada','Japan','China','Korea','Australien','Australia',
-  'Brasilien','Brazil','Israel','Türkei','Turkey','Indien','India'
-].map(ortSchl));
-
-// 'dach' bleibt stehen, 'aussen' faellt bei gesetztem Schalter weg, 'unklar'
-// bleibt stehen und wird gezaehlt: kein Ort eingetragen, oder einer, den keine
-// der beiden Listen fuehrt.
-function kongRaum(k){
-  const teile = ortTeile(k && k.ort);
-  if(!teile.length)                     return 'unklar';
-  if(teile.some(t=>KONG_DACH.has(t)))   return 'dach';
-  if(teile.some(t=>KONG_AUSSEN.has(t))) return 'aussen';
-  return 'unklar';
-}
+// Fehlt das Merkmal - eine Sicherung von vor dieser Spalte, eine aeltere Kopie
+// im Dokument -, gilt der Kongress als deutschsprachig und bleibt stehen.
+// Ausgeblendet wird allein, was ausdruecklich anders gekennzeichnet ist.
+function kongDach(k){ return !k || k.dach !== false; }
 
 // Wie mxArtSetzen: die offene Heftleiste faellt weg, denn sie kann zu einer
 // Zeile gehoeren, die der Schalter im selben Zug wegnimmt.
@@ -4525,13 +4417,12 @@ function mxDachSetzen(b){
 function mxZeilen(){
   const j = DATEN[jahr];
   const alle = (j && j.kongresse) || [];
-  const gezeigt = mxNurDach ? alle.filter(k=>kongRaum(k)!=='aussen') : alle;
+  const gezeigt = mxNurDach ? alle.filter(kongDach) : alle;
   const mit  = gezeigt.filter(k=>k.von).sort((a,b)=>
     a.von===b.von ? (a.bis||'').localeCompare(b.bis||'') : a.von.localeCompare(b.von));
   const ohne = gezeigt.filter(k=>!k.von).sort((a,b)=>
     (a.unscharf||a.lang).localeCompare(b.unscharf||b.lang,'de'));
-  return {ohne, mit, gesamt: alle.length, weg: alle.length - gezeigt.length,
-          unklar: gezeigt.filter(k=>kongRaum(k)==='unklar').length};
+  return {ohne, mit, gesamt: alle.length, weg: alle.length - gezeigt.length};
 }
 
 // Alle (Heft, Art)-Paare eines Titels zu einem Kongress - bewusst ueber beide
@@ -4617,11 +4508,11 @@ function renderKongressmatrix(umschalter){
   if(!j || !j.umgestellt)
     return kopfZeile('') + `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
       Über <b>Daten &rarr; Kongresse umstellen</b> lässt sich das nachholen.</div>`;
-  const {ohne, mit, gesamt, weg, unklar} = mxZeilen();
+  const {ohne, mit, gesamt, weg} = mxZeilen();
   const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()">+ Neuer Kongress</button>`;
   // Der Schalter steht im Aufbau der Legendenzeile - dieselbe Sache, dieselbe
   // Form. Der Titel nennt beides: was wegfaellt und was bewusst stehen bleibt.
-  const dachSchalter = `<label class="switch" title="Blendet Kongresse aus, deren Ort außerhalb von Deutschland, Österreich und der Schweiz liegt. Kongresse ohne eindeutigen Ort bleiben stehen"><input type="checkbox"${
+  const dachSchalter = `<label class="switch" title="Blendet die Kongresse aus, bei denen im Dialog »Kongress bearbeiten« das Häkchen für Deutschland, Österreich und die Schweiz nicht gesetzt ist"><input type="checkbox"${
     mxNurDach?' checked':''} onchange="mxDachSetzen(this.checked)"><span class="sw-track"><span class="sw-knob"></span></span>Nur deutschsprachiger Raum</label>`;
   // Bleibt nach dem Schalten nichts uebrig, muss er trotzdem in der Zeile
   // stehen - sonst liesse er sich nicht mehr loesen.
@@ -4668,9 +4559,7 @@ function renderKongressmatrix(umschalter){
           weg ? `${ohne.length+mit.length} von ${gesamt} Kongressen`
               : `${ohne.length+mit.length} Kongresse`} &middot; ${belegt} ${
           mxArt==='auslage'?'Auslagen':'Berichte'}${
-          offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}${
-          mxNurDach && unklar ? ` &middot; <span title="Ohne Ortsangabe oder mit einem Ort, den die Liste nicht führt \u2014 diese Kongresse bleiben stehen">${
-            unklar} ohne eindeutigen Ort</span>` : ''}</div>
+          offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
         ${dachSchalter}
         ${mxArtUmschalterHtml()}
         ${neuKnopf}`) + notiz +
@@ -4859,7 +4748,13 @@ function mxKongDialog(k){
              placeholder="etwa »September 2027«">
       <span class="hinweis">Nur wenn Beginn und Ende leer bleiben – sonst gilt der genaue Zeitraum</span></label>
     <label class="bearb-feld">Ort
-      <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>`;
+      <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>
+    <label class="bearb-haken"><input type="checkbox" id="mkDach"${
+      neu || kongDach(k) ? ' checked' : ''}>
+      Findet in Deutschland, Österreich oder der Schweiz statt</label>
+    <span class="bearb-hakenhinweis">Steuert allein den Schalter »Nur deutschsprachiger
+      Raum« in der Kongressansicht. Bei einem neuen Kongress ist das Häkchen gesetzt;
+      wegzunehmen ist es bei einem Kongress im Ausland</span>`;
   dialogZeigen(neu ? 'Neuer Kongress' : 'Kongress bearbeiten', html,
     neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id),
     false, neu ? null : {text:'Entfernen', aktion:() => mxKongDialogEntfernen(k.id)});
@@ -4875,7 +4770,8 @@ async function mxKongDialogAusfuehren(kongressId){
   const bis = von ? (document.getElementById('mkBis').value || null) : null;
   const unscharf = von ? '' : (document.getElementById('mkUnscharf').value||'').trim();
   const patch = {lang, kurz:(document.getElementById('mkKurz').value||'').trim(), von, bis,
-    unscharf, ort:(document.getElementById('mkOrt').value||'').trim()};
+    unscharf, ort:(document.getElementById('mkOrt').value||'').trim(),
+    dach: !!document.getElementById('mkDach').checked};
   ladeKnoepfe(true);
   ladeStand(neu ? 'Wird angelegt …' : 'Wird gespeichert …');
   try{
@@ -4887,7 +4783,7 @@ async function mxKongDialogAusfuehren(kongressId){
          body: JSON.stringify([Object.assign({jahr}, patch)])});
       const roh = Array.isArray(angelegt) ? angelegt[0] : angelegt;
       if(!roh || !roh.id) throw new Error('Der Kongress wurde nicht angelegt.');
-      const satz = Object.assign({kurz:''}, roh);
+      const satz = Object.assign({kurz:'', dach:true}, roh);
       if(!DATEN[jahr].kongresse) DATEN[jahr].kongresse = [];
       DATEN[jahr].kongresse.push(satz);
       KONG.set(satz.id, satz);
@@ -4900,7 +4796,7 @@ async function mxKongDialogAusfuehren(kongressId){
     // Bei gesetztem Schalter kann der eben gespeicherte Kongress ausserhalb des
     // deutschsprachigen Raums liegen; seine Zeile waere dann nicht zu sehen.
     // Das sagt die Notiz, statt die Zeile kommentarlos fehlen zu lassen.
-    if(mxNurDach && kongRaum(patch)==='aussen')
+    if(mxNurDach && !patch.dach)
       mxNotiz = `»${patch.lang}« liegt außerhalb des deutschsprachigen Raums `
               + `und ist bei dieser Auswahl ausgeblendet.`;
     render();
@@ -5183,7 +5079,7 @@ function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
     if(!nachJahr.has(k.jahr)) nachJahr.set(k.jahr, []);
     nachJahr.get(k.jahr).push({id:k.id, lang:k.lang, kurz:k.kurz||'',
       von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||'',
-      erwartet:k.erwartet||[]});
+      dach:k.dach !== false, erwartet:k.erwartet||[]});
   });
   if(nachJahr.size){
     const jeAusgabe = new Map();
@@ -5244,7 +5140,7 @@ async function datenHolen(){
     dbAnfrage('/rest/v1/ausgabe?select=id,jahr,titel_id,reihenfolge,heft,erscheinung,'
             + 'anzeigenschluss,druckunterlagen,anlieferung,thema,sonderthema,'
             + 'auslagen,berichte&order=jahr,titel_id,reihenfolge&limit=5000'),
-    vielleicht('/rest/v1/kongress?select=id,jahr,lang,kurz,von,bis,unscharf,ort,erwartet'
+    vielleicht('/rest/v1/kongress?select=id,jahr,lang,kurz,von,bis,unscharf,ort,dach,erwartet'
              + '&order=jahr,von&limit=5000'),
     vielleicht('/rest/v1/kongress_ausgabe?select=kongress_id,ausgabe_id,art&limit=20000')
   ]);
@@ -5287,6 +5183,7 @@ async function kongresseAusVorjahrUebernehmen(y, vorlageJahr){
 
   const zeilen = alt.kongresse.map(k=>({
     jahr:y, lang:k.lang, kurz:k.kurz||'', von:null, bis:null, unscharf:'', ort:k.ort||'',
+    dach:k.dach !== false,
     erwartet: [...(verteilung.get(k.id)||[])].map(p=>{
       const [titel_id,art] = p.split('|');
       return {titel_id:Number(titel_id), art};
@@ -5353,7 +5250,8 @@ async function zuordnungSchreiben(iss){
     const angelegt = await dbAnfrage('/rest/v1/kongress',
       {method:'POST', headers:{Prefer:'return=representation'},
        body: JSON.stringify(saetze.map(k=>({jahr:jahr, lang:k.lang, kurz:k.kurz||'',
-         von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||''})))});
+         von:k.von||null, bis:k.bis||null, unscharf:k.unscharf||'', ort:k.ort||'',
+         dach:k.dach !== false})))});
     const nachText = new Map();
     (angelegt||[]).forEach(k=>nachText.set(kongressAus(k), k.id));
     saetze.forEach(k=>{

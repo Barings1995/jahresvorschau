@@ -107,6 +107,11 @@ create table if not exists kongress (
   -- noch keine Zeile in kongress_ausgabe dafuer existiert. Nichts anderes
   -- liest dieses Feld; ausser beim Uebernehmen schreibt nichts hinein.
   erwartet     jsonb       not null default '[]',
+  -- Steuert den Schalter "Nur deutschsprachiger Raum" in der Kongressansicht.
+  -- Voreingestellt wahr: ausgeblendet wird allein, was jemand ausdruecklich als
+  -- Ausland gekennzeichnet hat. Ein vergessenes Haekchen kostet damit nichts -
+  -- ein deutscher Kongress verschwindet nie von selbst aus der Planung.
+  dach         boolean     not null default true,
   check (bis is null or von is null or bis >= von),
   check (unscharf = '' or von is null)
 );
@@ -217,3 +222,19 @@ begin
   end loop;
 end;
 $$;
+
+-- --------------------------------------------------------- Nachtrag: dach --
+-- Fuer eine Datenbank, die vor dieser Spalte eingespielt wurde. Einmal
+-- ausfuehren; danach steht die Spalte auch in der Tabellendefinition oben.
+--
+-- Der zweite Befehl setzt den Startwert aus dem heutigen Ortsfeld, damit nicht
+-- alle 81 Saetze von Hand durchgesehen werden muessen. Er trifft im Bestand
+-- dreizehn Zeilen: zwoelf im Jahrgang 2027 und Prag im Jahrgang 2026. Die
+-- fuenfundzwanzig Saetze des Jahrgangs 2026 ohne Ortsangabe bleiben auf wahr
+-- und sind, wo noetig, im Dialog "Kongress bearbeiten" zu loesen.
+
+alter table kongress add column if not exists dach boolean not null default true;
+
+update kongress set dach = false
+ where ort in ('Barcelona','Chicago','Denver','Houston','Mailand','New Orleans',
+               'Prag','Rotterdam','San Antonio','San Francisco');
