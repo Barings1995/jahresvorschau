@@ -717,10 +717,9 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-umschalter.klein .bu-btn.aktiv svg rect{fill:#ffffff}
 
 /* ── Kongressmatrix ── */
-.mx-kopf{display:flex;justify-content:space-between;align-items:baseline;
+.mx-kopf{display:flex;justify-content:flex-end;align-items:baseline;
   gap:12px;margin-bottom:10px}
 .mx-kopf-re{display:flex;align-items:center;gap:14px}
-.mx-titel-kl{font-size:.85rem;font-weight:600;color:var(--navy)}
 .mx-zahl{font-size:.76rem;color:var(--muted)}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
   border-radius:6px}
@@ -4479,8 +4478,9 @@ function renderKongressmatrix(){
     zeilen += mit.map(k=>mxZeileHtml(k, mxAuswahl)).join('');
   }
 
+  // Der Jahrgang stand hier ein zweites Mal: die Statuszeile ueber dem
+  // Umschalter fuehrt ihn bereits ("Bearbeiten · Jahrgang 2026").
   return `<div class="mx-kopf">
-      <div class="mx-titel-kl">Jahrgang ${esc(jahr)}</div>
       <div class="mx-kopf-re">
         <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} ${
           mxArt==='auslage'?'Auslagen':'Berichte'}${
