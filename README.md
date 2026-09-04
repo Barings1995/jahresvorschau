@@ -368,6 +368,29 @@ beantwortet.
 Kongresse ohne Termin (noch zu recherchieren, oder mit unscharfer Angabe wie
 »September«) stehen oben in einer eigenen Gruppe.
 
+In derselben Zeile steht der Schalter **Nur deutschsprachiger Raum**. Er nimmt
+die Kongresse aus der Tabelle, die außerhalb von Deutschland, Österreich und
+der Schweiz stattfinden — im Jahrgang 2027 zwölf von vierzig, und mit
+ihnen dreißig der einundsiebzig Berichte; die Auslagen bleiben vollzählig, denn
+ausgelegt wird ohnehin nur im deutschsprachigen Raum. Die Zählung sagt dann
+»28 von 40 Kongressen« und zählt allein die Felder der gezeigten Zeilen.
+Der Schalter gilt nur hier: die fünf Leseansichten und jeder Export führen
+weiter den ganzen Jahrgang, damit ein Auszug beim Empfänger nicht heimlich
+kürzer ist als der Jahrgang.
+
+Beurteilt wird allein das Feld *Ort*. Ein eigenes Merkmal daneben wäre eine
+zweite Stelle für dieselbe Aussage — und bei einem Kongress, der den Ort
+wechselt, die eine, die niemand nachzieht. Das Werkzeug führt dafür zwei
+Ortslisten: eine für Deutschland, Österreich und die Schweiz (ganze Länder,
+Lugano und Genf also mit), eine für die gebräuchlichen Kongressorte im Ausland.
+Ein Ort, den keine der beiden kennt — und ein leeres Feld —, gilt als
+**unklar** und bleibt stehen; die Kopfzeile zählt diese Fälle als »25 ohne
+eindeutigen Ort«. Mit nur einer Inlandsliste hieße »Ort gefüllt, aber nicht
+darin« zwangsläufig Ausland, und ein deutscher Kongressort, den die Liste noch
+nicht führt, verschwände still aus der Planung — in einem Planungswerkzeug der
+schlechtere Fehler. Wird ein Kongress gespeichert, den der Schalter im selben
+Zug wegnimmt, sagt eine Zeile unter dem Kopf, warum seine Zeile fehlt.
+
 Ein Klick auf ein Feld öffnet darunter die Heftleiste: der ganze Jahrgang **in
 Heftfolge** als eine Reihe, je Heft ein Feld mit Nummer, Termin und Abstand zum
 Kongress — in der Auslagenansicht der Erscheinungstermin und sein Abstand zum

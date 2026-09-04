@@ -725,6 +725,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-kopf .bearb-umschalter{margin-bottom:0}
 .mx-kopf-re{display:flex;align-items:center;gap:14px}
 .mx-zahl{font-size:.76rem;color:var(--muted)}
+/* Kippschalter in der Kopfzeile: derselbe Bau wie in der Legendenzeile, nur
+   eine Spur kleiner, damit er neben Zaehlung und Umschalter nicht auftraegt */
+.mx-kopf .switch{font-size:.72rem}
+.mx-notiz{font-size:.72rem;color:var(--muted);margin:-6px 0 10px}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
   border-radius:6px}
 /* Feste Aufteilung statt Aufteilung nach Inhalt: die Felder tragen je ein
@@ -1357,6 +1361,15 @@ let mxAuswahl = null;
 // zurueckgesetzt: wer mitten in der Berichtsplanung kurz zur Ausgabenseite
 // schaut, findet sie beim Zurueckkommen unveraendert vor.
 let mxArt = 'auslage';
+// Schalter in der Kopfzeile der Kongressmatrix: nimmt die Kongresse ausserhalb
+// von Deutschland, Oesterreich und der Schweiz aus der Tabelle. Er gilt allein
+// dort - Leseansichten und Exporte fuehren weiter den ganzen Jahrgang. Nichts
+// wird gespeichert; jede Sitzung faengt geloest an.
+let mxNurDach = false;
+// Einzeiliger Hinweis unter der Kopfzeile, den das naechste Zeichnen wieder
+// aufbraucht. Steht dort nur, wenn ein eben gespeicherter Kongress vom
+// Schalter weggeblendet wird.
+let mxNotiz = '';
 let ohneVerstrichene = false;   // Schalter in der Legendenzeile
 const activeJ = new Set();
 let sortKey = 'et', sortDir = 1;
@@ -4371,14 +4384,154 @@ function bearbUmschalterHtml(){
 // Spalte je Titel. Kein Vorschlag - das Feld zeigt nur, was schon zugeordnet
 // ist; verteilt wird von Hand ueber die Heftwahl.
 
+// ── Ort: deutschsprachiger Raum oder nicht ─────────────────────────────────
+// Beurteilt wird allein das Feld "Ort" des Kongresssatzes. Ein eigenes Merkmal
+// daneben waere eine zweite Pflegestelle fuer dieselbe Aussage - und bei einem
+// Kongress, der den Ort wechselt, die eine, die niemand nachzieht.
+//
+// Zwei Listen statt einer: mit nur einer Inlandsliste hiesse "Ort gefuellt,
+// aber nicht darin" zwangslaeufig Ausland, und ein deutscher Kongressort, den
+// die Liste noch nicht fuehrt, verschwaende still aus der Planung. Was keine
+// der beiden Listen kennt, bleibt deshalb stehen und wird im Kopf gezaehlt.
+//
+// Zum deutschsprachigen Raum zaehlen Deutschland, Oesterreich und die Schweiz
+// als ganze Laender - Lugano und Genf also mit. Die Frage nach der dort
+// gesprochenen Sprache muss so beim Pflegen eines Orts nie gestellt werden.
+
+// Vergleichsform eines Ortsnamens: Kleinschreibung, ohne Akzente, ohne
+// Satzzeichen, und "ue/oe/ae" auf den blossen Vokal zurueckgefuehrt. Damit
+// findet dieselbe Zeile "Muenchen", "München" und "Munchen".
+function ortSchl(s){
+  return String(s == null ? '' : s).toLowerCase().replace(/ß/g,'ss')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u')
+    .replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+// "Erlangen/Nürnberg", "Wien, Österreich", "Basel & Zürich" - der Ort ist ein
+// Freitextfeld und traegt gelegentlich mehr als einen Namen. Erkannt wird der
+// Kongress schon dann als Inland, wenn einer der Teile dazugehoert.
+function ortTeile(ort){
+  return String(ort == null ? '' : ort).split(/[\/,;&+]|\bund\b/)
+    .map(ortSchl).filter(Boolean);
+}
+
+const KONG_DACH = new Set([
+  // Deutschland - grosszuegig gehalten: jeder Ort, der hier fehlt, waere sonst
+  // ein Kongress, der beim Planen unbemerkt fortfiele.
+  'Aachen','Aalen','Ahlen','Amberg','Ansbach','Arnsberg','Aschaffenburg','Augsburg',
+  'Bad Homburg','Bad Kissingen','Bad Nauheim','Bad Oeynhausen','Bad Salzuflen',
+  'Bad Segeberg','Baden-Baden','Bamberg','Bayreuth','Bergisch Gladbach','Berlin',
+  'Bernau','Bielefeld','Bocholt','Bochum','Bonn','Bottrop','Brandenburg',
+  'Braunschweig','Bremen','Bremerhaven','Bruchsal','Chemnitz','Coburg','Cottbus',
+  'Cuxhaven','Darmstadt','Deggendorf','Delmenhorst','Dessau','Detmold','Dinslaken',
+  'Dormagen','Dorsten','Dortmund','Dresden','Duisburg','Düren','Düsseldorf',
+  'Eberswalde','Eisenach','Elmshorn','Emden','Erding','Erfurt','Erlangen','Essen',
+  'Esslingen','Flensburg','Frankfurt','Frankfurt am Main','Frankfurt (Oder)',
+  'Freiberg','Freiburg','Freising','Friedrichshafen','Fulda','Fürth',
+  'Garmisch-Partenkirchen','Gelsenkirchen','Gera','Gießen','Gotha','Göppingen',
+  'Göttingen','Greifswald','Gummersbach','Gütersloh','Hagen','Halle','Hamburg',
+  'Hameln','Hamm','Hanau','Hannover','Hanover','Heidelberg','Heidenheim','Heilbronn',
+  'Herford','Herne','Herzogenaurach','Hildesheim','Hof','Homburg','Ingolstadt',
+  'Iserlohn','Jena','Kaiserslautern','Karlsruhe','Kassel','Kaufbeuren','Kempten',
+  'Kiel','Kleve','Koblenz','Konstanz','Krefeld','Köln','Cologne','Landau','Landshut',
+  'Leipzig','Leverkusen','Lippstadt','Ludwigsburg','Ludwigshafen','Lübeck','Lüneburg',
+  'Magdeburg','Mainz','Mannheim','Marburg','Meerbusch','Memmingen','Minden','Moers',
+  'Mönchengladbach','Mülheim','München','Munich','Münster','Neubrandenburg',
+  'Neumünster','Neuss','Neustadt','Neu-Ulm','Norderstedt','Nordhausen','Nürnberg',
+  'Nuremberg','Oberhausen','Offenbach','Offenburg','Oldenburg','Osnabrück',
+  'Paderborn','Passau','Pforzheim','Plauen','Potsdam','Ratingen','Ravensburg',
+  'Recklinghausen','Regensburg','Remscheid','Reutlingen','Rheine','Rosenheim',
+  'Rostock','Rüsselsheim','Saarbrücken','Salzgitter','Schweinfurt','Schwerin',
+  'Siegburg','Siegen','Sindelfingen','Solingen','Speyer','Stade','Stralsund',
+  'Straubing','Stuttgart','Sylt','Timmendorfer Strand','Trier','Troisdorf',
+  'Tübingen','Tuttlingen','Ulm','Unna','Velbert','Viersen','Villingen-Schwenningen',
+  'Waiblingen','Warnemünde','Weimar','Weiden','Wesel','Westerland','Wetzlar',
+  'Wiesbaden','Wilhelmshaven','Willingen','Wismar','Witten','Wolfsburg','Worms',
+  'Wuppertal','Würzburg','Zwickau',
+  // Oesterreich
+  'Wien','Vienna','Graz','Linz','Salzburg','Innsbruck','Igls','Klagenfurt','Villach',
+  'Wels','Steyr','Dornbirn','Bregenz','Feldkirch','Eisenstadt','Krems','St. Pölten',
+  'Sankt Pölten','Leoben','Baden bei Wien','Alpbach','Bad Gastein','Bad Hofgastein',
+  'Kitzbühel','Lech','Mayrhofen','Obergurgl','Pörtschach','Saalfelden','Schladming',
+  'Seefeld','Sölden','Velden','Zell am See','Hall in Tirol','Gmunden','Wörgl',
+  // Schweiz
+  'Zürich','Zurich','Basel','Basle','Bern','Berne','Genf','Genève','Geneva',
+  'Lausanne','Luzern','Lucerne','St. Gallen','Sankt Gallen','Winterthur','Lugano',
+  'Locarno','Ascona','Davos','Interlaken','Montreux','Zug','Chur','Thun','Biel',
+  'Bienne','Fribourg','Neuenburg','Neuchâtel','Sion','Schaffhausen','Baden','Olten',
+  'Solothurn','Rapperswil','Lenzerheide','Grindelwald','Weggis','Bad Ragaz',
+  'Crans-Montana','Verbier','Zermatt','Arosa','Engelberg','Wengen','Vitznau',
+  // Laendernamen, falls sie im Ortsfeld mitstehen
+  'Deutschland','Germany','Österreich','Austria','Schweiz','Switzerland','Suisse',
+  'Svizzera'
+].map(ortSchl));
+
+const KONG_AUSSEN = new Set([
+  // Die Orte des Bestands, dazu die gebraeuchlichen Kongressorte. Was hier
+  // fehlt, bleibt stehen und wird als "ohne eindeutigen Ort" gezaehlt - die
+  // Liste laesst sich dann gezielt ergaenzen.
+  'Amsterdam','Antwerpen','Athen','Athens','Atlanta','Auckland','Bangkok',
+  'Barcelona','Belgrad','Bergen','Birmingham','Bologna','Bordeaux','Boston',
+  'Brighton','Brüssel','Brussels','Bruxelles','Budapest','Buenos Aires','Cannes',
+  'Chicago','Cleveland','Dallas','Denver','Detroit','Dubai','Dublin','Edinburgh',
+  'Florenz','Florence','Firenze','Genua','Genova','Glasgow','Göteborg','Granada',
+  'Helsinki','Hongkong','Hong Kong','Honolulu','Houston','Istanbul','Jerusalem',
+  'Kopenhagen','Copenhagen','Krakau','Krakow','Kyoto','Las Vegas','Leiden','Lille',
+  'Lissabon','Lisbon','Lisboa','Liverpool','Ljubljana','London','Los Angeles','Lyon',
+  'Madrid','Mailand','Milan','Milano','Malmö','Manchester','Marseille','Melbourne',
+  'Mexico City','Miami','Minneapolis','Montpellier','Montreal','Moskau','Moscow',
+  'Mumbai','Nantes','Neapel','Naples','New Delhi','New Orleans','New York','Nizza',
+  'Nice','Orlando','Oslo','Ottawa','Oxford','Paris','Peking','Beijing',
+  'Philadelphia','Phoenix','Pittsburgh','Porto','Portland','Posen','Poznan','Prag',
+  'Prague','Praha','Reykjavik','Riga','Rom','Rome','Roma','Rotterdam',
+  'Salt Lake City','San Antonio','San Diego','San Francisco','Santiago','Sao Paulo',
+  'Sapporo','Seattle','Seoul','Sevilla','Seville','Shanghai','Singapur','Singapore',
+  'Sofia','Stockholm','Straßburg','Strasbourg','Sydney','Taipeh','Taipei','Tel Aviv',
+  'Tokio','Tokyo','Toronto','Toulouse','Turin','Torino','Utrecht','Valencia',
+  'Vancouver','Venedig','Venice','Venezia','Warschau','Warsaw','Warszawa',
+  'Washington','Wroclaw','Zagreb',
+  // Laendernamen
+  'USA','United States','Vereinigte Staaten','Spanien','Spain','Italien','Italy',
+  'Frankreich','France','Niederlande','Netherlands','Belgien','Belgium',
+  'Großbritannien','United Kingdom','England','Schottland','Irland','Ireland',
+  'Dänemark','Denmark','Schweden','Sweden','Norwegen','Norway','Finnland','Finland',
+  'Portugal','Griechenland','Greece','Polen','Poland','Tschechien','Ungarn',
+  'Hungary','Kanada','Canada','Japan','China','Korea','Australien','Australia',
+  'Brasilien','Brazil','Israel','Türkei','Turkey','Indien','India'
+].map(ortSchl));
+
+// 'dach' bleibt stehen, 'aussen' faellt bei gesetztem Schalter weg, 'unklar'
+// bleibt stehen und wird gezaehlt: kein Ort eingetragen, oder einer, den keine
+// der beiden Listen fuehrt.
+function kongRaum(k){
+  const teile = ortTeile(k && k.ort);
+  if(!teile.length)                     return 'unklar';
+  if(teile.some(t=>KONG_DACH.has(t)))   return 'dach';
+  if(teile.some(t=>KONG_AUSSEN.has(t))) return 'aussen';
+  return 'unklar';
+}
+
+// Wie mxArtSetzen: die offene Heftleiste faellt weg, denn sie kann zu einer
+// Zeile gehoeren, die der Schalter im selben Zug wegnimmt.
+function mxDachSetzen(b){
+  if(mxNurDach===!!b) return;
+  mxNurDach = !!b;
+  mxAuswahl = null;
+  bearbStandText=''; bearbStandArt='';
+  render();
+}
+
 function mxZeilen(){
   const j = DATEN[jahr];
   const alle = (j && j.kongresse) || [];
-  const mit  = alle.filter(k=>k.von).sort((a,b)=>
+  const gezeigt = mxNurDach ? alle.filter(k=>kongRaum(k)!=='aussen') : alle;
+  const mit  = gezeigt.filter(k=>k.von).sort((a,b)=>
     a.von===b.von ? (a.bis||'').localeCompare(b.bis||'') : a.von.localeCompare(b.von));
-  const ohne = alle.filter(k=>!k.von).sort((a,b)=>
+  const ohne = gezeigt.filter(k=>!k.von).sort((a,b)=>
     (a.unscharf||a.lang).localeCompare(b.unscharf||b.lang,'de'));
-  return {ohne, mit};
+  return {ohne, mit, gesamt: alle.length, weg: alle.length - gezeigt.length,
+          unklar: gezeigt.filter(k=>kongRaum(k)==='unklar').length};
 }
 
 // Alle (Heft, Art)-Paare eines Titels zu einem Kongress - bewusst ueber beide
@@ -4464,15 +4617,27 @@ function renderKongressmatrix(umschalter){
   if(!j || !j.umgestellt)
     return kopfZeile('') + `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
       Über <b>Daten &rarr; Kongresse umstellen</b> lässt sich das nachholen.</div>`;
-  const {ohne, mit} = mxZeilen();
+  const {ohne, mit, gesamt, weg, unklar} = mxZeilen();
   const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()">+ Neuer Kongress</button>`;
+  // Der Schalter steht im Aufbau der Legendenzeile - dieselbe Sache, dieselbe
+  // Form. Der Titel nennt beides: was wegfaellt und was bewusst stehen bleibt.
+  const dachSchalter = `<label class="switch" title="Blendet Kongresse aus, deren Ort außerhalb von Deutschland, Österreich und der Schweiz liegt. Kongresse ohne eindeutigen Ort bleiben stehen"><input type="checkbox"${
+    mxNurDach?' checked':''} onchange="mxDachSetzen(this.checked)"><span class="sw-track"><span class="sw-knob"></span></span>Nur deutschsprachiger Raum</label>`;
+  // Bleibt nach dem Schalten nichts uebrig, muss er trotzdem in der Zeile
+  // stehen - sonst liesse er sich nicht mehr loesen.
   if(!ohne.length && !mit.length)
-    return kopfZeile(neuKnopf) + `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>`;
+    return kopfZeile(`${weg?dachSchalter:''}${neuKnopf}`) + `<div class="bearb-leerhinweis" style="padding:20px 0">${
+      weg ? `Kein Kongress des Jahrgangs liegt im deutschsprachigen Raum \u2014 der Schalter oben nimmt ${
+             weg===1?'den einen':`alle ${weg}`} aus der Tabelle.`
+          : 'Der Jahrgang führt noch keine Kongresse.'}</div>`;
 
   // Gezaehlt wird nur, was die Ansicht auch zeigt - eine Zahl, die zur Haelfte
-  // unsichtbare Felder mitfuehrt, orientiert nicht, sie verwirrt.
+  // unsichtbare Felder mitfuehrt, orientiert nicht, sie verwirrt. Das gilt seit
+  // dem Schalter auch fuer die weggeblendeten Zeilen: gezaehlt werden allein
+  // die Felder der Kongresse, die in der Tabelle stehen.
+  const sichtbar = new Set([...ohne, ...mit].map(k=>k.id));
   const belegt = JOURNALS.reduce((s,t)=>s+t.issues.reduce((n,iss)=>
-    n + ((mxArt==='auslage' ? iss.a : iss.b)||[]).length, 0), 0);
+    n + ((mxArt==='auslage' ? iss.a : iss.b)||[]).filter(id=>sichtbar.has(id)).length, 0), 0);
   // Zaehlung fuer den Kopf: nur Felder mit einer noch offenen Erwartung aus
   // dem Vorjahr - erscheint erst, sobald es sie gibt.
   let offeneFelder = 0;
@@ -4495,11 +4660,20 @@ function renderKongressmatrix(umschalter){
 
   // Der Jahrgang steht hier nicht noch einmal: die Statuszeile ueber dem
   // Umschalter fuehrt ihn bereits ("Bearbeiten · Jahrgang 2026").
-  return kopfZeile(`<div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} ${
+  // Die Notiz gilt fuer einen Durchgang: sie erklaert die eben gespeicherte
+  // Zeile, die der Schalter im selben Zug weggenommen hat, und ist danach fort.
+  const notiz = mxNotiz ? `<div class="mx-notiz">${esc(mxNotiz)}</div>` : '';
+  mxNotiz = '';
+  return kopfZeile(`<div class="mx-zahl">${
+          weg ? `${ohne.length+mit.length} von ${gesamt} Kongressen`
+              : `${ohne.length+mit.length} Kongresse`} &middot; ${belegt} ${
           mxArt==='auslage'?'Auslagen':'Berichte'}${
-          offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
+          offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}${
+          mxNurDach && unklar ? ` &middot; <span title="Ohne Ortsangabe oder mit einem Ort, den die Liste nicht führt \u2014 diese Kongresse bleiben stehen">${
+            unklar} ohne eindeutigen Ort</span>` : ''}</div>
+        ${dachSchalter}
         ${mxArtUmschalterHtml()}
-        ${neuKnopf}`) +
+        ${neuKnopf}`) + notiz +
     `<div class="mx-scroll"><table class="mx-tab">
       <thead>${kopf}</thead><tbody>${zeilen}</tbody>
     </table></div>`;
@@ -4723,6 +4897,12 @@ async function mxKongDialogAusfuehren(kongressId){
       Object.assign(k, patch);
     }
     dialogSchliessen();
+    // Bei gesetztem Schalter kann der eben gespeicherte Kongress ausserhalb des
+    // deutschsprachigen Raums liegen; seine Zeile waere dann nicht zu sehen.
+    // Das sagt die Notiz, statt die Zeile kommentarlos fehlen zu lassen.
+    if(mxNurDach && kongRaum(patch)==='aussen')
+      mxNotiz = `»${patch.lang}« liegt außerhalb des deutschsprachigen Raums `
+              + `und ist bei dieser Auswahl ausgeblendet.`;
     render();
   }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }
 }
