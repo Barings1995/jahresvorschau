@@ -357,8 +357,9 @@ Im Arbeitsschirm steht oben ein Umschalter *Nach Ausgabe · Nach Kongress* — d
 Arbeitskopie, zwei Seiten. *Nach Kongress* zeigt eine Zeile je Kongress und eine
 Spalte je Titel; im Feld stehen Heft, Art und Termin der bereits zugeordneten
 Ausgaben — in der Auslagenansicht der Erscheinungstermin, in der
-Berichtsansicht der Anzeigenschluss. Die Frage »welches Heft und wann« ist
-damit ohne Klick beantwortet.
+Berichtsansicht der Anzeigenschluss, jeweils mit dem Kürzel davor
+(»ET 05.02.«). Die Frage »welches Heft und wann« ist damit ohne Klick
+beantwortet.
 Kongresse ohne Termin (noch zu recherchieren, oder mit unscharfer Angabe wie
 »September«) stehen oben in einer eigenen Gruppe.
 

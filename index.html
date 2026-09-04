@@ -4418,7 +4418,7 @@ function mxZeileHtml(k, offen){
         return `<span class="kmx-chip zwei" title="${escA(
           (mxArt==='auslage'?'ET ':'AS ')+fmt(termin))}"><span class="kz1">${
           mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(iss.heft)}</span><span class="kz2">${
-          esc(mxKurzDatum(termin))}</span></span>`;
+          esc(mxKurzTermin(termin))}</span></span>`;
       }).join('');
     const erw = mxErwartetOffen(k,t).map(art=>
       `<span class="mx-erwartet" title="${art==='auslage'?'Auslage':'Bericht'} vom Vorjahr erwartet, noch kein Heft">${
