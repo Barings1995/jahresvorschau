@@ -158,8 +158,13 @@ Die Trennlinie zwischen den Heften folgt der Art, weil die Schwelle eine andere
 ist: bei der Auslage muss der **Erscheinungstermin vor Kongressbeginn** liegen,
 beim Bericht der **Anzeigenschluss nach Kongressende** — vorher lässt sich über
 den Kongress noch gar nicht berichten. Die Linie heißt entsprechend
-*Kongressbeginn* oder *Kongressende*. Beide Abstandsangaben je Heft bleiben in
-beiden Ansichten stehen; sie sind Information, keine Wertung.
+*Kongressbeginn* oder *Kongressende*.
+
+Aus demselben Grund steht je Heft nur **ein** Termin: in der Auslagenansicht der
+Erscheinungstermin, in der Berichtsansicht der Anzeigenschluss — derselbe
+Termin, nach dem die Trennlinie teilt. Der jeweils andere trägt zur
+Entscheidung nichts bei; er stand vorher in jeder Zeile mit und ließ zweimal
+zehn Datumsangaben lesen, wo eine gefragt war.
 
 Die Trennung betrifft allein die Planungsfläche. Die fünf Ansichten, der Druck,
 die Excel-Strecke und die Ausgabe für die Datenpflege zeigen Auslagen und
@@ -349,12 +354,14 @@ Kongresse ohne Termin (noch zu recherchieren, oder mit unscharfer Angabe wie
 »September«) stehen oben in einer eigenen Gruppe.
 
 Ein Klick auf ein Feld öffnet die Heftwahl darunter: alle Hefte des Titels **in
-Heftfolge**, mit Erscheinungstermin und dessen Abstand zum Kongressbeginn, dazu
-dem Anzeigenschluss und dessen Abstand zum Kongressende — letzterer nur, wenn er
-positiv ist, sonst stünde eine irreführende negative Zahl da. Zwischen den
-Heften, die vor Kongressbeginn erscheinen, und denen danach steht eine
-Trennlinie. Zwei kleine Knöpfe je Heft — Auslage, Bericht — ordnen zu oder nehmen
-zurück; ein bereits zugeordnetes Heft ist als solches zu erkennen. Es gibt
+Heftfolge**, je Heft mit dem Termin, auf den es in der gewählten Ansicht
+ankommt — in der Auslagenansicht der Erscheinungstermin mit seinem Abstand zum
+Kongressbeginn, in der Berichtsansicht der Anzeigenschluss mit seinem Abstand
+zum Kongressende. Der Abstand nach Ende steht nur dabei, wenn er positiv ist,
+sonst stünde eine irreführende negative Zahl da. Zwischen den Heften vor der
+Schwelle und denen danach steht eine Trennlinie. Ein Knopf je Heft — der der
+gewählten Art — ordnet zu oder nimmt zurück; ein bereits zugeordnetes Heft ist
+als solches zu erkennen. Es gibt
 keinen Vorschlag: Ein Rechenweg, an den 2027er Zuordnungen gemessen, träfe zu
 84–90 % — der Rest sähe wie eine geprüfte Angabe aus, wäre aber geraten.
 

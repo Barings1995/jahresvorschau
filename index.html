@@ -4498,19 +4498,29 @@ function mxHeftwahlHtml(k, t){
   let vor='', nach='';
   t.issues.forEach(iss=>{
     const istA = (iss.a||[]).includes(k.id), istB = (iss.b||[]).includes(k.id);
-    let ab = iss.et ? `ET ${fmt(iss.et)}` : 'ET –';
-    if(k.von && iss.et){
-      const d = mxTage(k.von, iss.et);
-      ab += d>=0 ? ` — ${d} Tage vor Beginn` : ` — ${-d} Tage nach Beginn`;
-    }
-    // Der Abstand steht nur dabei, wenn er etwas Wahres sagt: ein Anzeigenschluss
-    // vor Kongressende (die Hefte vor Beginn, aber auch manches fruehe Heft
-    // danach) liesse als "N Tage nach Ende" eine negative Zahl erwarten -
-    // dort bleibt es beim reinen Datum.
-    let ab2 = iss.as ? `AS ${fmt(iss.as)}` : 'AS –';
-    if(ende && iss.as){
-      const d = mxTage(iss.as, ende);
-      if(d>=0) ab2 += ` — ${d} Tage nach Ende`;
+    // Nur der Termin, auf den es in dieser Ansicht ankommt: eine Auslage muss
+    // erscheinen, ehe der Kongress beginnt - dafuer zaehlt der
+    // Erscheinungstermin; ein Bericht muss nach dessen Ende noch in die Ausgabe
+    // kommen - dafuer der Anzeigenschluss. Der jeweils andere Termin traegt zur
+    // Entscheidung nichts bei und stuende nur mit in der Zeile. Es ist derselbe
+    // Termin, nach dem die Trennlinie weiter unten die Hefte teilt.
+    let termin;
+    if(mxArt==='auslage'){
+      termin = iss.et ? `ET ${fmt(iss.et)}` : 'ET –';
+      if(k.von && iss.et){
+        const d = mxTage(k.von, iss.et);
+        termin += d>=0 ? ` — ${d} Tage vor Beginn` : ` — ${-d} Tage nach Beginn`;
+      }
+    }else{
+      // Der Abstand steht nur dabei, wenn er etwas Wahres sagt: ein Anzeigenschluss
+      // vor Kongressende (die Hefte vor Beginn, aber auch manches fruehe Heft
+      // danach) liesse als "N Tage nach Ende" eine negative Zahl erwarten -
+      // dort bleibt es beim reinen Datum.
+      termin = iss.as ? `AS ${fmt(iss.as)}` : 'AS –';
+      if(ende && iss.as){
+        const d = mxTage(iss.as, ende);
+        if(d>=0) termin += ` — ${d} Tage nach Ende`;
+      }
     }
     // Nur die Art, die gerade geplant wird: sonst waere ausgerechnet an der
     // Stelle, an der geklickt wird, die Verwechslung wieder moeglich, die die
@@ -4523,7 +4533,7 @@ function mxHeftwahlHtml(k, t){
       mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}<span>${wort}</span></button>`;
     const row = `<div class="mx-hf">
         <div><span class="mx-hf-heft">Heft ${esc(iss.heft)}</span>
-          <span class="mx-hf-ab">${ab}</span><span class="mx-hf-ab">${ab2}</span></div>
+          <span class="mx-hf-ab">${termin}</span></div>
         <div class="mx-hf-knoepfe">${knopf}</div>
       </div>`;
     // Die Schwelle ist je Art eine andere: die Auslage muss vor Beginn
