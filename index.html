@@ -4528,9 +4528,10 @@ function mxKongDialog(k){
     <label class="bearb-feld">Ort
       <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>
     ${neu ? '' : `<p class="mx-hinweis" style="margin-top:12px">${zahl.gesamt
-        ? `Trägt noch <b>${mxZuordnungText(zahl)}</b> – ${zahl.gesamt===1
-            ? 'die Zuordnung geht' : 'die Zuordnungen gehen'} beim Entfernen mit verloren.`
-        : 'Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.'}</p>`}`;
+        ? `Zugeordnet ${zahl.gesamt===1 ? 'ist' : 'sind'} noch <b>${
+             mxZuordnungText(zahl)}</b>. Ein Entfernen des
+           Kongresses löscht ${zahl.gesamt===1 ? 'die Zuordnung' : 'die Zuordnungen'} mit.`
+        : 'Dem Kongress ist kein Heft zugeordnet — ein Entfernen bleibt folgenlos, etwa bei einer doppelten Schreibweise.'}</p>`}`;
   dialogZeigen(neu ? 'Neuer Kongress' : 'Kongress bearbeiten', html,
     neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id),
     false, neu ? null : {text:'Entfernen', aktion:() => mxKongDialogEntfernen(k.id)});

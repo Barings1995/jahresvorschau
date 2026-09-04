@@ -186,8 +186,9 @@ ist; die Rückfragen dazu legen sich über das noch offene Dialogfenster.
 zugeordnet sind. Der häufige Anlass ist ja gerade, dass ein Kongress im
 Jahrgang nicht stattfindet oder doppelt geschrieben wurde; dann sollen die
 Zuordnungen mit weg. Statt zu sperren nennt der letzte Absatz im Dialog, was es
-kostet — »Trägt noch 3 Berichte in 3 Titeln« —, und die Rückfrage sagt es noch
-einmal.
+kostet — »Zugeordnet sind noch 3 Berichte in 3 Titeln« —, und die Rückfrage
+sagt es noch einmal. Beide Sätze sind Aussagen über den Kongress und stehen für
+sich; sie führen den Knopf nicht ein, weil er nicht mehr neben ihnen sitzt.
 
 Der Knopf sitzt in der Fußzeile ganz links, mit der Standzeile als
 Abstandhalter zur Bestätigung rechts: die zerstörende Handlung gehört weg von
