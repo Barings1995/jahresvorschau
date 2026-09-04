@@ -4451,6 +4451,26 @@ async function mxToggle(kongressId, titelId, heft, art){
 // "Jahrgang anlegen": ein einmaliger, mehrfeldriger Vorgang, im Unterschied
 // zur Heftwahl oben, die oft in schneller Folge in derselben Zeile passiert
 // und deshalb inline dort bleibt statt in einem Dialog aufzupoppen.
+// Wie oft haengt der Kongress noch an Heften - getrennt nach Art gezaehlt,
+// weil die Matrix immer nur eine zeigt: eine Zeile, die in der Auslagenansicht
+// leer aussieht, kann in der Berichteansicht fuenf Hefte tragen. Ohne diese
+// Aufschluesselung waere nicht zu sehen, wo das Uebersehene steht.
+function mxZuordnungZahl(k){
+  let a=0, b=0; const titel=new Set();
+  JOURNALS.forEach(t=>mxZelle(k,t).forEach(x=>{
+    if(x.art==='auslage') a++; else b++;
+    titel.add(t.id);
+  }));
+  return {a, b, gesamt:a+b, titel:titel.size};
+}
+
+function mxZuordnungText(z){
+  const teile=[];
+  if(z.a) teile.push(z.a + (z.a===1 ? ' Auslage' : ' Auslagen'));
+  if(z.b) teile.push(z.b + (z.b===1 ? ' Bericht' : ' Berichte'));
+  return teile.join(' und ') + (z.titel===1 ? ' in einem Titel' : ` in ${z.titel} Titeln`);
+}
+
 function mxOeffnenKongress(kongressId){
   const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
   if(!k) return;
@@ -4465,7 +4485,11 @@ function mxKongNeu(){ mxKongDialog(null); }
 // Entwurfs-Verwaltung, die jetzt ohnehin nur der Dialog selbst braucht.
 function mxKongDialog(k){
   const neu = !k;
-  const hatZuordnung = !neu && JOURNALS.some(t=>mxZelle(k,t).length>0);
+  // Entfernen steht auch bei bestehenden Zuordnungen - der haeufige Anlass ist
+  // ja gerade, dass der Kongress im Jahrgang nicht stattfindet oder doppelt
+  // geschrieben wurde; dann sollen die Zuordnungen mit weg. Statt zu sperren
+  // sagt der Hinweis, was es kostet, und die Rueckfrage nennt es noch einmal.
+  const zahl = neu ? {a:0,b:0,gesamt:0,titel:0} : mxZuordnungZahl(k);
   const html = `<p class="dlg-erklaerung">Gilt nur für den Jahrgang ${esc(jahr)}</p>
     <label class="bearb-feld">Name
       <input type="text" id="mkLang" value="${neu?'':escA(k.lang)}"></label>
@@ -4484,10 +4508,13 @@ function mxKongDialog(k){
       <span class="hinweis">Nur wenn Beginn und Ende leer bleiben – sonst gilt der genaue Zeitraum</span></label>
     <label class="bearb-feld">Ort
       <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>
-    ${(!neu && !hatZuordnung) ? `<div style="display:flex">
+    ${neu ? '' : `<div style="display:flex">
         <button type="button" class="bearb-loeschen" onclick="mxKongDialogEntfernen('${k.id}')">Entfernen</button>
       </div>
-      <p class="mx-hinweis" style="margin-top:8px">Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.</p>` : ''}`;
+      <p class="mx-hinweis" style="margin-top:8px">${zahl.gesamt
+        ? `Trägt noch <b>${mxZuordnungText(zahl)}</b> – ${zahl.gesamt===1
+            ? 'die Zuordnung geht' : 'die Zuordnungen gehen'} beim Entfernen mit verloren.`
+        : 'Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.'}</p>`}`;
   dialogZeigen(neu ? 'Neuer Kongress' : 'Kongress bearbeiten', html,
     neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id));
 }
@@ -4534,8 +4561,11 @@ async function mxKongDialogAusfuehren(kongressId){
 async function mxKongDialogEntfernen(kongressId){
   const k = (DATEN[jahr].kongresse||[]).find(x=>x.id===kongressId);
   if(!k) return;
+  const zahl = mxZuordnungZahl(k);
   if(!await frage('Kongress entfernen?',
-    `<p>»${esc(k.lang)}« wird aus dem Jahrgang ${esc(jahr)} entfernt.</p>`,
+    `<p>»${esc(k.lang)}« wird aus dem Jahrgang ${esc(jahr)} entfernt.</p>${
+      zahl.gesamt ? `<p>Dabei ${zahl.gesamt===1?'geht':'gehen'} <b>${
+        mxZuordnungText(zahl)}</b> mit verloren.</p>` : ''}`,
     'Entfernen')) return;
   ladeKnoepfe(true);
   ladeStand('Wird entfernt …');
@@ -4544,6 +4574,13 @@ async function mxKongDialogEntfernen(kongressId){
       {method:'DELETE', headers:{Prefer:'return=minimal'}});
     DATEN[jahr].kongresse = (DATEN[jahr].kongresse||[]).filter(x=>x.id!==k.id);
     KONG.delete(k.id);
+    // Die Datenbank raeumt die Zuordnungen selbst weg (on delete cascade), die
+    // Arbeitskopie im Browser nicht. Bliebe die Kennung in iss.a/iss.b stehen,
+    // setzte kongressText() sie im Druck als rohe Zeichenkette ein.
+    JOURNALS.forEach(t=>t.issues.forEach(iss=>{
+      if(iss.a) iss.a = iss.a.filter(x=>x!==k.id);
+      if(iss.b) iss.b = iss.b.filter(x=>x!==k.id);
+    }));
     dialogSchliessen();
     render();
   }catch(fehler){ ladeStand(fehlertext(fehler), true); ladeKnoepfe(false); }

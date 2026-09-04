@@ -166,10 +166,10 @@ die Excel-Strecke und die Ausgabe für die Datenpflege zeigen Auslagen und
 Berichte weiterhin gemeinsam je Ausgabe — dort ist gerade der vollständige
 Blick gefragt.
 
-Eine Fangfrage steckt in der Löschsperre: ob ein Kongress noch irgendwo hängt,
-wird **über beide Arten hinweg** geprüft, nicht nur über die gezeigte. Sonst
-ließe sich ein Kongress, der nur Berichte trägt, aus der Auslagenansicht heraus
-entfernen — samt seiner Berichte, deren Zeile dort leer aussah.
+Eine Fangfrage steckt im Entfernen: wie viel an einem Kongress noch hängt, wird
+**über beide Arten hinweg** gezählt, nicht nur über die gezeigte. Sonst sähe
+ein Kongress, der nur Berichte trägt, aus der Auslagenansicht heraus wie ein
+leerer aus und ließe sich scheinbar folgenlos entfernen.
 
 ### Bearbeiten und Vorjahresübernahme
 
@@ -178,11 +178,23 @@ Zwei Klickziele, zwei Wege — je nachdem, wie oft und wie kurz der Vorgang ist:
 Ein Klick auf die Kongresszeile selbst — nicht auf ein Titelfeld — öffnet ein
 Dialogfenster für Name, Kurzname, Zeitraum (genau oder als Wortlaut wie
 »September 2027«) und Ort, im selben Aufbau wie *Jahrgang anlegen*: gelesen
-werden die Felder erst mit *Speichern*, nicht bei jedem Zeichen. *Entfernen*
-steht nur, solange der Kongress keinem Heft zugeordnet ist — etwa bei einer
-doppelten Schreibweise; die Rückfrage dazu legt sich über das noch offene
-Dialogfenster. Ein Dialog passt hierher, weil an einer Kongresszeile meist nur
-einmal etwas zu ändern ist.
+werden die Felder erst mit *Speichern*, nicht bei jedem Zeichen. Ein Dialog
+passt hierher, weil an einer Kongresszeile meist nur einmal etwas zu ändern
+ist; die Rückfragen dazu legen sich über das noch offene Dialogfenster.
+
+*Entfernen* steht dort **immer** — auch wenn dem Kongress schon Hefte
+zugeordnet sind. Der häufige Anlass ist ja gerade, dass ein Kongress im
+Jahrgang nicht stattfindet oder doppelt geschrieben wurde; dann sollen die
+Zuordnungen mit weg. Statt zu sperren nennt der Hinweis unter dem Knopf, was es
+kostet — »Trägt noch 3 Berichte in 3 Titeln« —, und die Rückfrage sagt es noch
+einmal. Die Aufschlüsselung nach Art ist dabei kein Zierrat: seit die Matrix
+nur eine Art zeigt, kann eine Zeile in der Auslagenansicht leer aussehen,
+während der Kongress in der Berichteansicht fünf Hefte trägt. Gezählt wird
+deshalb über beide Arten hinweg, nicht über die gezeigte.
+
+Die Datenbank räumt die Zuordnungen selbst weg (`on delete cascade`) — die
+Arbeitskopie im Browser nicht. Sie wird darum beim Entfernen mit durchgegangen;
+bliebe eine Kennung stehen, setzte sie der Druck als rohe Zeichenkette ein.
 
 *+ Neuer Kongress* über der Matrix öffnet dasselbe Dialogfenster leer: ein
 Kongress, dessen Name bereits feststeht, dessen Termin und Titelverteilung
