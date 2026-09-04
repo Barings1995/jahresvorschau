@@ -743,6 +743,13 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-zelle.offen{background:var(--navy-faint);box-shadow:inset 0 0 0 1.5px var(--navy)}
 .kmx-chip{display:inline-flex;align-items:center;gap:2px;font-size:.72rem;
   color:var(--text);white-space:nowrap}
+/* Zwei Zeilen im Feld: Heft oben, sein Termin darunter. Damit beantwortet die
+   Matrix die Frage "welches Heft und wann" ohne Aufklappen. Die Zeilenhoehe
+   waechst dadurch nicht - die Kongresszeile links ist mit Name und Zeitraum
+   ohnehin zweizeilig und bleibt das Mass. */
+.kmx-chip.zwei{flex-direction:column;gap:0;line-height:1.15}
+.kmx-chip .kz1{display:inline-flex;align-items:center;gap:2px}
+.kmx-chip .kz2{font-size:.63rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .mx-erwartet{display:inline-flex;align-items:center;opacity:.7}
 /* Die Heftwahl klappt als eigene Tabellenzeile unter dem angeklickten
    Kongress auf statt in einem Panel weit unter einer langen Liste - der
@@ -757,22 +764,30 @@ p.bearb-stand:not(:empty){margin-top:9px}
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .mx-panel-zu:hover{color:var(--warm);border-color:var(--warm)}
 .mx-hinweis{font-size:.74rem;color:var(--accent);margin-bottom:8px}
-.mx-hf{display:flex;justify-content:space-between;align-items:center;gap:10px;
-  padding:6px 2px;border-top:1px solid var(--surface3);font-size:.78rem}
-.mx-hf:first-of-type{border-top:none}
-.mx-hf-heft{font-weight:600;color:var(--text);margin-right:8px}
-.mx-hf-ab{color:var(--muted);font-size:.72rem;margin-right:10px}
-.mx-hf-knoepfe{display:flex;gap:6px;flex:none}
-.mx-toggle{display:flex;align-items:center;gap:5px;padding:4px 9px;font-family:inherit;
-  font-size:.72rem;font-weight:600;color:var(--muted);background:var(--surface2);
-  border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
-.mx-toggle:hover{border-color:var(--navy-light)}
-.mx-toggle.an{color:#ffffff}
-.mx-toggle.auslage.an{background:var(--accent);border-color:var(--accent)}
-.mx-toggle.bericht.an{background:var(--navy);border-color:var(--navy)}
-.mx-trenn{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:.68rem;
-  color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.mx-trenn span{flex:1;border-top:1px solid var(--border)}
+/* Heftleiste: der Jahrgang als eine Reihe statt einer Liste. Je Heft ein
+   Schalter mit Nummer, Termin und Abstand; die Schwelle steht als senkrechter
+   Strich mitten in der Reihe. Ein eigener Knopf je Heft entfaellt - seit die
+   Ansichten nach Auslagen und Berichten getrennt sind, ist die Art bereits
+   entschieden, und der Chip selbst ist der Schalter. Zehn Hefte brauchen so
+   rund 970 statt 423 Pixel Hoehe. */
+.mx-hl{display:flex;flex-wrap:wrap;align-items:stretch;gap:5px;padding:2px 0 4px}
+.mx-hl-chip{display:flex;flex-direction:column;align-items:center;min-width:74px;
+  padding:4px 8px;font-family:inherit;line-height:1.2;color:var(--text);
+  background:var(--surface);border:1.5px solid var(--border);border-radius:4px;
+  cursor:pointer}
+.mx-hl-chip:hover{border-color:var(--navy-light)}
+.mx-hl-nr{font-size:.8rem;font-weight:600}
+.mx-hl-dat{font-size:.65rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.mx-hl-ab{font-size:.6rem;color:var(--muted);white-space:nowrap}
+.mx-hl-chip.an{color:#ffffff}
+.mx-hl-chip.an .mx-hl-dat,.mx-hl-chip.an .mx-hl-ab{color:rgba(255,255,255,.8)}
+.mx-hl-chip.auslage.an{background:var(--accent);border-color:var(--accent)}
+.mx-hl-chip.bericht.an{background:var(--navy);border-color:var(--navy)}
+.mx-hl-strich{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:0 3px}
+.mx-hl-strich i{flex:1;width:1px;background:var(--navy)}
+.mx-hl-strich b{font-size:.58rem;font-weight:600;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;padding:2px 0}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
@@ -4394,9 +4409,17 @@ function mxZeitraum(k){ return kongressZeitraum(k); }
 
 function mxZeileHtml(k, offen){
   const zellen = JOURNALS.map(t=>{
-    const treffer = mxZelle(k,t).filter(x=>x.art===mxArt);
-    const chips = treffer.map(x=>`<span class="kmx-chip">${
-      mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(x.heft)}</span>`).join('');
+    // Gezeichnet wird ueber die Hefte statt ueber mxZelle: das Feld nennt
+    // neben dem Heft auch dessen Termin, und den fuehrt allein die Ausgabe.
+    const chips = t.issues.filter(iss=>
+        ((mxArt==='auslage' ? iss.a : iss.b)||[]).includes(k.id))
+      .map(iss=>{
+        const termin = mxHeftTermin(iss);
+        return `<span class="kmx-chip zwei" title="${escA(
+          (mxArt==='auslage'?'ET ':'AS ')+fmt(termin))}"><span class="kz1">${
+          mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}${esc(iss.heft)}</span><span class="kz2">${
+          esc(mxKurzDatum(termin))}</span></span>`;
+      }).join('');
     const erw = mxErwartetOffen(k,t).map(art=>
       `<span class="mx-erwartet" title="${art==='auslage'?'Auslage':'Bericht'} vom Vorjahr erwartet, noch kein Heft">${
         art==='auslage'?MX_AUSLAGE_OFFEN:MX_BERICHT_OFFEN}</span>`).join('');
@@ -4486,6 +4509,31 @@ function mxSchliessen(){ mxAuswahl = null; render(); }
 
 function mxTage(a,b){ return Math.round((new Date(a) - new Date(b)) / 864e5); }
 
+// Der Termin, auf den es in dieser Ansicht ankommt: eine Auslage muss
+// erscheinen, ehe der Kongress beginnt - dafuer zaehlt der Erscheinungstermin;
+// ein Bericht muss nach dessen Ende noch in die Ausgabe kommen - dafuer der
+// Anzeigenschluss. Es ist derselbe Termin, nach dem die Heftleiste teilt.
+function mxHeftTermin(iss){ return mxArt==='auslage' ? iss.et : iss.as; }
+
+// TT.MM. - im Feld und in der Leiste ist das Jahr der Jahrgang, es steht oben.
+function mxKurzDatum(iso){ return iso ? `${iso.slice(8)}.${iso.slice(5,7)}.` : '–'; }
+
+// Abstand zum Kongress in Tagen. Die Richtung steht im Wort: die Auslage misst
+// gegen den Beginn, der Bericht gegen das Ende. Frueher blieb der Abstand beim
+// Bericht vor dem Ende leer, weil "nach Ende" dort eine negative Zahl ergeben
+// haette - die Zahl war nie das Problem, die Beschriftung war es.
+function mxHeftAbstand(k, iss){
+  const ende = k.bis || k.von;
+  if(mxArt==='auslage'){
+    if(!k.von || !iss.et) return '';
+    const d = mxTage(k.von, iss.et);
+    return d>=0 ? `${d} T. vor Beginn` : `${-d} T. nach Beginn`;
+  }
+  if(!ende || !iss.as) return '';
+  const d = mxTage(iss.as, ende);
+  return d>=0 ? `${d} T. nach Ende` : `${-d} T. vor Ende`;
+}
+
 // Nur noch die Heftwahl - die Kongress-Metadaten haben ein eigenes
 // Dialogfenster (siehe mxKongDialog), unabhaengig vom Render-Takt der Matrix.
 function mxHeftwahlHtml(k, t){
@@ -4497,55 +4545,30 @@ function mxHeftwahlHtml(k, t){
         &ndash; noch kein Heft gewählt.</div>` : '';
   let vor='', nach='';
   t.issues.forEach(iss=>{
-    const istA = (iss.a||[]).includes(k.id), istB = (iss.b||[]).includes(k.id);
-    // Nur der Termin, auf den es in dieser Ansicht ankommt: eine Auslage muss
-    // erscheinen, ehe der Kongress beginnt - dafuer zaehlt der
-    // Erscheinungstermin; ein Bericht muss nach dessen Ende noch in die Ausgabe
-    // kommen - dafuer der Anzeigenschluss. Der jeweils andere Termin traegt zur
-    // Entscheidung nichts bei und stuende nur mit in der Zeile. Es ist derselbe
-    // Termin, nach dem die Trennlinie weiter unten die Hefte teilt.
-    let termin;
-    if(mxArt==='auslage'){
-      termin = iss.et ? `ET ${fmt(iss.et)}` : 'ET –';
-      if(k.von && iss.et){
-        const d = mxTage(k.von, iss.et);
-        termin += d>=0 ? ` — ${d} Tage vor Beginn` : ` — ${-d} Tage nach Beginn`;
-      }
-    }else{
-      // Der Abstand steht nur dabei, wenn er etwas Wahres sagt: ein Anzeigenschluss
-      // vor Kongressende (die Hefte vor Beginn, aber auch manches fruehe Heft
-      // danach) liesse als "N Tage nach Ende" eine negative Zahl erwarten -
-      // dort bleibt es beim reinen Datum.
-      termin = iss.as ? `AS ${fmt(iss.as)}` : 'AS –';
-      if(ende && iss.as){
-        const d = mxTage(iss.as, ende);
-        if(d>=0) termin += ` — ${d} Tage nach Ende`;
-      }
-    }
     // Nur die Art, die gerade geplant wird: sonst waere ausgerechnet an der
     // Stelle, an der geklickt wird, die Verwechslung wieder moeglich, die die
-    // getrennten Ansichten vermeiden sollen.
-    const istDrin = mxArt==='auslage' ? istA : istB;
+    // getrennten Ansichten vermeiden sollen. Der Chip ist zugleich der
+    // Schalter - ein eigener Knopf daneben sagte in jeder Zeile dasselbe.
+    const istDrin = ((mxArt==='auslage' ? iss.a : iss.b)||[]).includes(k.id);
     const wort = mxArt==='auslage' ? 'Auslage' : 'Bericht';
-    const knopf = `<button type="button" class="mx-toggle ${mxArt}${istDrin?' an':''}"
+    const termin = mxHeftTermin(iss);
+    const ab = mxHeftAbstand(k, iss);
+    const chip = `<button type="button" class="mx-hl-chip ${mxArt}${istDrin?' an':''}"
       onclick="mxToggle('${k.id}',${t.id},'${esc(iss.heft)}','${mxArt}')"
-      title="${wort}${istDrin?' entfernen':' zuordnen'}">${
-      mxArt==='auslage'?MX_AUSLAGE:MX_BERICHT}<span>${wort}</span></button>`;
-    const row = `<div class="mx-hf">
-        <div><span class="mx-hf-heft">Heft ${esc(iss.heft)}</span>
-          <span class="mx-hf-ab">${termin}</span></div>
-        <div class="mx-hf-knoepfe">${knopf}</div>
-      </div>`;
+      title="${escA(`Heft ${iss.heft} · ${mxArt==='auslage'?'ET':'AS'} ${fmt(termin)}${
+        ab?' · '+ab:''} — ${wort}${istDrin?' entfernen':' zuordnen'}`)}"><span class="mx-hl-nr">${
+      esc(iss.heft)}</span><span class="mx-hl-dat">${esc(mxKurzDatum(termin))}</span><span class="mx-hl-ab">${
+      esc(ab)}</span></button>`;
     // Die Schwelle ist je Art eine andere: die Auslage muss vor Beginn
     // erscheinen, ueber den Kongress berichten laesst sich erst, wenn der
     // Anzeigenschluss nach seinem Ende liegt.
     if(mxArt==='auslage'
         ? (k.von && iss.et && iss.et < k.von)
-        : (ende && iss.as && iss.as < ende)) vor += row; else nach += row;
+        : (ende && iss.as && iss.as < ende)) vor += chip; else nach += chip;
   });
-  const trenn = (vor && nach)
-    ? `<div class="mx-trenn"><span></span><b>${
-        mxArt==='auslage'?'Kongressbeginn':'Kongressende'}</b><span></span></div>` : '';
+  const strich = (vor && nach)
+    ? `<span class="mx-hl-strich"><i></i><b>${
+        mxArt==='auslage'?'Beginn':'Ende'}</b><i></i></span>` : '';
 
   return `<div class="mx-panel-kopf">
       <div><div class="mx-panel-titel">${esc(t.short)} &middot; ${
@@ -4553,7 +4576,8 @@ function mxHeftwahlHtml(k, t){
         <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
       <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
     </div>
-    ${kein}${erwHinweis}${vor}${trenn}${nach}
+    ${kein}${erwHinweis}
+    <div class="mx-hl">${vor}${strich}${nach}</div>
     <p class="bearb-stand" id="bearbStand"></p>`;
 }
 

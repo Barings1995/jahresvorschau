@@ -150,21 +150,22 @@ keinen Weg mehr, ihnen eine erste Zuordnung zu geben. Die Zählung im Kopf und
 die hohlen Formen der Vorjahresübernahme folgen ebenfalls der gewählten Art;
 eine Zahl, die zur Hälfte unsichtbare Felder mitführte, orientiert nicht.
 
-Auch die Heftwahl zeigt nur den Knopf der gewählten Art. Blieben dort beide
-stehen, wäre ausgerechnet an der Stelle, an der geklickt wird, die
-Verwechslung wieder möglich, die die Trennung vermeiden soll.
+Auch die Heftleiste kennt nur die gewählte Art: der Chip ist zugleich der
+Schalter. Stünden dort zwei nebeneinander, wäre ausgerechnet an der Stelle, an
+der geklickt wird, die Verwechslung wieder möglich, die die Trennung vermeiden
+soll.
 
-Die Trennlinie zwischen den Heften folgt der Art, weil die Schwelle eine andere
+Die Trennung zwischen den Heften folgt der Art, weil die Schwelle eine andere
 ist: bei der Auslage muss der **Erscheinungstermin vor Kongressbeginn** liegen,
 beim Bericht der **Anzeigenschluss nach Kongressende** — vorher lässt sich über
-den Kongress noch gar nicht berichten. Die Linie heißt entsprechend
-*Kongressbeginn* oder *Kongressende*.
+den Kongress noch gar nicht berichten. Der Strich in der Leiste heißt
+entsprechend *Beginn* oder *Ende*.
 
 Aus demselben Grund steht je Heft nur **ein** Termin: in der Auslagenansicht der
 Erscheinungstermin, in der Berichtsansicht der Anzeigenschluss — derselbe
-Termin, nach dem die Trennlinie teilt. Der jeweils andere trägt zur
-Entscheidung nichts bei; er stand vorher in jeder Zeile mit und ließ zweimal
-zehn Datumsangaben lesen, wo eine gefragt war.
+Termin, nach dem der Strich teilt. Der jeweils andere trägt zur Entscheidung
+nichts bei; er stand vorher an jedem Heft mit und ließ zweimal zehn
+Datumsangaben lesen, wo eine gefragt war.
 
 Die Trennung betrifft allein die Planungsfläche. Die fünf Ansichten, der Druck,
 die Excel-Strecke und die Ausgabe für die Datenpflege zeigen Auslagen und
@@ -354,19 +355,26 @@ im Kasten »Die Sicherungspunkte werden geladen …«, nicht der Leerhinweis.
 
 Im Arbeitsschirm steht oben ein Umschalter *Nach Ausgabe · Nach Kongress* — dieselbe
 Arbeitskopie, zwei Seiten. *Nach Kongress* zeigt eine Zeile je Kongress und eine
-Spalte je Titel; im Feld stehen Heft und Art der bereits zugeordneten Ausgaben.
+Spalte je Titel; im Feld stehen Heft, Art und Termin der bereits zugeordneten
+Ausgaben — in der Auslagenansicht der Erscheinungstermin, in der
+Berichtsansicht der Anzeigenschluss. Die Frage »welches Heft und wann« ist
+damit ohne Klick beantwortet.
 Kongresse ohne Termin (noch zu recherchieren, oder mit unscharfer Angabe wie
 »September«) stehen oben in einer eigenen Gruppe.
 
-Ein Klick auf ein Feld öffnet die Heftwahl darunter: alle Hefte des Titels **in
-Heftfolge**, je Heft mit dem Termin, auf den es in der gewählten Ansicht
-ankommt — in der Auslagenansicht der Erscheinungstermin mit seinem Abstand zum
-Kongressbeginn, in der Berichtsansicht der Anzeigenschluss mit seinem Abstand
-zum Kongressende. Der Abstand nach Ende steht nur dabei, wenn er positiv ist,
-sonst stünde eine irreführende negative Zahl da. Zwischen den Heften vor der
-Schwelle und denen danach steht eine Trennlinie. Ein Knopf je Heft — der der
-gewählten Art — ordnet zu oder nimmt zurück; ein bereits zugeordnetes Heft ist
-als solches zu erkennen. Es gibt
+Ein Klick auf ein Feld öffnet darunter die Heftleiste: der ganze Jahrgang **in
+Heftfolge** als eine Reihe, je Heft ein Feld mit Nummer, Termin und Abstand zum
+Kongress — in der Auslagenansicht der Erscheinungstermin und sein Abstand zum
+Beginn, in der Berichtsansicht der Anzeigenschluss und sein Abstand zum Ende.
+Ein
+Anzeigenschluss vor dem Kongressende heißt dort *vor Ende*, nicht »minus so
+viele Tage nach Ende«: dieselbe Rechnung, andersherum benannt. Zwischen den
+Heften vor der Schwelle und denen danach steht ein senkrechter Strich.
+
+Ein Klick auf das Heft ordnet zu oder nimmt zurück — ein zugeordnetes Heft ist
+gefüllt. Einen eigenen Knopf je Heft gibt es nicht mehr: seit die Ansichten
+getrennt sind, ist die Art bereits entschieden, und zehn gleichlautende Knöpfe
+untereinander kosteten die halbe Breite und das Fünffache an Höhe. Es gibt
 keinen Vorschlag: Ein Rechenweg, an den 2027er Zuordnungen gemessen, träfe zu
 84–90 % — der Rest sähe wie eine geprüfte Angabe aus, wäre aber geraten.
 
