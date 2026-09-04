@@ -717,8 +717,12 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-umschalter.klein .bu-btn.aktiv svg rect{fill:#ffffff}
 
 /* ── Kongressmatrix ── */
-.mx-kopf{display:flex;justify-content:flex-end;align-items:baseline;
-  gap:12px;margin-bottom:10px}
+.mx-kopf{display:flex;flex-wrap:wrap;justify-content:space-between;
+  align-items:center;gap:10px 12px;margin-bottom:14px}
+/* Der Umschalter traegt seinen Abstand nach unten sonst selbst - hier gibt ihn
+   die Kopfzeile vor, damit die Tabelle so dicht steht wie in der
+   Ausgabenansicht. */
+.mx-kopf .bearb-umschalter{margin-bottom:0}
 .mx-kopf-re{display:flex;align-items:center;gap:14px}
 .mx-zahl{font-size:.76rem;color:var(--muted)}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
@@ -4443,16 +4447,21 @@ function mxZeileHtml(k, offen){
   return hauptzeile + inline;
 }
 
-function renderKongressmatrix(){
+// Der Ansichtsumschalter wird hereingereicht und steht in derselben Zeile wie
+// Zaehlung, Art-Umschalter und "+ Neuer Kongress". Stuende er wie in der
+// Ausgabenansicht als eigener Block darueber, bliebe links davon eine leere
+// Bank, und die Tabelle saesse 55 statt 14 Pixel unter dem Umschalter.
+function renderKongressmatrix(umschalter){
+  const kopfZeile = rechts =>
+    `<div class="mx-kopf">${umschalter}<div class="mx-kopf-re">${rechts}</div></div>`;
   const j = DATEN[jahr];
   if(!j || !j.umgestellt)
-    return `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
+    return kopfZeile('') + `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
       Über <b>Daten &rarr; Kongresse umstellen</b> lässt sich das nachholen.</div>`;
   const {ohne, mit} = mxZeilen();
   const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()">+ Neuer Kongress</button>`;
   if(!ohne.length && !mit.length)
-    return `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>
-      ${neuKnopf}`;
+    return kopfZeile(neuKnopf) + `<div class="bearb-leerhinweis" style="padding:20px 0">Der Jahrgang führt noch keine Kongresse.</div>`;
 
   // Gezaehlt wird nur, was die Ansicht auch zeigt - eine Zahl, die zur Haelfte
   // unsichtbare Felder mitfuehrt, orientiert nicht, sie verwirrt.
@@ -4478,18 +4487,14 @@ function renderKongressmatrix(){
     zeilen += mit.map(k=>mxZeileHtml(k, mxAuswahl)).join('');
   }
 
-  // Der Jahrgang stand hier ein zweites Mal: die Statuszeile ueber dem
+  // Der Jahrgang steht hier nicht noch einmal: die Statuszeile ueber dem
   // Umschalter fuehrt ihn bereits ("Bearbeiten · Jahrgang 2026").
-  return `<div class="mx-kopf">
-      <div class="mx-kopf-re">
-        <div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} ${
+  return kopfZeile(`<div class="mx-zahl">${ohne.length+mit.length} Kongresse &middot; ${belegt} ${
           mxArt==='auslage'?'Auslagen':'Berichte'}${
           offeneFelder ? ` &middot; ${offeneFelder} aus dem Vorjahr offen` : ''}</div>
         ${mxArtUmschalterHtml()}
-        ${neuKnopf}
-      </div>
-    </div>
-    <div class="mx-scroll"><table class="mx-tab">
+        ${neuKnopf}`) +
+    `<div class="mx-scroll"><table class="mx-tab">
       <thead>${kopf}</thead><tbody>${zeilen}</tbody>
     </table></div>`;
 }
@@ -4754,7 +4759,7 @@ async function mxKongDialogEntfernen(kongressId){
 }
 function renderBearbeiten(){
   const umschalter = bearbUmschalterHtml();
-  if(bearbAnsicht==='kongress') return umschalter + renderKongressmatrix();
+  if(bearbAnsicht==='kongress') return renderKongressmatrix(umschalter);
 
   const gewaehltIst = (art, titelId, index) => !!bearbAuswahl
     && bearbAuswahl.art===art && !bearbAuswahl.neu
