@@ -286,9 +286,31 @@ Liste links behält beim Wechsel der Ausgabe ihre Rollposition — sie wird bei
 jedem Zeichnen neu aufgebaut, ihr Stand wird dabei aber gemerkt und wieder
 gesetzt.
 
-Die Kongressfelder schlagen beim Tippen bereits verwendete Namen vor. Ein neuer
-Name ist erlaubt — nur wird ein Kongress, dessen Schreibweise von den übrigen
-abweicht, in der Kongressansicht zu einem eigenen Kasten.
+Kongresse werden hier nur zugeordnet, nicht angelegt. Zugeordnetes steht als
+feste Zeile mit einem `×` daneben; darunter führt ein Auswahlfeld *Kongress
+hinzufügen …* die Kongresse des Jahrgangs — gegliedert in *Termin fehlt* und
+*Nach Zeitraum*, wie die Kongressmatrix, und um die dieser Ausgabe bereits
+zugeordneten gekürzt. Eine leere Zeile kann damit nicht stehenbleiben, und
+derselbe Kongress lässt sich nicht zweimal eintragen. Ein neuer Eintrag wird
+gleich nach Zeitraum einsortiert, sodass das Formular dieselbe Reihenfolge zeigt
+wie der nächste Aufruf.
+
+Vorher standen dort zwei Freitextfelder mit einer Vorschlagsliste. Sie waren ein
+Angebot, keine Schranke: wich der eingetippte Wortlaut auch nur in einem Komma
+ab, entstand beim Speichern ein zweiter Kongresssatz — genau das Auseinanderlaufen,
+gegen das die Kongresssätze eingeführt wurden. Der Weg dorthin ist nicht mehr
+gesperrt, sondern nicht mehr vorhanden: der Entwurf führt Kennungen statt
+Wortlaute, und aus einer Kennung lässt sich nichts Neues anlegen. Angelegt,
+geändert und entfernt wird ein Kongress allein in der Ansicht *Nach Kongress*;
+dorthin führt aus dem Formular ein Knopf, wenn der Jahrgang noch keinen führt.
+
+Ein Jahrgang gilt als auf eigene Kongresssätze umgestellt, sobald er Kongresse
+in der Datenbank führt — oder, bei erreichbaren Kongresstabellen, sobald keine
+seiner Ausgaben ihre Kongresse noch als Text trägt. Der zweite Fall ist der eben
+angelegte, leere Jahrgang: ohne ihn verwiese die Kongressansicht dort auf eine
+Umstellung, die es gar nicht zu machen gibt. Die Freitextfelder samt
+Vorschlagsliste stehen nur noch für einen Jahrgang, der seine Kongresse
+tatsächlich noch als Text führt.
 
 ## Wenn die Anmeldung »JWT issued at future« meldet
 

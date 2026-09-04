@@ -635,6 +635,14 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   color:var(--text);background:var(--surface);
   border:1.5px solid var(--border);border-radius:4px}
 .bearb-zeile input:focus{border-color:var(--navy);outline:none}
+/* Die zugeordneten Kongresse stehen als Text, im Zuschnitt des Eingabefelds,
+   das hier frueher stand - gleiche Hoehe, gleicher Rahmen, nur ohne Schreibrecht. */
+.bearb-fest{flex:1;padding:6px 8px;font-size:.82rem;color:var(--text);
+  background:var(--surface2);border:1.5px solid var(--border);border-radius:4px}
+.bearb-wahl{width:100%;margin-top:2px;padding:6px 8px;font-family:inherit;
+  font-size:.82rem;color:var(--text);background:var(--surface);
+  border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
+.bearb-wahl:focus{border-color:var(--navy);outline:none}
 .bearb-weg{flex:none;width:30px;font-family:inherit;font-size:.9rem;
   color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);
   border-radius:4px;cursor:pointer}
@@ -1105,6 +1113,15 @@ function kongressAus(k){
 function kongressText(id){
   const k = KONG.get(id);
   return k ? kongressAus(k) : String(id);
+}
+
+// Wonach die Kongresse einer Ausgabe geordnet stehen: nach ihrem Zeitraum.
+// Wer keinen hat, kommt hinten - die Tilde liegt hinter allen Ziffern - und
+// dort nach seinem Wortlaut. Dieselbe Ordnung stellt der Abruf beim Laden her
+// und das Auswahlfeld im Ausgabenformular beim Hinzufuegen; stuenden dort
+// zwei verschiedene, zeigte das Formular etwas anderes als der naechste Aufruf.
+function kongSchluessel(k){
+  return k ? (k.von || ('~' + (k.unscharf || k.lang || ''))) : '';
 }
 
 // Traegt einen Wortlaut in den gezeigten Jahrgang ein und gibt die Kennung
@@ -3610,16 +3627,25 @@ function bearbBeginn(auswahl, roh){
   render();
 }
 
+function kongUmgestellt(){ return !!(DATEN[jahr] && DATEN[jahr].umgestellt); }
+
+function kongAusIssue(liste){
+  return kongUmgestellt() ? (liste||[]).slice() : (liste||[]).map(kongressText);
+}
+
 async function bearbWaehle(titelId, index){
   if(!await bearbFrei()) return;
   const t = JOURNALS.find(j=>j.id===titelId);
   const iss = t && t.issues[index];
   if(!iss) return;
+  // Umgestellt fuehrt der Entwurf die Kennungen der Kongresse, nicht ihren
+  // Wortlaut: gewaehlt wird aus den Saetzen des Jahrgangs, und ein Wortlaut,
+  // den es zurueckzurechnen gaebe, entsteht gar nicht erst. Nicht umgestellt
+  // bleibt es beim Freitext.
   bearbBeginn({ art:'ausgabe', titelId, index },
     { id: iss.id, heft: iss.heft, et: iss.et||'', as: iss.as||'',
       du: iss.du||'', eh: iss.eh||'', top: iss.top||'', sw: iss.sw||'',
-      a: (iss.a||[]).map(kongressText),
-      b: (iss.b||[]).map(kongressText) });
+      a: kongAusIssue(iss.a), b: kongAusIssue(iss.b) });
 }
 
 // Eine neue Ausgabe ist zunaechst nur ein leerer Entwurf. Angelegt wird sie
@@ -3676,6 +3702,24 @@ function bearbZeileWeg(art, i){
   entwurf[art].splice(i,1);
   bearbFormNeu();
 }
+
+// Einsortiert wird gleich nach Zeitraum, nicht angehaengt: sonst stuende der
+// eben gewaehlte Kongress bis zum naechsten Laden an anderer Stelle als danach.
+function bearbKongZu(art, id){
+  if(!entwurf || !id || entwurf[art].includes(id)) return bearbFormNeu();
+  entwurf[art].push(id);
+  entwurf[art].sort((x,z)=>
+    kongSchluessel(KONG.get(x)).localeCompare(kongSchluessel(KONG.get(z))));
+  bearbStand('Nicht gespeichert', '');
+  bearbFormNeu();
+}
+
+function bearbKongWeg(art, i){
+  if(!entwurf) return;
+  entwurf[art].splice(i,1);
+  bearbStand('Nicht gespeichert', '');
+  bearbFormNeu();
+}
 async function bearbVerwerfen(){
   if(!entwurf || !bearbAuswahl) return;
   if(!await frage('Begonnene Änderung verwerfen?',
@@ -3707,6 +3751,11 @@ async function bearbSpeichern(){
   return bearbAuswahl.neu ? ausgabeAnlegen() : ausgabeAendern();
 }
 
+function kongAlsText(liste){
+  return kongUmgestellt() ? (liste||[]).map(kongressText)
+                          : (liste||[]).map(x=>x.trim()).filter(Boolean);
+}
+
 // Die Spaltennamen der Datenbank stehen nur hier. Leere Termine werden zu
 // null: ein leerer Text waere fuer eine Datumsspalte kein gueltiger Wert.
 function ausgabeAusEntwurf(){
@@ -3719,8 +3768,10 @@ function ausgabeAusEntwurf(){
     anlieferung:     leerZuNull(entwurf.eh),
     thema:       entwurf.top,
     sonderthema: entwurf.sw,
-    auslagen: entwurf.a.map(x=>x.trim()).filter(Boolean),
-    berichte: entwurf.b.map(x=>x.trim()).filter(Boolean)
+    // Die beiden Alt-Textspalten werden weiter mitgeschrieben; umgestellt
+    // steht im Entwurf aber eine Kennung, kein Wortlaut.
+    auslagen: kongAlsText(entwurf.a),
+    berichte: kongAlsText(entwurf.b)
   };
 }
 
@@ -3732,10 +3783,17 @@ function entwurfInAusgabe(iss){
   iss.et = entwurf.et; iss.as = entwurf.as;
   iss.du = entwurf.du; iss.eh = entwurf.eh;
   iss.top = entwurf.top; iss.sw = entwurf.sw;
-  iss.a = kongressKennungen(entwurf.a);
-  iss.b = kongressKennungen(entwurf.b);
-  kongresseAufraeumen();
-  entwurf.a = iss.a.map(kongressText); entwurf.b = iss.b.map(kongressText);
+  if(kongUmgestellt()){
+    // Kein Weg ueber kongressEintragen: aus dem Ausgabenformular heraus soll
+    // kein Kongress entstehen koennen. Gewaehlt wurde aus den Saetzen des
+    // Jahrgangs, die Kennungen wandern unveraendert weiter.
+    iss.a = entwurf.a.slice(); iss.b = entwurf.b.slice();
+  }else{
+    iss.a = kongressKennungen(entwurf.a);
+    iss.b = kongressKennungen(entwurf.b);
+    kongresseAufraeumen();
+    entwurf.a = iss.a.map(kongressText); entwurf.b = iss.b.map(kongressText);
+  }
   entwurfRein = JSON.stringify(entwurf);
 }
 
@@ -4052,9 +4110,20 @@ function kongVorschlaege(){
   return [...namen].sort((a,b)=>a.localeCompare(b,'de'));
 }
 
+// Zwei Aufbauten, ein Rahmen. Umgestellt wird nur noch aus den Kongressen des
+// Jahrgangs gewaehlt; der Freitext bleibt allein fuer einen Jahrgang stehen,
+// der seine Kongresse noch als Text an der Ausgabe fuehrt.
 function zeilenGruppe(art, beschriftung, hinweis){
-  const liste = entwurf[art];
-  const zeilen = liste.map((wert,i)=>
+  return `<div class="bearb-gruppe">
+    <span class="bearb-feld">${beschriftung}
+      <span class="hinweis">${hinweis}${kongUmgestellt()
+        ? ' &middot; angelegt werden Kongresse in der Ansicht &raquo;Nach Kongress&laquo;' : ''}</span></span>
+    ${kongUmgestellt() ? kongWahlHtml(art) : freitextHtml(art)}
+  </div>`;
+}
+
+function freitextHtml(art){
+  const zeilen = entwurf[art].map((wert,i)=>
     `<div class="bearb-zeile">
        <input type="text" list="kongVorschlag" data-art="${art}"
               value="${escA(wert)}" placeholder="Name des Kongresses"
@@ -4062,13 +4131,51 @@ function zeilenGruppe(art, beschriftung, hinweis){
        <button type="button" class="bearb-weg" title="Zeile entfernen"
                onclick="bearbZeileWeg('${art}',${i})">&times;</button>
      </div>`).join('');
-  return `<div class="bearb-gruppe">
-    <span class="bearb-feld">${beschriftung}
-      <span class="hinweis">${hinweis}</span></span>
-    ${zeilen || '<p class="bearb-leerhinweis">Keine Einträge.</p>'}
+  return `${zeilen || '<p class="bearb-leerhinweis">Keine Einträge.</p>'}
     <button type="button" class="bearb-zu" onclick="bearbZeileZu('${art}')">
-      Zeile hinzufügen</button>
-  </div>`;
+      Zeile hinzufügen</button>`;
+}
+
+// Das Zugeordnete steht als Text da, nicht als Eingabefeld: geaendert wird ein
+// Kongress in der Kongressansicht, hier wird er nur zugeordnet und wieder
+// weggenommen. Darunter ein einziges Auswahlfeld statt einer Zeile je Eintrag -
+// so kann weder eine leere Zeile stehenbleiben noch derselbe Kongress zweimal
+// gewaehlt werden.
+function kongWahlHtml(art){
+  const zeilen = entwurf[art].map((id,i)=>
+    `<div class="bearb-zeile">
+       <span class="bearb-fest">${esc(kongressText(id))}</span>
+       <button type="button" class="bearb-weg" title="Zuordnung entfernen"
+               onclick="bearbKongWeg('${art}',${i})">&times;</button>
+     </div>`).join('');
+
+  const {ohne, mit} = mxZeilen();
+  const drin = new Set(entwurf[art]);
+  const frei = k => !drin.has(k.id);
+  const gruppe = (name, liste) => liste.filter(frei).length
+    ? `<optgroup label="${name}">${liste.filter(frei).map(k=>
+        `<option value="${escA(k.id)}">${esc(kongressAus(k))}</option>`).join('')}</optgroup>`
+    : '';
+
+  let wahl;
+  if(!ohne.length && !mit.length)
+    wahl = `<p class="bearb-leerhinweis">Der Jahrgang führt noch keinen Kongress.</p>
+      <button type="button" class="bearb-zu" onclick="bearbAnsichtSetzen('kongress')">
+        Zur Kongressansicht</button>`;
+  else if(!ohne.concat(mit).some(frei))
+    wahl = `<p class="bearb-leerhinweis">Alle Kongresse des Jahrgangs sind dieser
+      Ausgabe bereits zugeordnet.</p>`;
+  else
+    wahl = `<select class="bearb-wahl" onchange="bearbKongZu('${art}',this.value)">
+      <option value="">Kongress hinzufügen &hellip;</option>
+      ${gruppe('Termin fehlt', ohne)}${gruppe('Nach Zeitraum', mit)}
+    </select>`;
+
+  // Fuehrt der Jahrgang gar keinen Kongress, sagt der Hinweis darunter schon
+  // alles; ein vorangestelltes "Keine Zuordnung." verdoppelte es nur.
+  const leer = (ohne.length || mit.length)
+    ? '<p class="bearb-leerhinweis">Keine Zuordnung.</p>' : '';
+  return `${zeilen || leer}${wahl}`;
 }
 
 // Der Fuss ist bei Ausgaben und Titeln derselbe; nur die Beschriftung des
@@ -4860,7 +4967,7 @@ function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
     // Die Reihenfolge innerhalb einer Ausgabe richtet sich nach dem Zeitraum
     // des Kongresses: die Zuordnungstabelle kennt keine.
     for(const [y, liste] of nachJahr){
-      const rang = new Map(liste.map(k=>[k.id, k.von || ('~'+(k.unscharf||k.lang))]));
+      const rang = new Map(liste.map(k=>[k.id, kongSchluessel(k)]));
       const ordnen = ids => ids.sort((x,z)=>
         String(rang.get(x)||'').localeCompare(String(rang.get(z)||'')));
       ergebnis[y].kongresse = liste;
@@ -4871,6 +4978,23 @@ function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
       }));
     }
   }
+  // Ein Jahrgang ohne eine einzige Kongresszeile galt bisher als nicht
+  // umgestellt - auch der eben angelegte, noch leere. Die Kongressansicht
+  // verwies dort auf eine Umstellung, die es gar nicht zu machen gibt, und
+  // ohne einen Weg zum ersten Kongress waere das Ausgabenformular eine
+  // Sackgasse. Erreichbare Tabellen und kein Alttext an den Ausgaben genuegen
+  // deshalb ebenso; ein Jahrgang ohne Ausgaben erfuellt das von selbst. Traegt
+  // dagegen noch eine Ausgabe ihre Kongresse als Text - ein Excel-Eingang, bei
+  // dem die Uebernahme scheiterte -, bleibt es beim Freitextweg.
+  if(KONG_TABELLEN)
+    Object.keys(ergebnis).forEach(y=>{
+      const j = ergebnis[y];
+      if(j.umgestellt) return;
+      if(j.titel.some(t=>t.issues.some(iss=>
+        (iss.a||[]).length || (iss.b||[]).length))) return;
+      j.kongresse = [];
+      j.umgestellt = true;
+    });
   // Die uebrigen Jahrgaenge: Zeichenketten je Ausgabe, wie bisher.
   Object.keys(ergebnis).forEach(y=>kongressAufloesen(ergebnis[y]));
   return ergebnis;
