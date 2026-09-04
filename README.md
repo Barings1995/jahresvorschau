@@ -366,6 +366,8 @@ Ein Klick auf ein Feld öffnet darunter die Heftleiste: der ganze Jahrgang **in
 Heftfolge** als eine Reihe, je Heft ein Feld mit Nummer, Termin und Abstand zum
 Kongress — in der Auslagenansicht der Erscheinungstermin und sein Abstand zum
 Beginn, in der Berichtsansicht der Anzeigenschluss und sein Abstand zum Ende.
+Das Kürzel steht am Termin (»ET 05.02.«, »AS 22.01.«): welcher der beiden
+gemeint ist, sagt sonst nur die Ansicht, und die steht weit oben.
 Ein
 Anzeigenschluss vor dem Kongressende heißt dort *vor Ende*, nicht »minus so
 viele Tage nach Ende«: dieselbe Rechnung, andersherum benannt. Zwischen den

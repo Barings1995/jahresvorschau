@@ -771,7 +771,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
    entschieden, und der Chip selbst ist der Schalter. Zehn Hefte brauchen so
    rund 970 statt 423 Pixel Hoehe. */
 .mx-hl{display:flex;flex-wrap:wrap;align-items:stretch;gap:5px;padding:2px 0 4px}
-.mx-hl-chip{display:flex;flex-direction:column;align-items:center;min-width:74px;
+.mx-hl-chip{display:flex;flex-direction:column;align-items:center;min-width:86px;
   padding:4px 8px;font-family:inherit;line-height:1.2;color:var(--text);
   background:var(--surface);border:1.5px solid var(--border);border-radius:4px;
   cursor:pointer}
@@ -4518,20 +4518,28 @@ function mxHeftTermin(iss){ return mxArt==='auslage' ? iss.et : iss.as; }
 // TT.MM. - im Feld und in der Leiste ist das Jahr der Jahrgang, es steht oben.
 function mxKurzDatum(iso){ return iso ? `${iso.slice(8)}.${iso.slice(5,7)}.` : '–'; }
 
+// Dasselbe mit dem Kuerzel davor: in der Leiste steht an jedem Heft, um
+// welchen der beiden Termine es sich handelt. Welcher gemeint ist, sagt sonst
+// nur die Ansicht - und die steht weit oben.
+function mxKurzTermin(iso){ return `${mxArt==='auslage'?'ET':'AS'} ${mxKurzDatum(iso)}`; }
+
 // Abstand zum Kongress in Tagen. Die Richtung steht im Wort: die Auslage misst
 // gegen den Beginn, der Bericht gegen das Ende. Frueher blieb der Abstand beim
 // Bericht vor dem Ende leer, weil "nach Ende" dort eine negative Zahl ergeben
 // haette - die Zahl war nie das Problem, die Beschriftung war es.
 function mxHeftAbstand(k, iss){
   const ende = k.bis || k.von;
+  // Ein einzelner Tag ist ein Tag - die Zahl steht oft genug auf 1, als dass
+  // "1 Tage" auffiele.
+  const tage = n => `${n} ${n===1 ? 'Tag' : 'Tage'}`;
   if(mxArt==='auslage'){
     if(!k.von || !iss.et) return '';
     const d = mxTage(k.von, iss.et);
-    return d>=0 ? `${d} T. vor Beginn` : `${-d} T. nach Beginn`;
+    return d>=0 ? `${tage(d)} vor Beginn` : `${tage(-d)} nach Beginn`;
   }
   if(!ende || !iss.as) return '';
   const d = mxTage(iss.as, ende);
-  return d>=0 ? `${d} T. nach Ende` : `${-d} T. vor Ende`;
+  return d>=0 ? `${tage(d)} nach Ende` : `${tage(-d)} vor Ende`;
 }
 
 // Nur noch die Heftwahl - die Kongress-Metadaten haben ein eigenes
@@ -4557,7 +4565,7 @@ function mxHeftwahlHtml(k, t){
       onclick="mxToggle('${k.id}',${t.id},'${esc(iss.heft)}','${mxArt}')"
       title="${escA(`Heft ${iss.heft} · ${mxArt==='auslage'?'ET':'AS'} ${fmt(termin)}${
         ab?' · '+ab:''} — ${wort}${istDrin?' entfernen':' zuordnen'}`)}"><span class="mx-hl-nr">${
-      esc(iss.heft)}</span><span class="mx-hl-dat">${esc(mxKurzDatum(termin))}</span><span class="mx-hl-ab">${
+      esc(iss.heft)}</span><span class="mx-hl-dat">${esc(mxKurzTermin(termin))}</span><span class="mx-hl-ab">${
       esc(ab)}</span></button>`;
     // Die Schwelle ist je Art eine andere: die Auslage muss vor Beginn
     // erscheinen, ueber den Kongress berichten laesst sich erst, wenn der
