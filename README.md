@@ -191,10 +191,11 @@ ist; die Rückfragen dazu legen sich über das noch offene Dialogfenster.
 *Entfernen* steht dort **immer** — auch wenn dem Kongress schon Hefte
 zugeordnet sind. Der häufige Anlass ist ja gerade, dass ein Kongress im
 Jahrgang nicht stattfindet oder doppelt geschrieben wurde; dann sollen die
-Zuordnungen mit weg. Statt zu sperren nennt der letzte Absatz im Dialog, was es
-kostet — »Zugeordnet sind noch 3 Berichte in 3 Titeln« —, und die Rückfrage
-sagt es noch einmal. Beide Sätze sind Aussagen über den Kongress und stehen für
-sich; sie führen den Knopf nicht ein, weil er nicht mehr neben ihnen sitzt.
+Zuordnungen mit weg. Statt zu sperren nennt die Rückfrage, was es kostet —
+»Dabei gehen 3 Berichte in 3 Titeln mit verloren«. Der Dialog selbst zeigt nur
+die Felder: die Zahl stand dort eine Zeit lang als letzter Absatz zusätzlich,
+sagte aber nichts, was nicht eine Sekunde später ohnehin käme — und sie sprach
+von einer Folge, die an dieser Stelle noch gar nicht zur Entscheidung stand.
 
 Der Knopf sitzt in der Fußzeile ganz links, mit der Standzeile als
 Abstandhalter zur Bestätigung rechts: die zerstörende Handlung gehört weg von

@@ -4666,9 +4666,8 @@ function mxKongDialog(k){
   const neu = !k;
   // Entfernen steht auch bei bestehenden Zuordnungen - der haeufige Anlass ist
   // ja gerade, dass der Kongress im Jahrgang nicht stattfindet oder doppelt
-  // geschrieben wurde; dann sollen die Zuordnungen mit weg. Statt zu sperren
-  // sagt der Hinweis, was es kostet, und die Rueckfrage nennt es noch einmal.
-  const zahl = neu ? {a:0,b:0,gesamt:0,titel:0} : mxZuordnungZahl(k);
+  // geschrieben wurde; dann sollen die Zuordnungen mit weg. Was das kostet,
+  // sagt allein die Rueckfrage; der Dialog selbst zeigt nur die Felder.
   const html = `<p class="dlg-erklaerung">Gilt nur für den Jahrgang ${esc(jahr)}</p>
     <label class="bearb-feld">Name
       <input type="text" id="mkLang" value="${neu?'':escA(k.lang)}"></label>
@@ -4686,12 +4685,7 @@ function mxKongDialog(k){
              placeholder="etwa »September 2027«">
       <span class="hinweis">Nur wenn Beginn und Ende leer bleiben – sonst gilt der genaue Zeitraum</span></label>
     <label class="bearb-feld">Ort
-      <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>
-    ${neu ? '' : `<p class="mx-hinweis" style="margin-top:12px">${zahl.gesamt
-        ? `Zugeordnet ${zahl.gesamt===1 ? 'ist' : 'sind'} noch <b>${
-             mxZuordnungText(zahl)}</b>. Ein Entfernen des
-           Kongresses löscht ${zahl.gesamt===1 ? 'die Zuordnung' : 'die Zuordnungen'} mit.`
-        : 'Dem Kongress ist kein Heft zugeordnet — ein Entfernen bleibt folgenlos, etwa bei einer doppelten Schreibweise.'}</p>`}`;
+      <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>`;
   dialogZeigen(neu ? 'Neuer Kongress' : 'Kongress bearbeiten', html,
     neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id),
     false, neu ? null : {text:'Entfernen', aktion:() => mxKongDialogEntfernen(k.id)});
