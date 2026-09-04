@@ -328,6 +328,11 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .dlg-btn{padding:6px 14px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);background:var(--surface);border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .dlg-btn:hover{border-color:var(--navy-light)}
 .dlg-ok{color:#ffffff;background:var(--navy);border-color:var(--navy)}
+/* Die zerstoerende Handlung steht in der Fusszeile ganz links, mit der
+   Standzeile als Abstandhalter zwischen ihr und der Bestaetigung rechts. */
+.dlg-loeschen{color:var(--warm);border-color:var(--surface3)}
+.dlg-loeschen:hover{border-color:var(--warm)}
+.dlg-loeschen:disabled{color:var(--faint);border-color:var(--surface3);cursor:default}
 .dlg-ok:hover{background:var(--navy-light);border-color:var(--navy-light)}
 .pr-jahr{font-size:.82rem;color:var(--navy);margin:10px 0 5px}
 .pr-jahr:first-child{margin-top:0}
@@ -953,6 +958,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
       <h3 class="dlg-kopf" id="ladeKopf"></h3>
       <div class="dlg-inhalt" id="ladeInhalt"></div>
       <div class="dlg-fuss">
+        <button class="dlg-btn dlg-loeschen" id="ladeWeg" hidden
+                onclick="dialogWegAusfuehren()"></button>
         <span class="dlg-stand" id="ladeStand"></span>
         <button class="dlg-btn" id="ladeAbbruch" onclick="dialogSchliessen()">Abbrechen</button>
         <button class="dlg-btn dlg-ok" id="ladeOk" onclick="dialogAusfuehren()">&Uuml;bernehmen</button>
@@ -2443,14 +2450,20 @@ function ladeStand(text, schlecht){
 function ladeKnoepfe(gesperrt){
   const ok=document.getElementById('ladeOk');
   const ab=document.getElementById('ladeAbbruch');
+  const weg=document.getElementById('ladeWeg');
   if(ok) ok.disabled=!!gesperrt;
   if(ab) ab.disabled=!!gesperrt;
+  if(weg) weg.disabled=!!gesperrt;
 }
 
 // Der Dialog trägt seine Handlung selbst: laden, entfernen oder nur melden.
 let dialogAktion=null;
+let dialogWegAktion=null;
 
-function dialogZeigen(titel,html,okText,aktion,warnend){
+// "weg" ist die dritte, zerstoerende Handlung: {text, aktion}. Sie fehlt bei
+// fast allen Dialogen - der Knopf wird darum bei jedem Aufruf wieder
+// ausgeblendet, sonst bliebe er vom vorigen Dialog stehen.
+function dialogZeigen(titel,html,okText,aktion,warnend,weg){
   document.getElementById('ladeKopf').textContent=titel;
   document.getElementById('ladeInhalt').innerHTML=html;
   dialogAktion=aktion||null;
@@ -2459,9 +2472,15 @@ function dialogZeigen(titel,html,okText,aktion,warnend){
   ok.textContent=okText||'Übernehmen';
   ok.classList.toggle('dlg-warnung',!!warnend);
   document.getElementById('ladeAbbruch').textContent=aktion?'Abbrechen':'Schließen';
+  const wegKnopf=document.getElementById('ladeWeg');
+  dialogWegAktion=(weg && weg.aktion)||null;
+  wegKnopf.hidden=!dialogWegAktion;
+  wegKnopf.textContent=(weg && weg.text)||'Entfernen';
   ladeStand(''); ladeKnoepfe(false);
   document.getElementById('ladeDialog').classList.add('offen');
 }
+
+function dialogWegAusfuehren(){ if(dialogWegAktion) dialogWegAktion(); }
 function dialogAusfuehren(){
   const tun=dialogAktion;
   if(tun) tun();
@@ -2499,7 +2518,7 @@ function verlust(y,neu){
 }
 function dialogSchliessen(){
   document.getElementById('ladeDialog').classList.remove('offen');
-  ladeErgebnis=null; dialogAktion=null;
+  ladeErgebnis=null; dialogAktion=null; dialogWegAktion=null;
   ladeStand(''); ladeKnoepfe(false);
 }
 
@@ -4508,15 +4527,13 @@ function mxKongDialog(k){
       <span class="hinweis">Nur wenn Beginn und Ende leer bleiben – sonst gilt der genaue Zeitraum</span></label>
     <label class="bearb-feld">Ort
       <input type="text" id="mkOrt" value="${neu?'':escA(k.ort||'')}"></label>
-    ${neu ? '' : `<div style="display:flex">
-        <button type="button" class="bearb-loeschen" onclick="mxKongDialogEntfernen('${k.id}')">Entfernen</button>
-      </div>
-      <p class="mx-hinweis" style="margin-top:8px">${zahl.gesamt
+    ${neu ? '' : `<p class="mx-hinweis" style="margin-top:12px">${zahl.gesamt
         ? `Trägt noch <b>${mxZuordnungText(zahl)}</b> – ${zahl.gesamt===1
             ? 'die Zuordnung geht' : 'die Zuordnungen gehen'} beim Entfernen mit verloren.`
         : 'Ohne zugeordnetes Heft – kann entfernt werden, etwa bei einer doppelten Schreibweise.'}</p>`}`;
   dialogZeigen(neu ? 'Neuer Kongress' : 'Kongress bearbeiten', html,
-    neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id));
+    neu ? 'Anlegen' : 'Speichern', () => mxKongDialogAusfuehren(neu ? null : k.id),
+    false, neu ? null : {text:'Entfernen', aktion:() => mxKongDialogEntfernen(k.id)});
 }
 
 async function mxKongDialogAusfuehren(kongressId){

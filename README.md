@@ -185,9 +185,16 @@ ist; die Rückfragen dazu legen sich über das noch offene Dialogfenster.
 *Entfernen* steht dort **immer** — auch wenn dem Kongress schon Hefte
 zugeordnet sind. Der häufige Anlass ist ja gerade, dass ein Kongress im
 Jahrgang nicht stattfindet oder doppelt geschrieben wurde; dann sollen die
-Zuordnungen mit weg. Statt zu sperren nennt der Hinweis unter dem Knopf, was es
+Zuordnungen mit weg. Statt zu sperren nennt der letzte Absatz im Dialog, was es
 kostet — »Trägt noch 3 Berichte in 3 Titeln« —, und die Rückfrage sagt es noch
-einmal. Die Aufschlüsselung nach Art ist dabei kein Zierrat: seit die Matrix
+einmal.
+
+Der Knopf sitzt in der Fußzeile ganz links, mit der Standzeile als
+Abstandhalter zur Bestätigung rechts: die zerstörende Handlung gehört weg von
+*Speichern*. Die Fußzeile ist statisch und wird von allen Dialogen derselben
+Hülle geteilt, `dialogZeigen()` nimmt sie darum als dritte, freiwillige
+Handlung entgegen und blendet sie bei jedem Aufruf wieder aus — sonst bliebe
+sie vom vorigen Dialog stehen. Die Aufschlüsselung nach Art ist dabei kein Zierrat: seit die Matrix
 nur eine Art zeigt, kann eine Zeile in der Auslagenansicht leer aussehen,
 während der Kongress in der Berichteansicht fünf Hefte trägt. Gezählt wird
 deshalb über beide Arten hinweg, nicht über die gezeigte.
