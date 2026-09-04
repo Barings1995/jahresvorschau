@@ -238,13 +238,18 @@ gefüllte Form. Die Kopfzeile der Matrix zählt die noch offenen Felder mit.
 
 ### Ausgabe für die Datenpflege
 
-*Daten → Kongresse für die Datenpflege* gibt den Jahrgang als Excel-Datei aus,
-im Aufbau des Blattes »Termine« von `Angebotsdaten.xlsx` — Jahrgang, Titel,
-Heft, Monat, ET, AS, DU-Schluss, EH-Termin, Themenschwerpunkte und, in der
-letzten Spalte, die Kongresszeile in deren Schreibweise: `Kurzname (Auslage),
-Zeitraum, Ort`, mehrere Kongresse einer Ausgabe je eine eigene Zeile. Ein
-Kongress ohne Termin trägt kein Datum, das sich einsetzen ließe, und bleibt
-darin aus — der Bericht nennt, wie viele das betrifft.
+*Exportieren → Kongresse für die Datenpflege* gibt den Jahrgang als
+Excel-Datei aus, im Aufbau des Blattes »Termine« von `Angebotsdaten.xlsx` —
+Jahrgang, Titel, Heft, Monat, ET, AS, DU-Schluss, EH-Termin,
+Themenschwerpunkte und, in der letzten Spalte, die Kongresszeile in deren
+Schreibweise: `Kurzname (Auslage), Zeitraum, Ort`, mehrere Kongresse einer
+Ausgabe je eine eigene Zeile. Ein Kongress ohne Termin trägt kein Datum, das
+sich einsetzen ließe, und bleibt darin aus — der Bericht nennt, wie viele das
+betrifft.
+
+Der Punkt steht bei den übrigen Ausgaben und nicht mehr im Menü *Daten*: er
+erzeugt eine Datei und ändert am Bestand nichts, während dort ausschließlich
+Punkte stehen, die die Datenbank verändern.
 
 Innerhalb einer bearbeiteten Ausgabe kopiert *Kongresszeile für die
 Datenpflege kopieren* nur deren eigene Zeile in die Zwischenablage; das bezieht

@@ -881,10 +881,6 @@ p.bearb-stand:not(:empty){margin-top:9px}
           <span class="ex-t" id="kongUmstellenText">Kongresse umstellen</span>
           <span class="ex-d">Legt jeden Kongress des Jahrgangs einmal an, statt ihn in jeder Ausgabe erneut zu f&uuml;hren. Zeigt vorher, was dabei auff&auml;llt; ein Sicherungspunkt entsteht ohne Zutun</span>
         </button>
-        <button class="ex-item" role="menuitem" onclick="datenpflegeExport()">
-          <span class="ex-t">Kongresse für die <em>Datenpflege</em></span>
-          <span class="ex-d">Gibt je Ausgabe die Kongresszeile in der Schreibweise der Angebotswerkzeuge aus, als Excel-Datei im Aufbau des Blattes &raquo;Termine&laquo;</span>
-        </button>
         <button class="ex-item" id="entfernenBtn" role="menuitem" onclick="jahrgangEntfernen()" disabled>
           <span class="ex-t" id="entfernenText">Jahrgang entfernen</span>
           <span class="ex-d">Nimmt den Jahrgang mit allen Titeln, Ausgaben und Sicherungspunkten aus der Datenbank</span>
@@ -914,6 +910,10 @@ p.bearb-stand:not(:empty){margin-top:9px}
           <button class="ex-item" role="menuitem" onclick="exportHtml()">
             <span class="ex-t">Als HTML</span>
             <span class="ex-d">Eigenst&auml;ndige, durchsuchbare Datei mit dem vollst&auml;ndigen Jahrgang</span>
+          </button>
+          <button class="ex-item" role="menuitem" onclick="datenpflegeExport()">
+            <span class="ex-t">Kongresse für die <em>Datenpflege</em></span>
+            <span class="ex-d">Gibt je Ausgabe die Kongresszeile in der Schreibweise der Angebotswerkzeuge aus, als Excel-Datei im Aufbau des Blattes &raquo;Termine&laquo;</span>
           </button>
         </div>
         <div class="ex-ebene" id="exFormat">
@@ -3242,7 +3242,7 @@ function baueDatenpflegeXlsx(blattXmlText){
 }
 
 async function datenpflegeExport(){
-  schliesseDaten();
+  schliesseExport();
   const b = datenpflegeBlatt();
   const bytes = baueDatenpflegeXlsx(b.xml);
   const url = URL.createObjectURL(new Blob([bytes.buffer||bytes],
