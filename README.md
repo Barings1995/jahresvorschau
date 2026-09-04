@@ -357,7 +357,9 @@ Im Arbeitsschirm steht oben ein Umschalter *Nach Ausgabe · Nach Kongress* — d
 Arbeitskopie, zwei Seiten. In der Kongressansicht teilt er sich die Zeile mit
 der Zählung, dem Umschalter *Auslagen · Berichte* und *+ Neuer Kongress*; so
 steht die Tabelle so dicht unter ihm wie die Liste in der Ausgabenansicht. *Nach Kongress* zeigt eine Zeile je Kongress und eine
-Spalte je Titel; im Feld stehen Heft, Art und Termin der bereits zugeordneten
+Spalte je Titel, alle gleich breit — damit die farbigen Unterstriche im
+Kopf gleich lang sind und die Breiten nicht mit der Länge der Titelnamen
+springen; im Feld stehen Heft, Art und Termin der bereits zugeordneten
 Ausgaben — in der Auslagenansicht der Erscheinungstermin, in der
 Berichtsansicht der Anzeigenschluss, jeweils mit dem Kürzel davor
 (»ET 05.02.«). Die Frage »welches Heft und wann« ist damit ohne Klick

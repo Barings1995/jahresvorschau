@@ -727,11 +727,17 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-zahl{font-size:.76rem;color:var(--muted)}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
   border-radius:6px}
-.mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px}
+/* Feste Aufteilung statt Aufteilung nach Inhalt: die Felder tragen je ein
+   Heft, die Spaltenbreiten kaemen sonst allein aus der Laenge der
+   Titelnamen im Kopf - und faenden je Titel eine andere. Die Kongressspalte
+   bekommt einen festen Anteil, die sechs Titelspalten teilen den Rest zu
+   gleichen Teilen. */
+.mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px;
+  table-layout:fixed}
 .mx-tab th{font-weight:600;font-size:.7rem;color:var(--muted);text-align:center;
   padding:9px 6px 7px;border-bottom:1px solid var(--border)}
 .mx-tab td{border-bottom:1px solid var(--surface3);vertical-align:top;padding:5px 4px}
-.mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;min-width:220px}
+.mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;width:38%}
 .mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
 .mx-lblklick:hover{background:var(--navy-faint)}
 .mx-name{color:var(--text)}
