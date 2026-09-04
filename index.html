@@ -735,6 +735,16 @@ p.bearb-stand:not(:empty){margin-top:9px}
 /* Kippschalter in der Kopfzeile: derselbe Bau wie in der Legendenzeile, nur
    eine Spur kleiner, damit er neben Zaehlung und Umschalter nicht auftraegt */
 .mx-kopf .switch{font-size:.72rem}
+/* Der Schalter in der Legendenzeile ueberdauert das Zeichnen, dieser hier wird
+   mit der Kopfzeile neu gebaut und entstuende deshalb ohne Bewegung schon in
+   der Endstellung. Diese Klasse haelt Knebel und Farbe eine Bildlage lang am
+   Ausgangspunkt; wird sie genommen, laeuft dieselbe Bewegung wie dort. Der
+   Schalter selbst steht die ganze Zeit richtig - zurueckgehalten wird allein
+   das Bild. */
+.mx-kopf .switch.zurueck input:checked+.sw-track{background:var(--surface3);border-color:var(--border)}
+.mx-kopf .switch.zurueck input:checked+.sw-track .sw-knob{transform:none}
+.mx-kopf .switch.zurueck input:not(:checked)+.sw-track{background:var(--navy);border-color:var(--navy)}
+.mx-kopf .switch.zurueck input:not(:checked)+.sw-track .sw-knob{transform:translateX(14px)}
 .mx-notiz{font-size:.72rem;color:var(--muted);margin:-6px 0 10px}
 .mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
   border-radius:6px}
@@ -4412,6 +4422,18 @@ function mxDachSetzen(b){
   mxAuswahl = null;
   bearbStandText=''; bearbStandArt='';
   render();
+  mxSchalterGleiten();
+}
+
+// Zwei Bildlagen: die erste zeigt den Schalter noch in der alten Stellung, mit
+// der zweiten faellt die Klasse und der Knebel laeuft hinueber. Eine einzelne
+// genuegt nicht - Klasse setzen und wieder nehmen faenden dann im selben
+// Durchgang statt, und es gaebe wieder nichts zu sehen.
+function mxSchalterGleiten(){
+  const s = document.querySelector('.mx-kopf .switch');
+  if(!s || typeof requestAnimationFrame !== 'function') return;
+  s.classList.add('zurueck');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>s.classList.remove('zurueck')));
 }
 
 function mxZeilen(){
