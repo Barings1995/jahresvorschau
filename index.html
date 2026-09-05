@@ -36,7 +36,11 @@ header{background:var(--surface);position:sticky;top:0;z-index:100;box-shadow:0 
 .sm-hero-titles{display:flex;flex-direction:column;gap:1px}
 h1{font-family:'Playfair Display',serif;font-size:25px;letter-spacing:-.01em;color:#fff;font-weight:700;text-wrap:balance;line-height:1.2}
 h1 .accent{color:var(--accent)}
-.brand-sub{font-size:12px;color:rgba(255,255,255,.72);letter-spacing:.16em;font-weight:600;text-transform:uppercase}
+/* Zeilenhöhe fest, nicht vom Blatt geerbt: sonst hängt die Höhe der Leiste daran, ob das
+   jeweilige Werkzeug im body ein line-height setzt. In den Angebotswerkzeugen liefen die
+   Leisten dadurch um 0,5 px auseinander (05.09.2026); hier ergab das Erben zufällig
+   denselben Wert, an dem es jetzt festgeschrieben ist. */
+.brand-sub{line-height:17.5px;font-size:12px;color:rgba(255,255,255,.72);letter-spacing:.16em;font-weight:600;text-transform:uppercase}
 /* Jahrgang als Teil des Titels: gleiche Schrift, gleiche Größe, Orange wie der Akzent */
 .hero-year{font-family:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;line-height:inherit;color:#fff;background-color:transparent;border:none;border-radius:4px;padding:0 19px 0 4px;margin-left:.18em;cursor:pointer;appearance:none;-webkit-appearance:none;transition:background-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23ffffff' stroke-width='1.8'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center;background-size:12px}
 .hero-year:hover{background-color:rgba(255,255,255,.16)}
