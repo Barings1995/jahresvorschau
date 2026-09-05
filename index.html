@@ -826,15 +826,17 @@ p.bearb-stand:not(:empty){margin-top:9px}
    Knopf ueberall dasselbe tut. Aufgezaehlt statt pauschal ueber button:active:
    die Felder der Matrix und die Kongressnamen sind keine Knoepfe - sie
    antworten mit Farbe, und eine ganze Tabellenzeile, die beim Klicken wandert,
-   waere unruhig. Der Anmeldeknopf steht mit in der Liste, obwohl seine uebrigen
-   Regeln erst weiter unten stehen: die Bewegung ist dieselbe Sache und gehoert
-   an eine Stelle. */
+   waere unruhig. Anmeldeknopf und Dialogknoepfe stehen mit in der Liste, obwohl
+   ihre uebrigen Regeln anderswo im Blatt stehen: die Bewegung ist dieselbe
+   Sache und gehoert an eine Stelle. In den Dialogfenstern genuegt .dlg-btn -
+   jeder Knopf dort traegt die Klasse, .dlg-ok und .dlg-loeschen kommen nur
+   zusaetzlich dazu. */
 .bearb-titel:active,.bearb-eintrag:active,.bearb-titelknopf:active,
 .bearb-zu:active,.bearb-weg:active,.bearb-speichern:active,
 .bearb-verwerfen:active,.bearb-loeschen:active,
 .bearb-sich-zurueck:active,.bearb-sich-weg:active,
 .bu-btn:active,.mx-panel-zu:active,.mx-hl-chip:active,
-.an-knopf:active{transform:translateY(1px)}
+.an-knopf:active,.dlg-btn:active{transform:translateY(1px)}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
