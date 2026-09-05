@@ -822,15 +822,19 @@ p.bearb-stand:not(:empty){margin-top:9px}
 /* ── Nachgeben beim Klicken ──
    Kopf- und Legendenzeile beantworten einen Druck seit jeher mit einem Pixel
    nach unten (.mode-btn, .view-btn, .chip, .daten-btn, .export-btn); in der
-   Arbeitsansicht fehlte das. Dieselbe Bewegung, damit ein Knopf ueberall
-   dasselbe tut. Aufgezaehlt statt pauschal ueber button:active: die Felder der
-   Matrix und die Kongressnamen sind keine Knoepfe - sie antworten mit Farbe,
-   und eine ganze Tabellenzeile, die beim Klicken wandert, waere unruhig. */
+   Arbeitsansicht und an der Anmeldung fehlte das. Dieselbe Bewegung, damit ein
+   Knopf ueberall dasselbe tut. Aufgezaehlt statt pauschal ueber button:active:
+   die Felder der Matrix und die Kongressnamen sind keine Knoepfe - sie
+   antworten mit Farbe, und eine ganze Tabellenzeile, die beim Klicken wandert,
+   waere unruhig. Der Anmeldeknopf steht mit in der Liste, obwohl seine uebrigen
+   Regeln erst weiter unten stehen: die Bewegung ist dieselbe Sache und gehoert
+   an eine Stelle. */
 .bearb-titel:active,.bearb-eintrag:active,.bearb-titelknopf:active,
 .bearb-zu:active,.bearb-weg:active,.bearb-speichern:active,
 .bearb-verwerfen:active,.bearb-loeschen:active,
 .bearb-sich-zurueck:active,.bearb-sich-weg:active,
-.bu-btn:active,.mx-panel-zu:active,.mx-hl-chip:active{transform:translateY(1px)}
+.bu-btn:active,.mx-panel-zu:active,.mx-hl-chip:active,
+.an-knopf:active{transform:translateY(1px)}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
