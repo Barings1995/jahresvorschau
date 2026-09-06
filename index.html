@@ -750,7 +750,17 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-kopf .switch.zurueck input:not(:checked)+.sw-track{background:var(--navy);border-color:var(--navy)}
 .mx-kopf .switch.zurueck input:not(:checked)+.sw-track .sw-knob{transform:translateX(14px)}
 .mx-notiz{font-size:.72rem;color:var(--muted);margin:-6px 0 10px}
-.mx-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--border);
+/* Ein eigenes Rollfeld statt Rollen mit der Seite. Nur so kann die Kopfzeile
+   stehen bleiben: ein klebendes Element haelt sich an seinem naechsten
+   rollenden Vorfahren fest, und bei overflow:auto ist das dieser Kasten.
+   Dieselbe Bauart wie die Ausgabenliste links (.bearb-liste), die ihre
+   Titelkoepfe seit jeher so festhaelt. Die Hoehe ist so bemessen, dass
+   Kopfleiste, Statuszeile, Umschalterzeile und Tabelle zusammen ins Fenster
+   passen - die Seite selbst rollt dann gar nicht, es stehen also nicht zwei
+   Rollbalken nebeneinander. Wird das Fenster sehr flach, greift die
+   Mindesthoehe und die Seite rollt wieder mit. */
+.mx-scroll{overflow:auto;max-height:calc(100vh - 310px);min-height:340px;
+  background:var(--surface);border:1px solid var(--border);
   border-radius:6px}
 /* Feste Aufteilung statt Aufteilung nach Inhalt: die Felder tragen je ein
    Heft, die Spaltenbreiten kaemen sonst allein aus der Laenge der
@@ -759,10 +769,35 @@ p.bearb-stand:not(:empty){margin-top:9px}
    gleichen Teilen. */
 .mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px;
   table-layout:fixed}
+/* Die Kopfzeile bleibt beim Blaettern stehen - bei 40 Kongressen ist sie
+   sonst nach dem ersten Rollen fort, und welche Spalte welchem Titel gehoert,
+   steht dann nirgends mehr. Ihr unterer Rand muss dabei ein Innenschatten
+   werden: bei border-collapse:collapse gehoert ein Rand der Tabelle, nicht der
+   Zelle - er bliebe an seinem Platz und wanderte unter der klebenden Zeile
+   weg. Der Schatten gehoert der Zelle und geht mit.
+   Die Titelnamen bleiben ungekuerzt; die Zeile ist damit rund 53 Pixel hoch.
+   Das ist sie wert - ein halber Titelname hilft beim Zuordnen nicht, und die
+   Hoehe fehlt der Tabelle, nicht der Seite. */
 .mx-tab th{font-weight:600;font-size:.7rem;color:var(--muted);text-align:center;
-  padding:9px 6px 7px;border-bottom:1px solid var(--border)}
+  padding:9px 6px 7px;position:sticky;top:0;z-index:3;background:var(--surface);
+  box-shadow:inset 0 -1px 0 var(--border)}
 .mx-tab td{border-bottom:1px solid var(--surface3);vertical-align:top;padding:5px 4px}
-.mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;width:38%}
+/* Die Kongressspalte bleibt beim seitlichen Rollen stehen. Die Tabelle ist
+   mindestens 720 Pixel breit und rollt auf einem schmalen Schirm waagerecht -
+   ohne das waere zwar die Kopfzeile da, aber nicht mehr zu sehen, zu welchem
+   Kongress die Zeile gehoert. Der Schatten rechts vertritt den Rand, den die
+   Zelle bei border-collapse nicht selbst besitzt.
+   Nicht mit fest stehen die Zeilen ueber die ganze Breite: die
+   Gruppenueberschriften und die aufgeklappte Heftleiste. Die Heftleiste ist
+   die Arbeitsflaeche selbst und soll mit dem Inhalt wandern. */
+.mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;width:38%;
+  position:sticky;left:0;z-index:2;background:var(--surface);
+  box-shadow:1px 0 0 var(--surface3)}
+/* Die Ecke klebt in beide Richtungen und liegt deshalb ueber beiden. Ihr
+   unterer Rand steht hier noch einmal mit dabei - ein zweiter box-shadow
+   ersetzt den ersten, er ergaenzt ihn nicht. */
+.mx-tab th.mx-lbl{z-index:4;
+  box-shadow:1px 0 0 var(--surface3),inset 0 -1px 0 var(--border)}
 .mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
 .mx-lblklick:hover{background:var(--navy-faint)}
 .mx-name{color:var(--text)}
@@ -1410,6 +1445,10 @@ let mxNurDach = false;
 // aufbraucht. Steht dort nur, wenn ein eben gespeicherter Kongress vom
 // Schalter weggeblendet wird.
 let mxNotiz = '';
+// Setzt das Rollfeld der Matrix beim naechsten Zeichnen einmal an den Anfang.
+// Gebraucht wird das allein dort, wo der Zeilenbestand ausgetauscht wird - der
+// alte Rollstand zeigte danach auf Zeilen, die es nicht mehr gibt.
+let mxRollZurueck = false;
 let ohneVerstrichene = false;   // Schalter in der Legendenzeile
 const activeJ = new Set();
 let sortKey = 'et', sortDir = 1;
@@ -3410,11 +3449,23 @@ function render(){
     // unten arbeitet, muesste sich jedes Mal neu herunterrollen.
     const alteListe = res.querySelector('.bearb-liste');
     const listeStand = alteListe ? alteListe.scrollTop : 0;
+    // Dasselbe fuer das Rollfeld der Kongressmatrix, seit die Tabelle in sich
+    // rollt: ohne dieses Merken staende sie nach jedem Klick wieder am Anfang -
+    // schlechter als vorher, wo die Seite rollte und stehen blieb. Waagerecht
+    // ebenso, sonst spraenge auf schmalem Schirm die Spaltenwahl zurueck.
+    const alteMx = res.querySelector('.mx-scroll');
+    const mxStand = (alteMx && !mxRollZurueck)
+      ? {y:alteMx.scrollTop, x:alteMx.scrollLeft} : null;
+    mxRollZurueck = false;
     res.className='bearbansicht';
     res.innerHTML=renderBearbeiten();
     if(listeStand){
       const neueListe = res.querySelector('.bearb-liste');
       if(neueListe) neueListe.scrollTop = listeStand;
+    }
+    if(mxStand && (mxStand.y || mxStand.x)){
+      const neueMx = res.querySelector('.mx-scroll');
+      if(neueMx){ neueMx.scrollTop = mxStand.y; neueMx.scrollLeft = mxStand.x; }
     }
     sts.innerHTML=`Bearbeiten &middot; Jahrgang ${jahrgang()}`;
     bearbStand(bearbStandText,bearbStandArt);
@@ -4403,6 +4454,7 @@ function mxArtSetzen(v){
   mxArt = v;
   mxAuswahl = null;
   bearbStandText=''; bearbStandArt='';
+  mxRollZurueck = true;
   render();
 }
 
@@ -4444,6 +4496,7 @@ function mxDachSetzen(b){
   mxNurDach = !!b;
   mxAuswahl = null;
   bearbStandText=''; bearbStandArt='';
+  mxRollZurueck = true;
   render();
   mxSchalterGleiten();
 }
@@ -4505,6 +4558,14 @@ function mxErwartetOffen(k, t){
 
 function mxZeitraum(k){ return kongressZeitraum(k); }
 
+// Die Titelfarbe als schwacher Flaechenton: dieselbe Farbe mit acht Prozent
+// Deckung. Traegt ein Titel etwas anderes als sechs Hexziffern - von Hand
+// gepflegt oder aus einer aelteren Zeile -, bleibt die Spalte lieber farblos
+// als dass eine unfertige Farbangabe die ganze Regel verwirft.
+function mxTon(hex){
+  return /^#[0-9a-f]{6}$/i.test(hex||'') ? hex+'14' : 'transparent';
+}
+
 function mxZeileHtml(k, offen){
   const zellen = JOURNALS.map(t=>{
     // Gezeichnet wird ueber die Hefte statt ueber mxZelle: das Feld nennt
@@ -4524,6 +4585,7 @@ function mxZeileHtml(k, offen){
     const on = offen && offen.kongressId===k.id && offen.titelId===t.id;
     return `<td style="text-align:center"><div class="mx-zelle${on?' offen':''}" role="button" tabindex="0"
       onclick="mxOeffnen('${k.id}',${t.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
+      title="${escA(t.short+' \u00b7 '+k.lang)}"
       aria-label="${escA(t.short)}, ${escA(k.lang)}">${chips}${erw}</div></td>`;
   }).join('');
   const hauptzeile = `<tr><td class="mx-lbl"><div class="mx-lblklick" role="button" tabindex="0"
@@ -4580,8 +4642,17 @@ function renderKongressmatrix(umschalter){
   [...ohne, ...mit].forEach(k=>JOURNALS.forEach(t=>{
     if(mxErwartetOffen(k,t).length) offeneFelder++;
   }));
+  // Der farbige Strich als Innenschatten, nicht als Rand: die Kopfzeile klebt,
+  // und ein Rand bliebe bei border-collapse an seinem Platz stehen.
   const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map(t=>
-    `<th style="border-bottom:2px solid ${escA(t.hex)}">${esc(t.short)}</th>`).join('')}</tr>`;
+    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)}">${esc(t.short)}</th>`).join('')}</tr>`;
+  // Jede Titelspalte traegt ihren Ton bis nach unten durch. Ueber die
+  // Spaltengruppe statt ueber jede Zelle: eine Zeile je Spalte statt sechs
+  // Angaben je Kongresszeile, und die Breiten bleiben unberuehrt. Der Ton ist
+  // bewusst schwach - er hilft beim Zielen, tragen muss ihn die Kopfzeile.
+  // Zwei der sechs Farben liegen ohnehin dicht beieinander.
+  const spaltenTon = `<colgroup><col>${JOURNALS.map(t=>
+    `<col style="background:${escA(mxTon(t.hex))}">`).join('')}</colgroup>`;
 
   let zeilen = '';
   if(ohne.length){
@@ -4609,7 +4680,7 @@ function renderKongressmatrix(umschalter){
         ${mxArtUmschalterHtml()}
         ${neuKnopf}`) + notiz +
     `<div class="mx-scroll"><table class="mx-tab">
-      <thead>${kopf}</thead><tbody>${zeilen}</tbody>
+      ${spaltenTon}<thead>${kopf}</thead><tbody>${zeilen}</tbody>
     </table></div>`;
 }
 
