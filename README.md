@@ -377,9 +377,12 @@ Schirm bleibt die **Kongressspalte** links stehen. Bei vierzig Kongressen ist
 die Tabelle rund achtzehnhundert Pixel hoch — wer weiter unten ein Heft
 zuordnet, sähe sonst weder, welche Spalte zu welchem Titel gehört, noch, in
 welcher Zeile er ist. Die Titelnamen stehen dort ungekürzt; die Kopfzeile ist
-dadurch rund fünfzig Pixel hoch, und das ist sie wert. Zusätzlich trägt jede
-Titelspalte ihre Farbe als schwachen Flächenton bis nach unten, und jedes Feld
-nennt im Tooltip seinen Titel und seinen Kongress. Der Rollstand bleibt beim
+dadurch rund fünfzig Pixel hoch, und das ist sie wert. Zwischen den Spalten steht eine
+Haarlinie wie in der Jahresmatrix; zusätzlich trägt jede Titelspalte ihre Farbe
+als schwachen Flächenton bis nach unten, und jedes Feld nennt im Tooltip seinen
+Titel und seinen Kongress. Die Linie trennt, die Farbe erinnert — zwei der
+sechs Titelfarben sind blass kaum zu unterscheiden, und die Farbe allein
+trennte genau dort zu weich, wo es am nötigsten ist. Der Rollstand bleibt beim
 Zuordnen erhalten; nur wenn der Zeilenbestand wechselt — beim Umschalten
 zwischen Auslagen und Berichten und beim Schalter *Nur deutschsprachiger Raum* —
 fängt die Tabelle wieder oben an.

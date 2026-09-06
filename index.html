@@ -798,6 +798,15 @@ p.bearb-stand:not(:empty){margin-top:9px}
    ersetzt den ersten, er ergaenzt ihn nicht. */
 .mx-tab th.mx-lbl{z-index:4;
   box-shadow:1px 0 0 var(--surface3),inset 0 -1px 0 var(--border)}
+/* Eine Haarlinie zwischen den Spalten. Der Flaechenton allein trennt zu weich:
+   zwei der sechs Titelfarben (#0088c7 und #0073a8) sind blass kaum zu
+   unterscheiden, und die Grenze faellt genau dorthin, wo sie am noetigsten
+   ist. Die Linie leistet das, was die Farbe nicht kann - die Farbe bleibt
+   damit, was sie sein soll: Wiedererkennung, nicht Trennung. Die Jahresmatrix
+   zieht dieselbe Linie zwischen ihren Spalten, seit es sie gibt.
+   An der Kongressspalte faellt die Linie mit deren rechtem Schatten zusammen;
+   beide sind var(--surface3) und liegen auf demselben Pixel. */
+.mx-tab td+td{border-left:1px solid var(--surface3)}
 .mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
 .mx-lblklick:hover{background:var(--navy-faint)}
 .mx-name{color:var(--text)}
@@ -4645,7 +4654,8 @@ function renderKongressmatrix(umschalter){
   // Der farbige Strich als Innenschatten, nicht als Rand: die Kopfzeile klebt,
   // und ein Rand bliebe bei border-collapse an seinem Platz stehen.
   const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map(t=>
-    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)}">${esc(t.short)}</th>`).join('')}</tr>`;
+    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)},inset 1px 0 0 var(--surface3)">${
+      esc(t.short)}</th>`).join('')}</tr>`;
   // Jede Titelspalte traegt ihren Ton bis nach unten durch. Ueber die
   // Spaltengruppe statt ueber jede Zelle: eine Zeile je Spalte statt sechs
   // Angaben je Kongresszeile, und die Breiten bleiben unberuehrt. Der Ton ist
