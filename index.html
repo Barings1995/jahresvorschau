@@ -903,9 +903,20 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-erwartet{display:inline-flex;align-items:center;opacity:.7}
 /* Die Heftwahl klappt als eigene Tabellenzeile unter dem angeklickten
    Kongress auf statt in einem Panel weit unter einer langen Liste - der
-   linke Streifen haelt die Zugehoerigkeit zur Zeile darueber sichtbar. */
-.mx-inline-zelle{background:var(--navy-faint);border-left:3px solid var(--navy);
-  padding:12px 16px 14px;text-align:left}
+   linke Streifen haelt die Zugehoerigkeit zur Zeile darueber sichtbar.
+   Der Streifen liegt innen. Als Rand waere er ein Rand der Tabelle, nicht
+   der Zelle - bei border-collapse liegt eine Randlinie mittig auf der
+   Trennlinie, und ein drei Pixel breiter Rand am linken Tabellenrand ragt
+   anderthalb Pixel nach aussen. Chrome schafft sich den Platz, indem es
+   den gesamten Zelleninhalt der Tabelle um anderthalb Pixel nach rechts
+   rueckt: sobald ein Kongress aufgeklappt war, stand die Kongressspalte
+   ueber ihre volle Hoehe anderthalb Pixel neben dem Rahmen, und links
+   davon klaffte eine Luecke (gemessen: alle Zellen von x=25 auf x=26,5,
+   waehrend der Tabellenkasten bei 25 blieb). Innen gezeichnet kostet der
+   Streifen keine Breite. Das linke Polster traegt die drei Pixel dafuer
+   mit, damit der Text steht, wo er stand. */
+.mx-inline-zelle{background:var(--navy-faint);box-shadow:inset 3px 0 0 var(--navy);
+  padding:12px 16px 14px 19px;text-align:left}
 .mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
 .mx-panel-titel{font-size:.88rem;font-weight:600;color:var(--navy)}
 .mx-panel-unter{font-size:.74rem;color:var(--muted);margin-top:2px}
