@@ -386,7 +386,10 @@ trennte genau dort zu weich, wo es am nötigsten ist. Die Linien des Rasters
 sind dabei durchscheinend und nicht hell eingefärbt: eine helle Linie liegt auf
 dem Flächenton der Ärzte Zeitung praktisch unsichtbar, weil Ton und Linie
 dasselbe Blaugrau treffen — eine durchscheinende dunkelt ab, was unter ihr
-liegt, und ist deshalb in jeder Spalte gleich gut zu sehen. Der Rollstand bleibt beim
+liegt, und ist deshalb in jeder Spalte gleich gut zu sehen. Aus demselben Grund
+trägt das Feld unter dem Zeiger einen dünnen Rahmen und nur eine schwache
+Fläche: eine kräftige Fläche graute den Titelton aus, der Rahmen ist auf jedem
+Ton gleich gut zu sehen. Der Rollstand bleibt beim
 Zuordnen erhalten; nur wenn der Zeilenbestand wechselt — beim Umschalten
 zwischen Auslagen und Berichten und beim Schalter *Nur deutschsprachiger Raum* —
 fängt die Tabelle wieder oben an.

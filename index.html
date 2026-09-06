@@ -768,7 +768,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
    bekommt einen festen Anteil, die sechs Titelspalten teilen den Rest zu
    gleichen Teilen. */
 .mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px;
-  table-layout:fixed;--mxlinie:rgba(0,40,90,.14);--mxkante:rgba(0,40,90,.21)}
+  table-layout:fixed;--mxlinie:rgba(0,40,90,.14);--mxkante:rgba(0,40,90,.21);
+  --mxfeld:rgba(0,40,90,.06);--mxfeldrand:rgba(0,40,90,.25)}
 /* Die Farbe aller Rasterlinien der Matrix, an einer Stelle. Sie ist
    durchscheinend, und das ist der Punkt: eine deckende Linie setzt einen
    festen Wert neben den Untergrund und verliert genau dort, wo der Untergrund
@@ -859,8 +860,21 @@ p.bearb-stand:not(:empty){margin-top:9px}
   background:#fdf1e3;border-radius:4px}
 .mx-zelle{min-height:22px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;
   align-items:center;padding:3px;border-radius:4px;cursor:pointer}
-.mx-zelle:hover{background:var(--navy-faint)}
-.mx-zelle.offen{background:var(--navy-faint);box-shadow:inset 0 0 0 1.5px var(--navy)}
+/* Das Feld unter dem Zeiger aus demselben Grund durchscheinend wie die
+   Rasterlinien: --navy-faint (#e8edf4) traf den Flaechenton der Aerzte
+   Zeitung (#00285a mit 8% ueber Weiss = #ebeef2) fast auf den Punkt, das
+   Feld war dort nicht mehr zu sehen (gemessen 1,01; in den anderen fuenf
+   Spalten 1,05 bis 1,12, in der weissen Jahresmatrix 1,23).
+   Die Flaeche allein muesste kraeftig werden, um ueberall zu tragen, und
+   graute dann den Titelton aus - bei InFo wird das Orange braeunlich.
+   Deshalb traegt der Rahmen die Sichtbarkeit (gemessen 1,83 bis 1,86 in
+   allen sechs Spalten) und die schwache Flaeche macht daraus weiterhin
+   eine Flaeche statt eines blossen Umrisses.
+   Das aufgeklappte Feld hinterlegt mit demselben Ton - sein eigener
+   Rahmen ist voller Navy und 1,5px stark, verwechseln laesst sich das
+   nicht. */
+.mx-zelle:hover{background:var(--mxfeld);box-shadow:inset 0 0 0 1px var(--mxfeldrand)}
+.mx-zelle.offen{background:var(--mxfeld);box-shadow:inset 0 0 0 1.5px var(--navy)}
 .kmx-chip{display:inline-flex;align-items:center;gap:2px;font-size:.72rem;
   color:var(--text);white-space:nowrap}
 /* Zwei Zeilen im Feld: Heft oben, sein Termin darunter. Damit beantwortet die
