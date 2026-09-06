@@ -768,7 +768,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
    bekommt einen festen Anteil, die sechs Titelspalten teilen den Rest zu
    gleichen Teilen. */
 .mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px;
-  table-layout:fixed;--mxlinie:rgba(0,40,90,.14)}
+  table-layout:fixed;--mxlinie:rgba(0,40,90,.14);--mxkante:rgba(0,40,90,.21)}
 /* Die Farbe aller Rasterlinien der Matrix, an einer Stelle. Sie ist
    durchscheinend, und das ist der Punkt: eine deckende Linie setzt einen
    festen Wert neben den Untergrund und verliert genau dort, wo der Untergrund
@@ -778,7 +778,18 @@ p.bearb-stand:not(:empty){margin-top:9px}
    Teil, die Linie war schlicht nicht mehr da. Eine durchscheinende Linie
    dunkelt ab, was unter ihr liegt, und hat deshalb in jeder Spalte dieselbe
    Kraft: gemessen 1,31 bis 1,32 in allen sieben Spalten. Vererbt wird sie an
-   alle Zellen, auch an den im Skript gesetzten Kopfstrich. */
+   alle Zellen, auch an den im Skript gesetzten Kopfstrich.
+   Eine Kante faellt aus der Reihe, und zwar nicht der Farbe wegen, sondern des
+   Untergrunds wegen: die rechte Kante der Kongressspalte liegt als Schatten
+   auf deren weissem Grund, waehrend rechts daneben schon der Flaechenton der
+   ersten Titelspalte beginnt. Dieselbe Farbe kam dort auf 1,13 statt auf 1,31.
+   --mxkante gleicht das aus - der Wert ist so bemessen, dass die Kante auf
+   Weiss genau den Ton annimmt, den --mxlinie ueber dem Flaechenton hat, und
+   damit zur Tabellenseite hin dieselben 1,32 erreicht wie jede andere Linie.
+   Zur Kongressspalte hin steht sie damit kraeftiger als die uebrigen (1,54);
+   das ist die Grenze zwischen Beschriftung und Daten und die einzige Kante,
+   die beim seitlichen Rollen stehen bleibt - ein festerer Strich ist dort
+   richtig. */
 /* Die Kopfzeile bleibt beim Blaettern stehen - bei 40 Kongressen ist sie
    sonst nach dem ersten Rollen fort, und welche Spalte welchem Titel gehoert,
    steht dann nirgends mehr. Ihr unterer Rand muss dabei ein Innenschatten
@@ -795,28 +806,38 @@ p.bearb-stand:not(:empty){margin-top:9px}
 /* Die Kongressspalte bleibt beim seitlichen Rollen stehen. Die Tabelle ist
    mindestens 720 Pixel breit und rollt auf einem schmalen Schirm waagerecht -
    ohne das waere zwar die Kopfzeile da, aber nicht mehr zu sehen, zu welchem
-   Kongress die Zeile gehoert. Der Schatten rechts vertritt den Rand, den die
-   Zelle bei border-collapse nicht selbst besitzt.
+   Kongress die Zeile gehoert. Die rechte Kante ist ein Innenschatten und
+   vertritt den Rand, den die Zelle bei border-collapse nicht selbst besitzt -
+   ein Rand gehoerte dort der Tabelle und bliebe beim seitlichen Rollen zurueck.
+   Er muss innen liegen: an einer Tabellenzelle mit eingeklapptem Rand zeichnet
+   Chrome einen aeusseren Schatten nicht, einen inneren dagegen schon. Mit
+   einem aeusseren stand die Spalte beim seitlichen Rollen ohne jede Kante da -
+   in einem Bildschirmfoto mit knallrot gesetztem Schatten war kein einziges
+   rotes Pixel zu finden.
    Nicht mit fest stehen die Zeilen ueber die ganze Breite: die
    Gruppenueberschriften und die aufgeklappte Heftleiste. Die Heftleiste ist
    die Arbeitsflaeche selbst und soll mit dem Inhalt wandern. */
 .mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;width:38%;
   position:sticky;left:0;z-index:2;background:var(--surface);
-  box-shadow:1px 0 0 var(--mxlinie)}
+  box-shadow:inset -1px 0 0 var(--mxkante)}
 /* Die Ecke klebt in beide Richtungen und liegt deshalb ueber beiden. Ihr
    unterer Rand steht hier noch einmal mit dabei - ein zweiter box-shadow
    ersetzt den ersten, er ergaenzt ihn nicht. */
 .mx-tab th.mx-lbl{z-index:4;
-  box-shadow:1px 0 0 var(--mxlinie),inset 0 -1px 0 var(--border)}
+  box-shadow:inset -1px 0 0 var(--mxkante),inset 0 -1px 0 var(--border)}
 /* Eine Haarlinie zwischen den Spalten. Der Flaechenton allein trennt zu weich:
    zwei der sechs Titelfarben (#0088c7 und #0073a8) sind blass kaum zu
    unterscheiden, und die Grenze faellt genau dorthin, wo sie am noetigsten
    ist. Die Linie leistet das, was die Farbe nicht kann - die Farbe bleibt
    damit, was sie sein soll: Wiedererkennung, nicht Trennung. Die Jahresmatrix
    zieht dieselbe Linie zwischen ihren Spalten, seit es sie gibt.
-   An der Kongressspalte faellt die Linie mit deren rechtem Schatten zusammen;
-   beide sind var(--mxlinie) und liegen auf demselben Pixel. */
+   Am ersten Titelfeld entfaellt sie: dort zieht die Kongressspalte schon ihre
+   eigene Kante, und beide nebeneinander ergaeben einen doppelt breiten Strich
+   - einen, der beim seitlichen Rollen auch noch auf einen zusammenschrumpfte,
+   weil der Rand mit der Tabelle wegwandert und der Innenschatten stehen
+   bleibt. Dieselbe Ausnahme macht die Kopfzeile in renderKongressmatrix. */
 .mx-tab td+td{border-left:1px solid var(--mxlinie)}
+.mx-tab td.mx-lbl+td{border-left:none}
 .mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
 .mx-lblklick:hover{background:var(--navy-faint)}
 .mx-name{color:var(--text)}
@@ -4663,8 +4684,9 @@ function renderKongressmatrix(umschalter){
   }));
   // Der farbige Strich als Innenschatten, nicht als Rand: die Kopfzeile klebt,
   // und ein Rand bliebe bei border-collapse an seinem Platz stehen.
-  const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map(t=>
-    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)},inset 1px 0 0 var(--mxlinie)">${
+  const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map((t,i)=>
+    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)}${
+      i ? ',inset 1px 0 0 var(--mxlinie)' : ''}">${
       esc(t.short)}</th>`).join('')}</tr>`;
   // Jede Titelspalte traegt ihren Ton bis nach unten durch. Ueber die
   // Spaltengruppe statt ueber jede Zelle: eine Zeile je Spalte statt sechs
