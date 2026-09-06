@@ -768,7 +768,17 @@ p.bearb-stand:not(:empty){margin-top:9px}
    bekommt einen festen Anteil, die sechs Titelspalten teilen den Rest zu
    gleichen Teilen. */
 .mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px;
-  table-layout:fixed}
+  table-layout:fixed;--mxlinie:rgba(0,40,90,.14)}
+/* Die Farbe aller Rasterlinien der Matrix, an einer Stelle. Sie ist
+   durchscheinend, und das ist der Punkt: eine deckende Linie setzt einen
+   festen Wert neben den Untergrund und verliert genau dort, wo der Untergrund
+   ihr nahekommt. Der Flaechenton der Aerzte Zeitung (#00285a zu 8 % auf Weiss)
+   ergibt #ebeef2 - fast dasselbe Blaugrau wie das frueher benutzte
+   var(--surface3); der Kontrast fiel dort auf 1,05 gegenueber 1,23 im weissen
+   Teil, die Linie war schlicht nicht mehr da. Eine durchscheinende Linie
+   dunkelt ab, was unter ihr liegt, und hat deshalb in jeder Spalte dieselbe
+   Kraft: gemessen 1,31 bis 1,32 in allen sieben Spalten. Vererbt wird sie an
+   alle Zellen, auch an den im Skript gesetzten Kopfstrich. */
 /* Die Kopfzeile bleibt beim Blaettern stehen - bei 40 Kongressen ist sie
    sonst nach dem ersten Rollen fort, und welche Spalte welchem Titel gehoert,
    steht dann nirgends mehr. Ihr unterer Rand muss dabei ein Innenschatten
@@ -781,7 +791,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-tab th{font-weight:600;font-size:.7rem;color:var(--muted);text-align:center;
   padding:9px 6px 7px;position:sticky;top:0;z-index:3;background:var(--surface);
   box-shadow:inset 0 -1px 0 var(--border)}
-.mx-tab td{border-bottom:1px solid var(--surface3);vertical-align:top;padding:5px 4px}
+.mx-tab td{border-bottom:1px solid var(--mxlinie);vertical-align:top;padding:5px 4px}
 /* Die Kongressspalte bleibt beim seitlichen Rollen stehen. Die Tabelle ist
    mindestens 720 Pixel breit und rollt auf einem schmalen Schirm waagerecht -
    ohne das waere zwar die Kopfzeile da, aber nicht mehr zu sehen, zu welchem
@@ -792,12 +802,12 @@ p.bearb-stand:not(:empty){margin-top:9px}
    die Arbeitsflaeche selbst und soll mit dem Inhalt wandern. */
 .mx-lbl{text-align:left;padding-left:10px!important;line-height:1.35;width:38%;
   position:sticky;left:0;z-index:2;background:var(--surface);
-  box-shadow:1px 0 0 var(--surface3)}
+  box-shadow:1px 0 0 var(--mxlinie)}
 /* Die Ecke klebt in beide Richtungen und liegt deshalb ueber beiden. Ihr
    unterer Rand steht hier noch einmal mit dabei - ein zweiter box-shadow
    ersetzt den ersten, er ergaenzt ihn nicht. */
 .mx-tab th.mx-lbl{z-index:4;
-  box-shadow:1px 0 0 var(--surface3),inset 0 -1px 0 var(--border)}
+  box-shadow:1px 0 0 var(--mxlinie),inset 0 -1px 0 var(--border)}
 /* Eine Haarlinie zwischen den Spalten. Der Flaechenton allein trennt zu weich:
    zwei der sechs Titelfarben (#0088c7 und #0073a8) sind blass kaum zu
    unterscheiden, und die Grenze faellt genau dorthin, wo sie am noetigsten
@@ -805,8 +815,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
    damit, was sie sein soll: Wiedererkennung, nicht Trennung. Die Jahresmatrix
    zieht dieselbe Linie zwischen ihren Spalten, seit es sie gibt.
    An der Kongressspalte faellt die Linie mit deren rechtem Schatten zusammen;
-   beide sind var(--surface3) und liegen auf demselben Pixel. */
-.mx-tab td+td{border-left:1px solid var(--surface3)}
+   beide sind var(--mxlinie) und liegen auf demselben Pixel. */
+.mx-tab td+td{border-left:1px solid var(--mxlinie)}
 .mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
 .mx-lblklick:hover{background:var(--navy-faint)}
 .mx-name{color:var(--text)}
@@ -4654,7 +4664,7 @@ function renderKongressmatrix(umschalter){
   // Der farbige Strich als Innenschatten, nicht als Rand: die Kopfzeile klebt,
   // und ein Rand bliebe bei border-collapse an seinem Platz stehen.
   const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map(t=>
-    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)},inset 1px 0 0 var(--surface3)">${
+    `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)},inset 1px 0 0 var(--mxlinie)">${
       esc(t.short)}</th>`).join('')}</tr>`;
   // Jede Titelspalte traegt ihren Ton bis nach unten durch. Ueber die
   // Spaltengruppe statt ueber jede Zelle: eine Zeile je Spalte statt sechs

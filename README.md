@@ -382,7 +382,11 @@ Haarlinie wie in der Jahresmatrix; zusätzlich trägt jede Titelspalte ihre Farb
 als schwachen Flächenton bis nach unten, und jedes Feld nennt im Tooltip seinen
 Titel und seinen Kongress. Die Linie trennt, die Farbe erinnert — zwei der
 sechs Titelfarben sind blass kaum zu unterscheiden, und die Farbe allein
-trennte genau dort zu weich, wo es am nötigsten ist. Der Rollstand bleibt beim
+trennte genau dort zu weich, wo es am nötigsten ist. Die Linien des Rasters
+sind dabei durchscheinend und nicht hell eingefärbt: eine helle Linie liegt auf
+dem Flächenton der Ärzte Zeitung praktisch unsichtbar, weil Ton und Linie
+dasselbe Blaugrau treffen — eine durchscheinende dunkelt ab, was unter ihr
+liegt, und ist deshalb in jeder Spalte gleich gut zu sehen. Der Rollstand bleibt beim
 Zuordnen erhalten; nur wenn der Zeilenbestand wechselt — beim Umschalten
 zwischen Auslagen und Berichten und beim Schalter *Nur deutschsprachiger Raum* —
 fängt die Tabelle wieder oben an.
