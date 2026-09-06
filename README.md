@@ -383,13 +383,14 @@ als schwachen Flächenton bis nach unten, und jedes Feld nennt im Tooltip seinen
 Titel und seinen Kongress. Die Linie trennt, die Farbe erinnert — zwei der
 sechs Titelfarben sind blass kaum zu unterscheiden, und die Farbe allein
 trennte genau dort zu weich, wo es am nötigsten ist. Die Linien des Rasters
-sind dabei durchscheinend und nicht hell eingefärbt: eine helle Linie liegt auf
-dem Flächenton der Ärzte Zeitung praktisch unsichtbar, weil Ton und Linie
-dasselbe Blaugrau treffen — eine durchscheinende dunkelt ab, was unter ihr
-liegt, und ist deshalb in jeder Spalte gleich gut zu sehen. Aus demselben Grund
-trägt das Feld unter dem Zeiger einen dünnen Rahmen und nur eine schwache
-Fläche: eine kräftige Fläche graute den Titelton aus, der Rahmen ist auf jedem
-Ton gleich gut zu sehen. Der Rollstand bleibt beim
+tragen einen Ton, der auf jedem Flächenton steht: ein helles Blaugrau läge auf
+dem Ton der Ärzte Zeitung praktisch unsichtbar, weil Ton und Linie einander zu
+nahe kommen. Der gewählte Ton ist der dunkelste der sieben, und er ist in jeder
+Spalte derselbe — eine Linie, deren Farbe vom Untergrund abhinge, wechselte
+beim seitlichen Rollen die Farbe, sobald sie unter die stehende Kongressspalte
+liefe. Das Feld unter dem Zeiger trägt aus verwandtem Grund einen dünnen Rahmen
+und nur eine schwache Fläche: eine kräftige Fläche graute den Titelton aus, der
+Rahmen ist auf jedem Ton gleich gut zu sehen. Der Rollstand bleibt beim
 Zuordnen erhalten; nur wenn der Zeilenbestand wechselt — beim Umschalten
 zwischen Auslagen und Berichten und beim Schalter *Nur deutschsprachiger Raum* —
 fängt die Tabelle wieder oben an.

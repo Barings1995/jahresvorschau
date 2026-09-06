@@ -767,51 +767,51 @@ p.bearb-stand:not(:empty){margin-top:9px}
    Titelnamen im Kopf - und faenden je Titel eine andere. Die Kongressspalte
    bekommt einen festen Anteil, die sechs Titelspalten teilen den Rest zu
    gleichen Teilen. */
-/* Die Tabelle klappt ihre Raender nicht ein. Eingeklappte Raender gehoeren
-   der Tabelle, nicht den Zellen - und Chrome zeichnet sie ueber die klebende
-   Kongressspalte hinweg. Beim seitlichen Rollen lief deshalb die Zeilenlinie
-   der darunter durchwandernden Titelspalte quer in die Kongressspalte hinein:
-   im Bildschirmfoto (620 Pixel Fenster, ganz nach rechts gerollt) ein 158
-   Pixel langes Stueck in 201,210,220 - der Linienton ueber dem Flaechenton -
-   mitten im weissen Feld der Beschriftung, und es wanderte mit dem Rollstand.
-   Getrennte Raender gehoeren der Zelle und werden mit ihr gezeichnet; die
-   klebende Spalte deckt die durchwandernden Zeilen damit ab. Der Abstand
-   zwischen den Zellen bleibt dabei null, sonst stuenden die Linien doppelt.
-   Die Tabelle bleibt gleich hoch (1898 Pixel), nur die Spaltenlinien ruecken
-   um ein Pixel nach rechts: der Rand liegt jetzt in der Zelle statt auf der
-   Grenze zwischen zweien. */
-.mx-tab{width:100%;border-collapse:separate;border-spacing:0;font-size:.76rem;
-  min-width:720px;table-layout:fixed;--mxlinie:rgba(0,40,90,.14);--mxkante:rgba(0,40,90,.21);
+.mx-tab{width:100%;border-collapse:collapse;font-size:.76rem;min-width:720px;
+  table-layout:fixed;--mxlinie:#c9d2dc;--mxkante:#b3becd;
   --mxfeld:rgba(0,40,90,.06);--mxfeldrand:rgba(0,40,90,.25)}
-/* Die Farbe aller Rasterlinien der Matrix, an einer Stelle. Sie ist
-   durchscheinend, und das ist der Punkt: eine deckende Linie setzt einen
-   festen Wert neben den Untergrund und verliert genau dort, wo der Untergrund
-   ihr nahekommt. Der Flaechenton der Aerzte Zeitung (#00285a zu 8 % auf Weiss)
-   ergibt #ebeef2 - fast dasselbe Blaugrau wie das frueher benutzte
-   var(--surface3); der Kontrast fiel dort auf 1,05 gegenueber 1,23 im weissen
-   Teil, die Linie war schlicht nicht mehr da. Eine durchscheinende Linie
-   dunkelt ab, was unter ihr liegt, und hat deshalb in jeder Spalte dieselbe
-   Kraft: gemessen 1,31 bis 1,32 in allen sieben Spalten. Vererbt wird sie an
-   alle Zellen, auch an den im Skript gesetzten Kopfstrich.
-   Eine Kante faellt aus der Reihe, und zwar nicht der Farbe wegen, sondern des
-   Untergrunds wegen: die rechte Kante der Kongressspalte liegt als Schatten
-   auf deren weissem Grund, waehrend rechts daneben schon der Flaechenton der
-   ersten Titelspalte beginnt. Dieselbe Farbe kam dort auf 1,13 statt auf 1,31.
-   --mxkante gleicht das aus - der Wert ist so bemessen, dass die Kante auf
-   Weiss genau den Ton annimmt, den --mxlinie ueber dem Flaechenton hat, und
-   damit zur Tabellenseite hin dieselben 1,32 erreicht wie jede andere Linie.
-   Zur Kongressspalte hin steht sie damit kraeftiger als die uebrigen (1,54);
-   das ist die Grenze zwischen Beschriftung und Daten und die einzige Kante,
-   die beim seitlichen Rollen stehen bleibt - ein festerer Strich ist dort
-   richtig. */
+/* Die Farbe aller Rasterlinien der Matrix, an einer Stelle - und sie ist
+   deckend. Sie war einmal durchscheinend, aus gutem Grund: eine deckende
+   Linie verliert dort, wo der Untergrund ihr nahekommt, und das frueher
+   benutzte var(--surface3) lag auf dem Flaechenton der Aerzte Zeitung
+   (#00285a zu 8 % auf Weiss = #ebeef2) praktisch unsichtbar - Kontrast 1,05.
+   Eine durchscheinende Linie dunkelt ab, was unter ihr liegt, und trug
+   deshalb ueberall gleich: gemessen 1,31 bis 1,32 in allen sieben Spalten.
+   Sie nimmt damit aber auch den Ton dessen an, was unter ihr liegt - und
+   unter der klebenden Kongressspalte ist das beim seitlichen Rollen die
+   gerade durchwandernde Titelspalte. Die Zeilenlinie wechselte dort mitten
+   im weissen Feld der Beschriftung die Farbe: gemessen 213,221,214 ueber
+   FORUM DKG, 201,210,220 ueber der Aerzte Zeitung, waehrend sie daneben mit
+   219,225,232 zeichnete. (Der eingeklappte Rand gehoert der Tabelle, und
+   Chrome zeichnet ihn ueber die klebende Spalte hinweg; deren weisser Grund
+   deckt ihn nicht ab, weil er in den Randstreifen gar nicht hineinreicht.)
+   #c9d2dc ist genau der Ton, den die durchscheinende Linie ueber dem
+   Flaechenton der Aerzte Zeitung annahm - der dunkelste der sieben. Kein
+   Feld faellt damit unter den Wert von vorher: gemessen 1,31 auf der Aerzte
+   Zeitung, 1,37 bis 1,46 auf den anderen fuenf Toenen, 1,53 auf dem weissen
+   Grund der Kongressspalte. In jeder Spalte dieselbe Farbe - was die Linie
+   vorher nur zu sein schien. Vererbt wird sie an alle Zellen, auch an den im
+   Skript gesetzten Kopfstrich.
+   Warum nicht getrennte Raender (border-collapse:separate)? Die haben den
+   Ton auch in Ordnung gebracht - jede Zelle zeichnet dann ihre eigene Linie,
+   und die klebende Spalte deckt die durchwandernden Zeilen ab. Dafuer
+   zeichnet aber auch jede Zelle ihre Linie selbst, und die klebende Spalte
+   ist eine eigene Ebene: bei einem Browserzoom, der nicht auf ganze
+   Geraetepixel faellt, liegt ihre Linie ein Geraetepixel neben der der
+   Nachbarzellen - die Zeile eckt in einzelnen Reihen an der Spaltenkante ab.
+   Eingeklappt ist es eine Linie je Zeile, in einem Zug ueber die ganze
+   Breite gezeichnet; die kann mit sich selbst nicht uneins sein.
+   --mxkante, die rechte Kante der Kongressspalte, ist der einzige Strich,
+   der staerker steht: #b3becd, Kontrast 1,88 auf Weiss gegen die 1,53 der
+   Linien. Das ist die Grenze zwischen Beschriftung und Daten und die einzige
+   Kante, die beim seitlichen Rollen stehen bleibt - ein festerer Strich ist
+   dort richtig. */
 /* Die Kopfzeile bleibt beim Blaettern stehen - bei 40 Kongressen ist sie
    sonst nach dem ersten Rollen fort, und welche Spalte welchem Titel gehoert,
-   steht dann nirgends mehr. Ihr unterer Rand ist ein Innenschatten. Noetig
-   war das, solange die Tabelle ihre Raender einklappte: ein eingeklappter Rand
-   gehoert der Tabelle und waere beim Blaettern an seinem Platz geblieben,
-   waehrend die Zeile weiterwandert. Seit die Raender getrennt sind (siehe
-   .mx-tab) taete es auch ein Rand - der Schatten bleibt, weil er anders als
-   ein Rand keine Hoehe kostet.
+   steht dann nirgends mehr. Ihr unterer Rand muss dabei ein Innenschatten
+   werden: bei border-collapse:collapse gehoert ein Rand der Tabelle, nicht der
+   Zelle - er bliebe an seinem Platz und wanderte unter der klebenden Zeile
+   weg. Der Schatten gehoert der Zelle und geht mit.
    Die Titelnamen bleiben ungekuerzt; die Zeile ist damit rund 53 Pixel hoch.
    Das ist sie wert - ein halber Titelname hilft beim Zuordnen nicht, und die
    Hoehe fehlt der Tabelle, nicht der Seite. */
@@ -822,14 +822,14 @@ p.bearb-stand:not(:empty){margin-top:9px}
 /* Die Kongressspalte bleibt beim seitlichen Rollen stehen. Die Tabelle ist
    mindestens 720 Pixel breit und rollt auf einem schmalen Schirm waagerecht -
    ohne das waere zwar die Kopfzeile da, aber nicht mehr zu sehen, zu welchem
-   Kongress die Zeile gehoert. Die rechte Kante ist ein Innenschatten, aus
-   demselben Grund wie der Strich unter der Kopfzeile: zur Zeit der
-   eingeklappten Raender war ein Rand dort nicht zu haben (er haette der
-   Tabelle gehoert und waere beim seitlichen Rollen zurueckgeblieben; ein
-   aeusserer Schatten wurde an einer solchen Zelle gar nicht erst gezeichnet -
-   knallrot gesetzt war im Bildschirmfoto kein einziges rotes Pixel zu finden).
-   Geblieben ist er, weil er keine Breite kostet: ein Rand fraesse ein Pixel
-   vom Kongressnamen.
+   Kongress die Zeile gehoert. Die rechte Kante ist ein Innenschatten und
+   vertritt den Rand, den die Zelle bei border-collapse nicht selbst besitzt -
+   ein Rand gehoerte dort der Tabelle und bliebe beim seitlichen Rollen zurueck.
+   Er muss innen liegen: an einer Tabellenzelle mit eingeklapptem Rand zeichnet
+   Chrome einen aeusseren Schatten nicht, einen inneren dagegen schon. Mit
+   einem aeusseren stand die Spalte beim seitlichen Rollen ohne jede Kante da -
+   in einem Bildschirmfoto mit knallrot gesetztem Schatten war kein einziges
+   rotes Pixel zu finden.
    Nicht mit fest stehen die Zeilen ueber die ganze Breite: die
    Gruppenueberschriften und die aufgeklappte Heftleiste. Die Heftleiste ist
    die Arbeitsflaeche selbst und soll mit dem Inhalt wandern. */
@@ -850,9 +850,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
    Am ersten Titelfeld entfaellt sie: dort zieht die Kongressspalte schon ihre
    eigene Kante, und beide nebeneinander ergaeben einen doppelt breiten Strich
    - einen, der beim seitlichen Rollen auch noch auf einen zusammenschrumpfte,
-   weil der Rand mit seiner Zelle wegwandert und der Innenschatten der
-   klebenden Spalte stehen bleibt. Dieselbe Ausnahme macht die Kopfzeile in
-   renderKongressmatrix. */
+   weil der Rand mit der Tabelle wegwandert und der Innenschatten stehen
+   bleibt. Dieselbe Ausnahme macht die Kopfzeile in renderKongressmatrix. */
 .mx-tab td+td{border-left:1px solid var(--mxlinie)}
 .mx-tab td.mx-lbl+td{border-left:none}
 /* Das Feld unter dem Zeiger haelt links wie rechts vier Pixel Abstand zum
@@ -876,8 +875,9 @@ p.bearb-stand:not(:empty){margin-top:9px}
   background:#fdf1e3;border-radius:4px}
 .mx-zelle{min-height:22px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;
   align-items:center;padding:3px;border-radius:4px;cursor:pointer}
-/* Das Feld unter dem Zeiger aus demselben Grund durchscheinend wie die
-   Rasterlinien: --navy-faint (#e8edf4) traf den Flaechenton der Aerzte
+/* Das Feld unter dem Zeiger ist durchscheinend, und anders als bei den
+   Rasterlinien geht das hier auch gut: es liegt immer in seiner eigenen
+   Spalte, nie unter einer fremden. --navy-faint (#e8edf4) traf den Flaechenton der Aerzte
    Zeitung (#00285a mit 8% ueber Weiss = #ebeef2) fast auf den Punkt, das
    Feld war dort nicht mehr zu sehen (gemessen 1,01; in den anderen fuenf
    Spalten 1,05 bis 1,12, in der weissen Jahresmatrix 1,23).
@@ -4723,10 +4723,8 @@ function renderKongressmatrix(umschalter){
   [...ohne, ...mit].forEach(k=>JOURNALS.forEach(t=>{
     if(mxErwartetOffen(k,t).length) offeneFelder++;
   }));
-  // Der farbige Strich als Innenschatten, nicht als Rand: er kostet damit
-  // keine Hoehe und liegt ueber dem Flaechenton der Spalte. Zur Zeit der
-  // eingeklappten Raender war er zudem die einzige Moeglichkeit - ein Rand
-  // haette der Tabelle gehoert und waere beim Blaettern stehen geblieben.
+  // Der farbige Strich als Innenschatten, nicht als Rand: die Kopfzeile klebt,
+  // und ein Rand bliebe bei border-collapse an seinem Platz stehen.
   const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map((t,i)=>
     `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)}${
       i ? ',inset 1px 0 0 var(--mxlinie)' : ''}">${
