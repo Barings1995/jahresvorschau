@@ -838,7 +838,18 @@ p.bearb-stand:not(:empty){margin-top:9px}
    bleibt. Dieselbe Ausnahme macht die Kopfzeile in renderKongressmatrix. */
 .mx-tab td+td{border-left:1px solid var(--mxlinie)}
 .mx-tab td.mx-lbl+td{border-left:none}
-.mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px -4px}
+/* Das Feld unter dem Zeiger haelt links wie rechts vier Pixel Abstand zum
+   Rand der Zelle. Rechts ist das nicht nur Form: dort liegt der
+   Innenschatten, der die Kante der Kongressspalte zeichnet, und ein Kind
+   uebermalt den Innenschatten seiner Zelle - mit dem frueheren negativen
+   Rand von -4px brach die Kante in genau der Zeile ab, in der die Maus
+   stand (im Bildschirmfoto an der Kante gemessen: 201,209,220 in jeder
+   Zeile, 232,237,244 in der Zeile unter dem Zeiger). Links sind es
+   -6px statt -4px, weil die Zelle links 10 und rechts 4 Pixel Polster
+   hat; gleiche Abstaende ueber ein Polster von 10 Pixeln rechts waeren
+   zwar auch symmetrisch, kosten aber Textbreite und schoben einen langen
+   Kongressnamen in eine zweite Zeile (Tabelle 1898 -> 1914 Pixel). */
+.mx-lblklick{cursor:pointer;border-radius:4px;padding:2px 4px;margin:-2px 0 -2px -6px}
 .mx-lblklick:hover{background:var(--navy-faint)}
 .mx-name{color:var(--text)}
 .mx-info{font-size:.7rem;color:var(--muted);margin-top:1px}
