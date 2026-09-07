@@ -376,9 +376,9 @@ Titelnamen bleibt dabei stehen**, und beim seitlichen Rollen auf einem schmalen
 Schirm bleibt die **Kongressspalte** links stehen. Bei vierzig Kongressen ist
 die Tabelle rund achtzehnhundert Pixel hoch — wer weiter unten ein Heft
 zuordnet, sähe sonst weder, welche Spalte zu welchem Titel gehört, noch, in
-welcher Zeile er ist. Die Titelnamen stehen dort ungekürzt; die Kopfzeile ist
-dadurch rund fünfzig Pixel hoch, und das ist sie wert. Zwischen den Spalten steht eine
-Haarlinie wie in der Jahresmatrix; zusätzlich trägt jede Titelspalte ihre Farbe
+welcher Zeile er ist. Im Kopf steht der vollständige Titelname, ungekürzt; die
+Kopfzeile ist dadurch rund fünfundsiebzig Pixel hoch, und das ist sie wert.
+Zwischen den Spalten steht eine Haarlinie wie in der Jahresmatrix; zusätzlich trägt jede Titelspalte ihre Farbe
 als schwachen Flächenton bis nach unten, und jedes Feld nennt im Tooltip seinen
 Titel und seinen Kongress. Die Linie trennt, die Farbe erinnert — zwei der
 sechs Titelfarben sind blass kaum zu unterscheiden, und die Farbe allein
@@ -461,7 +461,16 @@ In der Ansicht *Bearbeiten*:
 * **Ausgabe entfernen** — im Formular unten rechts, mit Rückfrage.
 * **Titel-Stammdaten** — der farbige Kopf über den Heften führt zu Kurzname,
   vollständigem Namen, Auflage und Kennfarbe. Sie gelten je Jahrgang: die
-  Auflage unterscheidet sich von Jahr zu Jahr.
+  Auflage unterscheidet sich von Jahr zu Jahr. Beide Namen werden gezeigt, an
+  getrennten Stellen: der **vollständige Name** auf den Titel-Schaltern, in der
+  Tabellenansicht, in der Jahresmatrix und im Kopf der Kongresszuordnung — dort
+  also, wo der Titel für sich allein steht und benannt sein will. Der
+  **Kurzname** steht, wo der Platz knapp ist oder der Titel ohnehin schon
+  eingeordnet ist: in den Kacheln, in der Monatsliste, in der Kongressansicht,
+  in den Feldern der Kongresszuordnung und in den Excel-Ausgaben. Der
+  vollständige Name schlägt bis in den PDF-Export durch — ein sehr langer Name
+  bricht die Titelspalte dort auf mehrere Zeilen um und macht die Tabelle
+  höher.
 * **Titel anlegen und entfernen** — *+ Neuen Titel anlegen* steht unter der
   Liste, nicht in ihr, und bleibt damit sichtbar, gleich wie weit geblättert
   ist; *Titel entfernen* im Formular. Ein entfernter Titel nimmt seine Ausgaben mit; der

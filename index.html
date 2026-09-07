@@ -1471,7 +1471,7 @@ function baueChips(){
   // an als die Ansicht darunter. Beim Jahrgangswechsel ist activeJ leer, dort
   // aendert sich dadurch nichts.
   anlegen(0,'Alle Titel',activeJ.size===0);
-  JOURNALS.forEach(j=>anlegen(j.id,j.short,activeJ.has(j.id),j.hex));
+  JOURNALS.forEach(j=>anlegen(j.id,j.full||j.short,activeJ.has(j.id),j.hex));
 }
 
 // Auf einer hellen Kennfarbe ist weisser Text nicht mehr zu lesen. Die
@@ -1865,7 +1865,7 @@ function renderMatrix(items,q){
   MON_KURZ.forEach(m=>h+=`<th class="mx-month">${m}</th>`);
   h+='</tr></thead><tbody>';
   titel.forEach(j=>{
-    h+=`<tr><th class="mx-title" style="--jcol:${j.hex};border-left:3px solid ${j.hex}">${esc(j.short)}</th>`;
+    h+=`<tr><th class="mx-title" style="--jcol:${j.hex};border-left:3px solid ${j.hex}">${esc(j.full||j.short)}</th>`;
     for(let m=0;m<12;m++){
       const arr=(raster[j.id]||{})[m]||[];
       h+='<td class="mx-cell">';
@@ -1928,7 +1928,7 @@ function tabSpalten(){
 
 function tabZelle(s,j,iss,q){
   switch(s.k){
-    case 'titel':   return`<td class="t-titel" style="color:${j.hex}">${esc(j.short)}</td>`;
+    case 'titel':   return`<td class="t-titel" style="color:${j.hex}">${esc(j.full||j.short)}</td>`;
     case 'heft':    return`<td class="t-num">${esc(iss.heft)}</td>`;
     case 'auflage': return`<td class="t-num">${j.auflage.toLocaleString('de-DE')}</td>`;
     case 'sw':      return`<td class="t-thema">${themaZelle(iss,q)}</td>`;
@@ -4486,12 +4486,13 @@ function formTitelHtml(){
     <label class="bearb-feld">Kurzname
       <input type="text" value="${escA(entwurf.short)}"
              oninput="bearbFeld('short',this.value)">
-      <span class="hinweis">So steht der Titel auf den Schaltern, in der Tabelle
-        und in der Matrix</span></label>
+      <span class="hinweis">So steht der Titel in den Kacheln, in der Monatsliste,
+        in der Kongressansicht und in den Exporten</span></label>
     <label class="bearb-feld">Vollständiger Name
       <input type="text" value="${escA(entwurf.full)}"
              oninput="bearbFeld('full',this.value)">
-      <span class="hinweis">Wird beim Ausklappen in der Monatsliste gezeigt</span></label>
+      <span class="hinweis">So steht der Titel auf den Schaltern, in der Tabelle,
+        in der Jahresmatrix und im Kopf der Kongresszuordnung</span></label>
 
     <div class="bearb-reihe zwei">
       <label class="bearb-feld">Auflage
@@ -4753,7 +4754,7 @@ function renderKongressmatrix(umschalter){
   const kopf = `<tr><th class="mx-lbl">Kongress</th>${JOURNALS.map((t,i)=>
     `<th style="box-shadow:inset 0 -2px 0 ${escA(t.hex)}${
       i ? ',inset 1px 0 0 var(--mxlinie)' : ''}">${
-      esc(t.short)}</th>`).join('')}</tr>`;
+      esc(t.full||t.short)}</th>`).join('')}</tr>`;
   // Jede Titelspalte traegt ihren Ton bis nach unten durch. Ueber die
   // Spaltengruppe statt ueber jede Zelle: eine Zeile je Spalte statt sechs
   // Angaben je Kongresszeile, und die Breiten bleiben unberuehrt. Der Ton ist
