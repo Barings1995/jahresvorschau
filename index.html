@@ -913,10 +913,17 @@ p.bearb-stand:not(:empty){margin-top:9px}
    ueber ihre volle Hoehe anderthalb Pixel neben dem Rahmen, und links
    davon klaffte eine Luecke (gemessen: alle Zellen von x=25 auf x=26,5,
    waehrend der Tabellenkasten bei 25 blieb). Innen gezeichnet kostet der
-   Streifen keine Breite. Das linke Polster traegt die drei Pixel dafuer
-   mit, damit der Text steht, wo er stand. */
-.mx-inline-zelle{background:var(--navy-faint);box-shadow:inset 3px 0 0 var(--navy);
-  padding:12px 16px 14px 19px;text-align:left}
+   Streifen keine Breite.
+   Das kostet aber Platz nach innen: der Rand lag vor dem Polster, der
+   Schatten liegt darin. Das linke Polster traegt die drei Pixel deshalb
+   mit - 7 statt 4 -, damit zwischen Streifen und Text dieselben vier Pixel
+   bleiben wie zuvor. Die Regel steht mit .mx-tab davor, sonst gilt sie
+   nicht: .mx-tab td ist das genauere Muster und hat das Polster dieser
+   Zelle immer schon gesetzt. (Die frueheren 12/16/14 Pixel an dieser
+   Stelle waren aus demselben Grund wirkungslos - gemessen 4px, seit es
+   die Heftleiste gibt.) */
+.mx-tab td.mx-inline-zelle{background:var(--navy-faint);
+  box-shadow:inset 3px 0 0 var(--navy);padding:5px 4px 5px 7px;text-align:left}
 .mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
 .mx-panel-titel{font-size:.88rem;font-weight:600;color:var(--navy)}
 .mx-panel-unter{font-size:.74rem;color:var(--muted);margin-top:2px}
