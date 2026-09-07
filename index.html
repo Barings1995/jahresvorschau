@@ -33,7 +33,10 @@ header{background:var(--surface);position:sticky;top:0;z-index:100;box-shadow:0 
 .sm-logo-white{line-height:0;flex:none}
 .sm-logo-white svg{height:30px;width:auto;display:block}
 .sm-hero-div{width:1px;align-self:stretch;min-height:34px;background:rgba(255,255,255,.28);flex:none}
-.sm-hero-titles{display:flex;flex-direction:column;gap:1px}
+/* 2 px, nicht 1: die Angebotswerkzeuge setzen die Luecke als h1{margin-bottom:2px}.
+   Mit 1 px war die Kopfzeile 48,5 statt 49,5 hoch, und weil sie mittig ausrichtet,
+   sass das Logo einen halben Pixel zu hoch (27,84 statt 28,34 ab Streifenkante). */
+.sm-hero-titles{display:flex;flex-direction:column;gap:2px}
 h1{font-family:'Playfair Display',serif;font-size:25px;letter-spacing:-.01em;color:#fff;font-weight:700;text-wrap:balance;line-height:1.2}
 h1 .accent{color:var(--accent)}
 /* Zeilenhöhe fest, nicht vom Blatt geerbt: sonst hängt die Höhe der Leiste daran, ob das
