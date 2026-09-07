@@ -56,6 +56,15 @@ h1 .accent{color:var(--accent)}
 .stand-feld.bearbbar{border-bottom:1px dotted rgba(255,255,255,.35);cursor:text}
 .stand-feld.bearbbar:hover{border-bottom-color:var(--accent)}
 .stand-feld:focus{background:rgba(255,255,255,.12);border-bottom:1px solid var(--accent);color:#ffffff}
+/* Konto rechts im Navy-Streifen, neben dem Standstempel und in dessen
+   zurueckhaltender Optik: die Adresse liest sich nur, wer sie sucht, der Weg
+   hinaus ist ein Knopf. Das [hidden] braucht seine eigene Regel - display:flex
+   schlaegt sonst die Voreinstellung des Browsers. */
+.hero-konto{display:flex;align-items:center;gap:8px;align-self:center;flex:none;font-size:.68rem}
+.hero-konto[hidden]{display:none}
+.hk-mail{color:rgba(255,255,255,.6);letter-spacing:.03em;white-space:nowrap}
+.hk-ab{font-family:inherit;font-size:.68rem;font-weight:600;letter-spacing:.03em;color:rgba(255,255,255,.85);background:none;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:3px 9px;cursor:pointer;transition:background .15s,border-color .15s}
+.hk-ab:hover{background:rgba(255,255,255,.14);border-color:var(--accent)}
 .controls{padding:12px 1.5rem 14px}
 
 
@@ -299,7 +308,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   .kentry{grid-template-columns:repeat(4,1fr);gap:6px 9px}
   .ktitel,.kthema{grid-column:1/-1}
 }
-@media(max-width:640px){main{padding:14px}.sm-hero,.controls{padding:12px 14px}h1{font-size:1.2rem}.search-row{flex-direction:column;align-items:stretch}.search-wrap{max-width:none}.mode-group{width:100%}.export-wrap{align-self:flex-end;margin-left:0}.grid{grid-template-columns:1fr}.hero-stamp{display:none}.view-group{width:100%}.view-btn{flex:1}}
+@media(max-width:640px){main{padding:14px}.sm-hero,.controls{padding:12px 14px}h1{font-size:1.2rem}.search-row{flex-direction:column;align-items:stretch}.search-wrap{max-width:none}.mode-group{width:100%}.export-wrap{align-self:flex-end;margin-left:0}.grid{grid-template-columns:1fr}.hero-stamp,.hk-mail{display:none}.view-group{width:100%}.view-btn{flex:1}}
 
 /* ── Clear button ── */
 .clear-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;line-height:1;padding:2px 4px;border-radius:4px;display:none;transition:color .15s}
@@ -389,6 +398,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .ex-item{display:block;width:100%;text-align:left;padding:9px 13px;background:none;border:none;border-bottom:1px solid var(--surface3);font-family:inherit;cursor:pointer;transition:background .12s}
 .ex-item[hidden]{display:none}
 .ex-item:last-child{border-bottom:none}
+#datenMenu .ex-item:has(+ .ex-item[hidden]){border-bottom:none}
 .ex-item:hover:not(:disabled){background:var(--navy-faint)}
 .ex-item:disabled{cursor:default;opacity:.55}
 .ex-t{display:block;font-size:.8rem;font-weight:600;color:var(--navy)}
@@ -1047,6 +1057,15 @@ p.bearb-stand:not(:empty){margin-top:9px}
         <span class="brand-sub">Termine &middot; Themen &middot; Kongresse</span>
       </div>
       <span class="hero-stamp">Stand <span class="stand-feld" id="standFeld"></span></span>
+      <!-- Wer angemeldet ist, stand bisher nirgends, und das Abmelden lag im
+           Menue "Daten" - zwischen Vorgaengen, die den Datenbestand aendern.
+           Beides gehoert hierher: die Sitzung betrifft die Person, nicht die
+           Daten. Der Bereich faellt im Druck mit dem Streifen weg und wird aus
+           einer ausgegebenen Kopie eigens entfernt (baueKopie). -->
+      <div class="hero-konto" id="heroKonto" hidden>
+        <span class="hk-mail" id="heroMail"></span>
+        <button type="button" class="hk-ab" onclick="abmelden()">Abmelden</button>
+      </div>
     </div>
   </div>
   <div class="controls">
@@ -1070,7 +1089,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
     </div>
     <div class="daten-wrap">
       <button class="daten-btn" id="datenBtn" aria-haspopup="true" aria-expanded="false" onclick="toggleDaten(event)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9"/><polyline points="7 8 12 3 17 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
         Daten<span class="ex-chev">&#9660;</span>
       </button>
       <div class="export-menu" id="datenMenu" role="menu">
@@ -1086,17 +1105,13 @@ p.bearb-stand:not(:empty){margin-top:9px}
           <span class="ex-t">Jahrgang anlegen</span>
           <span class="ex-d">Legt ein weiteres Jahr an, auf Wunsch mit den Titeln des gezeigten Jahrgangs. Die Hefte kommen einzeln dazu</span>
         </button>
-        <button class="ex-item" id="kongUmstellenBtn" role="menuitem" onclick="kongresseUmstellen()">
-          <span class="ex-t" id="kongUmstellenText">Kongresse umstellen</span>
-          <span class="ex-d">Legt jeden Kongress des Jahrgangs einmal an, statt ihn in jeder Ausgabe erneut zu f&uuml;hren. Zeigt vorher, was dabei auff&auml;llt; ein Sicherungspunkt entsteht ohne Zutun</span>
-        </button>
         <button class="ex-item" id="entfernenBtn" role="menuitem" onclick="jahrgangEntfernen()" disabled>
           <span class="ex-t" id="entfernenText">Jahrgang entfernen</span>
           <span class="ex-d">Nimmt den Jahrgang mit allen Titeln, Ausgaben und Sicherungspunkten aus der Datenbank</span>
         </button>
-        <button class="ex-item" role="menuitem" onclick="abmelden()">
-          <span class="ex-t">Abmelden</span>
-          <span class="ex-d">Beendet die Sitzung; danach ist bis zur n&auml;chsten Anmeldung nichts mehr sichtbar</span>
+        <button class="ex-item" id="kongUmstellenBtn" role="menuitem" onclick="kongresseUmstellen()">
+          <span class="ex-t" id="kongUmstellenText">Kongresse umstellen</span>
+          <span class="ex-d">Legt jeden Kongress des Jahrgangs einmal an, statt ihn in jeder Ausgabe erneut zu f&uuml;hren. Zeigt vorher, was dabei auff&auml;llt; ein Sicherungspunkt entsteht ohne Zutun</span>
         </button>
       </div>
       <input type="file" id="datenDatei" accept=".xlsx" style="display:none" onchange="datenDateiGewaehlt(event)">
@@ -1104,7 +1119,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
     <div class="export-wrap">
       <button class="export-btn" id="exportBtn" aria-haspopup="true" aria-expanded="false" onclick="toggleExport(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Exportieren<span class="ex-chev">&#9660;</span>
+        Export<span class="ex-chev">&#9660;</span>
       </button>
       <div class="export-menu" id="exportMenu" role="menu">
         <div class="ex-ebene" id="exMain">
@@ -2236,9 +2251,11 @@ function baueKopie(){
   const klon = neutralerKlon();
   // Bedienelemente, die nur zur Arbeitsdatei gehoeren, fallen in der Kopie weg.
   // Der Menuepunkt "Bearbeiten" liegt in .daten-wrap und faellt damit mit weg.
+  // .hero-konto traegt die angemeldete Adresse - die hat in einer Kopie, die
+  // weitergereicht wird, nichts zu suchen.
   // querySelectorAll, nicht querySelector: seit die Rueckfragen eigene Blaetter
   // mit derselben Klasse anlegen, kann es mehr als ein .daten-dialog geben.
-  ['.export-wrap','.daten-wrap','.daten-dialog','#anmeldung','#netzhinweis']
+  ['.export-wrap','.daten-wrap','.daten-dialog','.hero-konto','#anmeldung','#netzhinweis']
     .forEach(sel=>{ klon.querySelectorAll(sel).forEach(w=>w.remove()); });
   // Die Zugangsdatei liegt neben der Arbeitsfassung, nicht neben der Kopie.
   // Ihr Skript-Verweis wuerde dort ins Leere zeigen.
@@ -2528,7 +2545,7 @@ function werteBlattAus(tab){
   }
   if(!kopfR) throw new Error('In der Datei wurde keine Kopfzeile mit der Spalte '
     +'»Jahrgang« gefunden.\n\nErwartet wird das Blatt »Ausgaben«, das dieses '
-    +'Werkzeug unter »Exportieren → Als Excel« schreibt.');
+    +'Werkzeug unter »Export → Als Excel« schreibt.');
 
   const fehlend=PFLICHTSPALTEN.filter(s=>!spalte[s]);
   if(fehlend.length) throw new Error('In der Tabelle fehlen Spalten:\n\n'
@@ -2552,7 +2569,7 @@ function werteBlattAus(tab){
   if(!vollstaendig) throw new Error('Diese Excel-Datei ist ein Auszug.\n\n'
     +'Geladen werden kann nur eine Ausgabe des vollständigen Jahrgangs: '
     +'Suchfeld leeren, Inhaltsfilter auf »Alle Inhalte«, alle Titel und den '
-    +'Schalter für verstrichene Anzeigenschlüsse aus – dann »Exportieren → '
+    +'Schalter für verstrichene Anzeigenschlüsse aus – dann »Export → '
     +'Als Excel«.');
 
   const jahre={}, unbekannt=new Set(), krummeJahre=new Set();
@@ -5147,6 +5164,19 @@ function sitzungSchreiben(s){
   else  localStorage.removeItem(SITZUNG_SCHLUESSEL);
 }
 
+// Die angemeldete Adresse steht rechts im Kopf. Sie kommt aus der Sitzung,
+// die Supabase-Antwort fuehrt sie unter user.email; fehlt sie wider Erwarten,
+// steht der Knopf allein - der Weg hinaus haengt nicht an ihr.
+function kontoAnzeige(){
+  const kasten = document.getElementById('heroKonto');
+  const mail   = document.getElementById('heroMail');
+  if(!kasten || !mail) return;
+  const adresse = (sitzung && sitzung.user && sitzung.user.email) || '';
+  mail.textContent = adresse;
+  mail.hidden = !adresse;
+  kasten.hidden = !sitzung;
+}
+
 function anmeldeMeldung(text, ruhig){
   const m = document.getElementById('anmeldeMeldung');
   if(!m) return;
@@ -5510,6 +5540,7 @@ async function bestandLadenUndZeigen(){
   DATEN = neu;
   starteAnsicht();
   document.getElementById('anmeldung').hidden = true;
+  kontoAnzeige();
   netzhinweis('');
   anmeldeMeldung('');
 }
@@ -5560,6 +5591,7 @@ function fehlertext(fehler){
 function abmelden(){
   schliesseDaten();
   sitzungSchreiben(null);
+  kontoAnzeige();
   DATEN = {};
   document.getElementById('anmeldung').hidden = false;
   const w = document.getElementById('anmeldeWort'); if(w) w.value = '';

@@ -45,6 +45,11 @@ Konten werden im Supabase-Verwaltungsbereich angelegt, nicht im Werkzeug:
 **„Auto Confirm User" einschalten**. Danach die Kennung des Kontos in
 `berechtigt` eintragen — ohne diesen Eintrag bleibt das Werkzeug leer.
 
+Wer angemeldet ist, steht rechts im Navy-Streifen: die Adresse und daneben
+*Abmelden*. Im Menü *Daten* liegt beides nicht mehr — dort geht es um den
+Datenbestand, nicht um die Sitzung. Aus einer ausgegebenen HTML-Kopie wird der
+Bereich entfernt, die Adresse wandert also nicht mit.
+
 ## Stand der Arbeiten
 
 * **Erster Bauabschnitt — fertig.** Datenbank angelegt, Jahrgänge 2026 und 2027
@@ -243,7 +248,7 @@ gefüllte Form. Die Kopfzeile der Matrix zählt die noch offenen Felder mit.
 
 ### Ausgabe für die Datenpflege
 
-*Exportieren → Kongresse für die Datenpflege* gibt den Jahrgang als
+*Export → Kongresse für die Datenpflege* gibt den Jahrgang als
 Excel-Datei aus, im Aufbau des Blattes »Termine« von `Angebotsdaten.xlsx` —
 Jahrgang, Titel, Heft, Monat, ET, AS, DU-Schluss, EH-Termin,
 Themenschwerpunkte und, in der letzten Spalte, die Kongresszeile in deren
@@ -276,7 +281,7 @@ ausgeblendet, solange gearbeitet wird.
 Derselbe Menüpunkt führt hinein und wieder hinaus — beim Öffnen heißt er
 *Bearbeiten*, danach *Bearbeiten beenden* und benennt die Ansicht, zu der er
 zurückführt. Er ist der einzige Weg hinaus: Suche, Inhaltsarten,
-Ansichtsknöpfe, Titel-Schalter und der Knopf *Exportieren* sind blass und
+Ansichtsknöpfe, Titel-Schalter und der Knopf *Export* sind blass und
 gesperrt, solange gearbeitet wird. Sie bleiben sichtbar, damit die Kopfzeilen
 beim Öffnen und Schließen nicht springen. Der Export ist gesperrt, weil er die
 Druckansichten ausgibt — im Arbeitsschirm gäbe es dafür keine Vorlage; ein noch
@@ -511,7 +516,7 @@ der vollständigen Heftplanung im Klartext. Öffentlich gehören nur
 `index.html`, `konfiguration.js`, `schema.sql` und `README.md`.
 
 *Werkzeug sichern* ist mit der Datenbank hinfällig und durch *Abmelden*
-ersetzt.
+rechts im Kopf ersetzt.
 
 ## Tabelle im Druck
 
