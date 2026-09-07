@@ -1811,7 +1811,7 @@ function inhaltBloecke(iss,q){
 function cardHtml(j,iss,q){
   return`<div class="card" style="--jcol:${j.hex}">
     <div class="card-top">
-      <span class="badge" style="background:${j.hex}22;color:${j.hex};border:1px solid ${j.hex}44">${esc(j.short)}</span>
+      <span class="badge" style="background:${j.hex}22;color:${j.hex};border:1px solid ${j.hex}44">${esc(j.full||j.short)}</span>
       <span class="heft-info"><span class="heft-num">Heft ${esc(iss.heft)}</span><br>${j.auflage.toLocaleString('de-DE')} Expl.</span>
     </div>
     <div class="dates">${datesHtml(iss,'date-col')}</div>
@@ -1838,7 +1838,7 @@ function renderListe(items,q){
       const thema=zeigeThema() ? [iss.top,iss.sw].filter(Boolean).join(' · ') : '';
       return`<details class="lrow" style="--jcol:${j.hex}"${q?' open':''}>
         <summary>
-          <span class="ltitle">${esc(j.short)}</span>
+          <span class="ltitle">${esc(j.full||j.short)}</span>
           <span class="lheft">Heft ${esc(iss.heft)}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
           ${datesHtml(iss,'ldate')}
           <span class="lthema">${hl(thema,q)}</span>
@@ -1909,7 +1909,7 @@ const TAB_SPALTEN=[
 ];
 
 function sortWert(it,k){
-  if(k==='titel')  return it.j.short;
+  if(k==='titel')  return it.j.full||it.j.short;
   if(k==='auflage')return it.j.auflage;
   if(k==='heft')   return it.iss.heft;
   return it.iss[k]||'';
@@ -2026,7 +2026,7 @@ function renderKongress(q){
     const zeilen=arr.map(({j,iss,art})=>{
       const thema=zeigeThema() ? [iss.top,iss.sw].filter(Boolean).join(' · ') : '';
       return`<div class="kentry" style="--jcol:${j.hex}">
-        <span class="ktitel">${esc(j.short)}</span>
+        <span class="ktitel">${esc(j.full||j.short)}</span>
         <span class="kheft">Heft ${esc(iss.heft)}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
         <span class="kart ${art}">${art==='auslage'?'Auslage':'Bericht'}</span>
         ${datesHtml(iss,'kdate')}
@@ -2074,7 +2074,7 @@ function auswahlTeile(q){
   if(modus.size) t.push('Inhalt: ' +
     ['auslage','bericht','thema'].filter(k=>modus.has(k)).map(k=>MODUS_TEXT[k]).join(' und '));
   if(ohneVerstrichene) t.push('Ohne verstrichene Anzeigenschlüsse');
-  if(activeJ.size) t.push('Titel: '+JOURNALS.filter(j=>activeJ.has(j.id)).map(j=>esc(j.short)).join(', '));
+  if(activeJ.size) t.push('Titel: '+JOURNALS.filter(j=>activeJ.has(j.id)).map(j=>esc(j.full||j.short)).join(', '));
   return t;
 }
 
@@ -2494,10 +2494,12 @@ function ausListenZelle(w){
 
 // Farbe, Langname und Kennnummer eines Titels bleiben im Werkzeug: sie aendern
 // sich nicht von Jahrgang zu Jahrgang und haetten in einer Terminliste nichts
-// verloren. Erkannt wird ein Titel an seinem Namen.
+// verloren. Erkannt wird ein Titel an seinem Namen - am vollstaendigen, den die
+// Excel-Ausgabe schreibt, und weiterhin am Kurznamen, damit eine aeltere Datei
+// nicht als lauter unbekannte Titel ankommt.
 function titelStamm(kurz){
   for(const y of jahrgaenge()){
-    const t=(DATEN[y].titel||[]).find(j=>j.short===kurz);
+    const t=(DATEN[y].titel||[]).find(j=>j.full===kurz||j.short===kurz);
     if(t) return {id:t.id,short:t.short,full:t.full,color:t.color,hex:t.hex};
   }
   return null;
@@ -2582,23 +2584,28 @@ function werteBlattAus(tab){
     // Jahresmatrix bestimmt. Fehlt er, entstuende eine Monatsgruppe ohne Namen
     // und die Ausgabe fiele aus der Matrix – lieber gleich abbrechen.
     if(!iss.et) ohneEt.push(`${y} · ${kurz}, Heft ${heft}`);
+    // Steht derselbe Titel in einer Datei einmal mit dem vollstaendigen Namen
+    // und einmal mit dem Kurznamen, gehoert er trotzdem in eine Zeile: gefuehrt
+    // wird nach der Kennnummer des erkannten Stammes, nicht nach der
+    // Schreibweise. Das gilt auch fuer die Doppelpruefung darunter.
+    const stamm=titelStamm(kurz);
+    const schl=stamm ? 'id'+stamm.id : 'neu|'+kurz;
     // Eine kopierte Zeile mit vergessener Heftnummer wuerde dieselbe Ausgabe
     // zweimal anlegen; in der Matrix teilten sich beide sogar ein Feld.
-    const schluessel=y+'|'+kurz+'|'+heft;
+    const schluessel=y+'|'+schl+'|'+heft;
     if(gesehen.has(schluessel)) doppelte.push(`${y} · ${kurz}, Heft ${heft}`);
     gesehen.add(schluessel);
 
     if(!jahre[y]) jahre[y]={stand:standZeile,titel:[],nachName:{}};
     const J=jahre[y];
-    if(!J.nachName[kurz]){
-      const stamm=titelStamm(kurz);
+    if(!J.nachName[schl]){
       if(!stamm) unbekannt.add(kurz);
       const t=stamm || {id:naechsteTitelId()+unbekannt.size-1,short:kurz,full:kurz,
                         color:'var(--muted)',hex:'#4a6080'};
-      J.nachName[kurz]=Object.assign({},t,{auflage:0,issues:[]});
-      J.titel.push(J.nachName[kurz]);
+      J.nachName[schl]=Object.assign({},t,{auflage:0,issues:[]});
+      J.titel.push(J.nachName[schl]);
     }
-    const T=J.nachName[kurz];
+    const T=J.nachName[schl];
     const aufl=parseInt(String(g('Auflage')).replace(/[^\d]/g,''),10);
     if(!T.auflage && aufl>0) T.auflage=aufl;
     T.issues.push(iss);
@@ -2735,14 +2742,14 @@ function verlust(y,neu){
   const hefte =t=>t.reduce((s,j)=>s+j.issues.length,0);
   const eintr =t=>t.reduce((s,j)=>s+j.issues.reduce((n,i)=>n+i.a.length+i.b.length,0),0);
   const neuNamen=new Set(neu.titel.map(j=>j.short));
-  const wegTitel=alt.titel.filter(j=>!neuNamen.has(j.short)).map(j=>j.short);
+  const wegTitel=alt.titel.filter(j=>!neuNamen.has(j.short)).map(j=>j.full||j.short);
   const wegHefte=[];
   alt.titel.forEach(j=>{
     const n=neu.titel.find(x=>x.short===j.short);
     if(!n) return;                       // ganzer Titel entfällt, oben schon genannt
     const da=new Set(n.issues.map(i=>i.heft));
     const fehlt=j.issues.filter(i=>!da.has(i.heft)).map(i=>i.heft);
-    if(fehlt.length) wegHefte.push(`${j.short}: Heft ${fehlt.join(', ')}`);
+    if(fehlt.length) wegHefte.push(`${j.full||j.short}: Heft ${fehlt.join(', ')}`);
   });
   const dA=hefte(alt.titel)-hefte(neu.titel);
   const dE=eintr(alt.titel)-eintr(neu.titel);
@@ -3057,7 +3064,7 @@ function kongressBefunde(y){
         ? (iss.as ? tage(iss.as, k.bis || k.von) : null)   // Kongress, dann Redaktion
         : (iss.et ? tage(k.von, iss.et)          : null);  // Heft, dann Kongress
       if(d === null || (d >= 0 && d <= SCHWELLE)) return;
-      fremd.push({k, art, titel:t.short, heft:iss.heft, tage:d});
+      fremd.push({k, art, titel:t.full||t.short, heft:iss.heft, tage:d});
     };
     (iss.a||[]).forEach(id=>pruefe(id,'auslage'));
     (iss.b||[]).forEach(id=>pruefe(id,'bericht'));
@@ -3267,7 +3274,7 @@ function excelBlaetter(q){
   if(zeigeB){ kopf1.push('Kongressberichte'); breiten1.push(46); }
 
   const zeilen1=items.map(({j,iss})=>{
-    const z=[{w:jahrgang()},{w:j.short},{w:iss.heft},
+    const z=[{w:jahrgang()},{w:j.full||j.short},{w:iss.heft},
       {w:excelDatum(iss.et),t:'n',s:2},{w:excelDatum(iss.as),t:'n',s:2},
       {w:excelDatum(iss.du),t:'n',s:2},{w:excelDatum(iss.eh),t:'n',s:2},
       {w:j.auflage,t:'n'}];
@@ -3298,7 +3305,7 @@ function excelBlaetter(q){
   if(zeigeT){ kopf2.push('Schwerpunkt'); breiten2.push(44); }
   const zeilen2=eintraege.map(e=>{
     const z=[{w:e.k.lang},{w:kongressZeitraum(e.k)},{w:e.k.ort||''},{w:e.art},
-      {w:e.j.short},{w:e.iss.heft},
+      {w:e.j.full||e.j.short},{w:e.iss.heft},
       {w:excelDatum(e.iss.et),t:'n',s:2},{w:excelDatum(e.iss.as),t:'n',s:2},
       {w:excelDatum(e.iss.du),t:'n',s:2},{w:excelDatum(e.iss.eh),t:'n',s:2},
       {w:e.j.auflage,t:'n'}];
@@ -3413,6 +3420,11 @@ function datenpflegeBlatt(){
     [...(iss.a||[]),...(iss.b||[])].forEach(id=>{
       const k=KONG.get(id); if(k && !k.von && !k.unscharf) ohneTermin++;
     });
+    // Einzige Stelle, die beim Kurznamen bleibt: dieses Blatt ist dem Blatt
+    // "Termine" von Angebotsdaten.xlsx nachgebaut und wird dort Zeile fuer
+    // Zeile danebengelegt. Die Titelspalte ist hier kein Ausweis, sondern die
+    // Marke zum Wiederfinden der richtigen Zeile - sie muss so heissen wie
+    // drueben.
     zeilen.push([{w:jahr},{w:t.short},{w:iss.heft},{w:dpMonat(iss.et)},
       {w:dpTermin(iss.et)},{w:dpTermin(iss.as)},{w:dpTermin(iss.du)},{w:dpTermin(iss.eh)},
       {w:themaText(iss)},{w:text}]);
@@ -4132,7 +4144,7 @@ async function ausgabeEntfernen(){
   const iss = t && t.issues[bearbAuswahl.index];
   if(!iss) return;
   if(!await frage('Ausgabe entfernen?',
-    '<p>Heft ' + esc(iss.heft) + ' von ' + esc(t.short) + ' wird aus der Datenbank entfernt.</p>' +
+    '<p>Heft ' + esc(iss.heft) + ' von ' + esc(t.full||t.short) + ' wird aus der Datenbank entfernt.</p>' +
     '<p>Termine, Themen und Kongresseinträge dieser Ausgabe gehen dabei verloren.</p>',
     'Entfernen')) return;
   bearbArbeitet('Wird entfernt …');
@@ -4199,7 +4211,7 @@ async function titelEntfernen(){
   }
   const n = t.issues.length;
   if(!await frage('Titel entfernen?',
-    '<p>' + esc(t.short) + ' wird aus dem Jahrgang ' + esc(jahrgang()) + ' entfernt, mit <b>' +
+    '<p>' + esc(t.full||t.short) + ' wird aus dem Jahrgang ' + esc(jahrgang()) + ' entfernt, mit <b>' +
     n + '</b> Ausgabe' + (n===1?'':'n') + '.</p>' +
     '<p>Andere Jahrgänge bleiben unberührt.</p>',
     'Entfernen')) return;
@@ -4438,7 +4450,7 @@ function formAusgabeHtml(){
        <input type="date" value="${escA(entwurf[k])}"
               oninput="bearbFeld('${k}',this.value)"></label>`).join('');
   return `
-    <div class="bearb-kopf">${esc(t?t.short:'')} &middot; ${
+    <div class="bearb-kopf">${esc(t?(t.full||t.short):'')} &middot; ${
       neu ? 'neue Ausgabe' : 'Heft ' + esc(entwurf.heft)}</div>
     <div class="bearb-unterkopf">Jahrgang ${jahrgang()} &middot; ${
       neu ? 'Die Ausgabe entsteht erst mit &raquo;Anlegen&laquo;'
@@ -4477,7 +4489,7 @@ function formTitelHtml(){
   const t = neu ? null : JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
   const anzahl = t ? t.issues.length : 0;
   return `
-    <div class="bearb-kopf">${neu ? 'Neuer Titel' : esc(t?t.short:'')}</div>
+    <div class="bearb-kopf">${neu ? 'Neuer Titel' : esc(t?(t.full||t.short):'')}</div>
     <div class="bearb-unterkopf">Stammdaten &middot; Jahrgang ${jahrgang()} &middot; ${
       neu ? 'Der Titel entsteht nur in diesem Jahrgang, ohne Ausgaben'
           : anzahl + ' Ausgabe' + (anzahl===1?'':'n') +
@@ -4486,13 +4498,13 @@ function formTitelHtml(){
     <label class="bearb-feld">Kurzname
       <input type="text" value="${escA(entwurf.short)}"
              oninput="bearbFeld('short',this.value)">
-      <span class="hinweis">So steht der Titel in den Kacheln, in der Monatsliste,
-        in der Kongressansicht und in den Exporten</span></label>
+      <span class="hinweis">Wird nicht mehr angezeigt: er dient dem Wiedererkennen
+        beim Einlesen aus Excel und steht in der Ausgabe für die Datenpflege</span></label>
     <label class="bearb-feld">Vollständiger Name
       <input type="text" value="${escA(entwurf.full)}"
              oninput="bearbFeld('full',this.value)">
-      <span class="hinweis">So steht der Titel auf den Schaltern, in der Tabelle,
-        in der Jahresmatrix und im Kopf der Kongresszuordnung</span></label>
+      <span class="hinweis">So steht der Titel überall in der Ansicht, im Druck
+        und in den Ausgaben</span></label>
 
     <div class="bearb-reihe zwei">
       <label class="bearb-feld">Auflage
@@ -4692,8 +4704,8 @@ function mxZeileHtml(k, offen){
     const on = offen && offen.kongressId===k.id && offen.titelId===t.id;
     return `<td style="text-align:center"><div class="mx-zelle${on?' offen':''}" role="button" tabindex="0"
       onclick="mxOeffnen('${k.id}',${t.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
-      title="${escA(t.short+' \u00b7 '+k.lang)}"
-      aria-label="${escA(t.short)}, ${escA(k.lang)}">${chips}${erw}</div></td>`;
+      title="${escA((t.full||t.short)+' \u00b7 '+k.lang)}"
+      aria-label="${escA(t.full||t.short)}, ${escA(k.lang)}">${chips}${erw}</div></td>`;
   }).join('');
   const hauptzeile = `<tr><td class="mx-lbl"><div class="mx-lblklick" role="button" tabindex="0"
       onclick="mxOeffnenKongress('${k.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
@@ -4878,7 +4890,7 @@ function mxHeftwahlHtml(k, t){
         mxArt==='auslage'?'Beginn':'Ende'}</b><i></i></span>` : '';
 
   return `<div class="mx-panel-kopf">
-      <div><div class="mx-panel-titel">${esc(t.short)} &middot; ${
+      <div><div class="mx-panel-titel">${esc(t.full||t.short)} &middot; ${
         mxArt==='auslage'?'Auslage':'Bericht'}</div>
         <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
       <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
@@ -5084,7 +5096,7 @@ function renderBearbeiten(){
         gewaehltIst('titel',t.id)?' gewaehlt':''}"
         style="background:${escA(t.hex)}" title="Stammdaten des Titels bearbeiten"
         onclick="bearbWaehleTitel(${t.id})">
-        <span>${esc(t.short)}</span>
+        <span>${esc(t.full||t.short)}</span>
         <span class="bt-zahl">${n} Heft${n===1?'':'e'}</span></button>
       ${eintraege}
       <button type="button" class="bearb-eintrag bearb-neu${neuIst('ausgabe',t.id)?' gewaehlt':''}"

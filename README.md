@@ -252,6 +252,11 @@ Ausgabe je eine eigene Zeile. Ein Kongress ohne Termin trägt kein Datum, das
 sich einsetzen ließe, und bleibt darin aus — der Bericht nennt, wie viele das
 betrifft.
 
+In der Spalte *Titel* steht hier als einziger Stelle weiterhin der **Kurzname**:
+Dieses Blatt wird dem Blatt »Termine« Zeile für Zeile danebengelegt, und die
+Spalte ist dort kein Ausweis, sondern die Marke zum Wiederfinden der richtigen
+Zeile — sie muss so heißen wie drüben.
+
 Der Punkt steht bei den übrigen Ausgaben und nicht mehr im Menü *Daten*: er
 erzeugt eine Datei und ändert am Bestand nichts, während dort ausschließlich
 Punkte stehen, die die Datenbank verändern.
@@ -461,16 +466,19 @@ In der Ansicht *Bearbeiten*:
 * **Ausgabe entfernen** — im Formular unten rechts, mit Rückfrage.
 * **Titel-Stammdaten** — der farbige Kopf über den Heften führt zu Kurzname,
   vollständigem Namen, Auflage und Kennfarbe. Sie gelten je Jahrgang: die
-  Auflage unterscheidet sich von Jahr zu Jahr. Beide Namen werden gezeigt, an
-  getrennten Stellen: der **vollständige Name** auf den Titel-Schaltern, in der
-  Tabellenansicht, in der Jahresmatrix und im Kopf der Kongresszuordnung — dort
-  also, wo der Titel für sich allein steht und benannt sein will. Der
-  **Kurzname** steht, wo der Platz knapp ist oder der Titel ohnehin schon
-  eingeordnet ist: in den Kacheln, in der Monatsliste, in der Kongressansicht,
-  in den Feldern der Kongresszuordnung und in den Excel-Ausgaben. Der
-  vollständige Name schlägt bis in den PDF-Export durch — ein sehr langer Name
-  bricht die Titelspalte dort auf mehrere Zeilen um und macht die Tabelle
-  höher.
+  Auflage unterscheidet sich von Jahr zu Jahr. Gezeigt wird überall der
+  **vollständige Name**: in allen fünf Ansichten, in beiden Matrizen, im
+  Bearbeiten-Menü, in den Rückfragen, im Druck und in der Excel-Ausgabe. Ein
+  sehr langer Name schlägt damit bis in den PDF-Export durch und bricht die
+  Titelspalte dort auf mehrere Zeilen um.
+
+  Der **Kurzname** wird nicht mehr angezeigt. Er bleibt trotzdem gepflegt: Er
+  ist die Marke, an der ein Titel beim Einlesen aus Excel wiedererkannt wird,
+  und er steht in der Ausgabe für die Datenpflege. Beim Einlesen gelten beide
+  Schreibweisen — der vollständige Name, den die Excel-Ausgabe seit dieser
+  Änderung schreibt, und weiterhin der Kurzname, damit eine ältere Datei nicht
+  als lauter unbekannte Titel ankommt. Stehen in einer Datei beide
+  Schreibweisen desselben Titels, wird er trotzdem einmal geführt.
 * **Titel anlegen und entfernen** — *+ Neuen Titel anlegen* steht unter der
   Liste, nicht in ihr, und bleibt damit sichtbar, gleich wie weit geblättert
   ist; *Titel entfernen* im Formular. Ein entfernter Titel nimmt seine Ausgaben mit; der
