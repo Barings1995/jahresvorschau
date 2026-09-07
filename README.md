@@ -540,15 +540,22 @@ Ansichten. Der
 Abzug gehört an den Satzspiegel und nicht an die Tabelle; säße er an der Tabelle,
 endete sie 0,4 px vor den Linien darüber.
 
-Die Kongressspalte steht deshalb auf 38,1 % statt auf 38 %. Das Pixel Luft nimmt
-ihr 0,38 px, und daran hängt der Zeilenumbruch, auch wenn die gezeichnete
-Spaltenkante gerundet gleich bleibt: im Jahrgang 2027 brachen dadurch drei
-Kongresseinträge zusätzlich um, und die Tabelle wuchs von sechs auf sieben
-Seiten. 38,1 % geben der Spalte gut 1 px zurück — das Zweieinhalbfache des
-Verlorenen. Die Innenabstände bleiben überall bei 5 px, links wie rechts, damit
-nichts unsymmetrisch wird; die übrigen Spalten geben zusammen das eine Pixel ab.
-An der seinerzeit gemessenen Abwägung 38 gegen 45 % ändert das nichts — die ging
-um 27 mm Spaltenbreite.
+Der Kongressspalte nimmt das Pixel Luft 0,38 px. Sie stand deshalb eine Zeit
+lang auf 38,1 % statt auf 38 %, weil an diesen 0,38 px der Zeilenumbruch hing
+und die Tabelle an einem Bestand dadurch von sechs auf sieben Seiten wuchs.
+Nachgemessen war das Zufall, und die Spalte steht wieder auf 38 %: Die Höhe der
+Tabelle fällt über der Spaltenbreite in Stufen, und die Stufe bei 395 px ist die
+kleinste von allen — sie bringt drei von 582 Zeilenkästen, während 37,5 auf 38 %
+gar nichts bringt und 39 auf 39,5 % gleich zehn. Ob aus diesen drei Zeilen eine
+Seite wird, entscheidet der Bestand: an 31 Bestandsgrößen zwischen 129 und 201
+Kongresszuordnungen gemessen (134 bis 148 lückenlos) sind 38 und 38,1 % in 28
+Fällen seitengleich; nur bei 138, 139 und 140 Zuordnungen spart die
+Zehntelstelle eine Seite. Ein fester Wert statt der Prozentangabe hilft nicht:
+105 mm träfe im Querformat dieselbe Breite, gäbe der Spalte im Hochformat aber
+44,7 % — genau die 45 %, die als zu breit verworfen sind. `calc(38% + 1px)`
+ebenso wenig; Chrome behandelt das in der Spaltenberechnung wie `auto`, die
+Spalte sprang damit auf 543 px. An der Abwägung 38 gegen 45 % ändert all das
+nichts — die ging um 27 mm Spaltenbreite.
 
 ## Meldungen
 
