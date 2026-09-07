@@ -252,11 +252,6 @@ Ausgabe je eine eigene Zeile. Ein Kongress ohne Termin trägt kein Datum, das
 sich einsetzen ließe, und bleibt darin aus — der Bericht nennt, wie viele das
 betrifft.
 
-In der Spalte *Titel* steht hier als einziger Stelle weiterhin der **Kurzname**:
-Dieses Blatt wird dem Blatt »Termine« Zeile für Zeile danebengelegt, und die
-Spalte ist dort kein Ausweis, sondern die Marke zum Wiederfinden der richtigen
-Zeile — sie muss so heißen wie drüben.
-
 Der Punkt steht bei den übrigen Ausgaben und nicht mehr im Menü *Daten*: er
 erzeugt eine Datei und ändert am Bestand nichts, während dort ausschließlich
 Punkte stehen, die die Datenbank verändern.
@@ -381,9 +376,9 @@ Titelnamen bleibt dabei stehen**, und beim seitlichen Rollen auf einem schmalen
 Schirm bleibt die **Kongressspalte** links stehen. Bei vierzig Kongressen ist
 die Tabelle rund achtzehnhundert Pixel hoch — wer weiter unten ein Heft
 zuordnet, sähe sonst weder, welche Spalte zu welchem Titel gehört, noch, in
-welcher Zeile er ist. Im Kopf steht der vollständige Titelname, ungekürzt; die
-Kopfzeile ist dadurch rund fünfundsiebzig Pixel hoch, und das ist sie wert.
-Zwischen den Spalten steht eine Haarlinie wie in der Jahresmatrix; zusätzlich trägt jede Titelspalte ihre Farbe
+welcher Zeile er ist. Die Titelnamen stehen dort ungekürzt; die Kopfzeile ist
+dadurch rund fünfzig Pixel hoch, und das ist sie wert. Zwischen den Spalten steht eine
+Haarlinie wie in der Jahresmatrix; zusätzlich trägt jede Titelspalte ihre Farbe
 als schwachen Flächenton bis nach unten, und jedes Feld nennt im Tooltip seinen
 Titel und seinen Kongress. Die Linie trennt, die Farbe erinnert — zwei der
 sechs Titelfarben sind blass kaum zu unterscheiden, und die Farbe allein
@@ -466,19 +461,7 @@ In der Ansicht *Bearbeiten*:
 * **Ausgabe entfernen** — im Formular unten rechts, mit Rückfrage.
 * **Titel-Stammdaten** — der farbige Kopf über den Heften führt zu Kurzname,
   vollständigem Namen, Auflage und Kennfarbe. Sie gelten je Jahrgang: die
-  Auflage unterscheidet sich von Jahr zu Jahr. Gezeigt wird überall der
-  **vollständige Name**: in allen fünf Ansichten, in beiden Matrizen, im
-  Bearbeiten-Menü, in den Rückfragen, im Druck und in der Excel-Ausgabe. Ein
-  sehr langer Name schlägt damit bis in den PDF-Export durch und bricht die
-  Titelspalte dort auf mehrere Zeilen um.
-
-  Der **Kurzname** wird nicht mehr angezeigt. Er bleibt trotzdem gepflegt: Er
-  ist die Marke, an der ein Titel beim Einlesen aus Excel wiedererkannt wird,
-  und er steht in der Ausgabe für die Datenpflege. Beim Einlesen gelten beide
-  Schreibweisen — der vollständige Name, den die Excel-Ausgabe seit dieser
-  Änderung schreibt, und weiterhin der Kurzname, damit eine ältere Datei nicht
-  als lauter unbekannte Titel ankommt. Stehen in einer Datei beide
-  Schreibweisen desselben Titels, wird er trotzdem einmal geführt.
+  Auflage unterscheidet sich von Jahr zu Jahr.
 * **Titel anlegen und entfernen** — *+ Neuen Titel anlegen* steht unter der
   Liste, nicht in ihr, und bleibt damit sichtbar, gleich wie weit geblättert
   ist; *Titel entfernen* im Formular. Ein entfernter Titel nimmt seine Ausgaben mit; der
