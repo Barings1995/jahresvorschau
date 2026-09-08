@@ -74,10 +74,20 @@ h1 .accent{color:var(--accent)}
 /* search row */
 .search-row{display:flex;gap:10px;align-items:center;margin-bottom:11px;flex-wrap:wrap}
 .search-wrap{position:relative;flex:1;min-width:200px;max-width:340px}
-.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);width:16px;height:16px;pointer-events:none}
+/* Nur die Lupe, nicht jedes Zeichen im Feld: als das Loeschzeichen eine
+   Zeichnung wurde, griff diese Regel auch auf sie - mit position:absolute,
+   left:11px und vor allem color:var(--muted), das den Zeigerzustand des
+   Knopfes uebersteuerte. Die Lupe ist unmittelbares Kind, das Kreuz steckt
+   im Knopf. */
+.search-wrap>svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);width:16px;height:16px;pointer-events:none}
 input[type=text]{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px 9px 36px;color:var(--text);font:inherit;font-size:.875rem;outline:none;transition:border-color .18s}
 input[type=text]:focus{border-color:var(--navy)}
 input::placeholder{color:var(--muted)}
+/* Rechts so viel Platz wie das Loeschzeichen samt Abstand braucht (8 + 24).
+   Zuvor endete der Innenabstand nach 14 px, und eine laengere Eingabe schob
+   sich 13,3 px weit unter das Zeichen. Nur hier, nicht an input[type=text]:
+   die Felder in den Rueckfragen tragen kein Zeichen. */
+.search-wrap input{padding-right:34px}
 
 /* mode pills */
 .mode-group{display:flex;background:var(--surface2);border:1.5px solid var(--navy);border-radius:4px;overflow:hidden}
@@ -314,8 +324,26 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 @media(max-width:640px){main{padding:14px}.sm-hero,.controls{padding:12px 14px}h1{font-size:1.2rem}.search-row{flex-direction:column;align-items:stretch}.search-wrap{max-width:none}.mode-group{width:100%}.export-wrap{align-self:flex-end;margin-left:0}.grid{grid-template-columns:1fr}.hero-stamp,.hk-mail{display:none}.view-group{width:100%}.view-btn{flex:1}}
 
 /* ── Clear button ── */
-.clear-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;line-height:1;padding:2px 4px;border-radius:4px;display:none;transition:color .15s}
-.clear-btn:hover{color:var(--text)}
+/* Das Loeschzeichen ist gezeichnet, nicht gesetzt. Als Buchstabe (&times;) kam
+   es aus der Schrift des Browsers - ein <button> erbt die Schriftfamilie nicht
+   von allein, und ohne font-family:inherit stand hier als einziger Stelle der
+   Oberflaeche Arial statt Source Sans 3; gemessen 9,34 statt 7,95 px breit.
+   Gezeichnet spricht es dieselbe Sprache wie die Lupe gegenueber: dasselbe
+   24er-Raster, Strich 2, runde Enden wie an den Symbolen von "Daten" und
+   "Export". Mit 14 px bleibt es kleiner als die Lupe (16 px) - die Lupe sagt,
+   was das Feld ist, das Kreuz nur, dass sich etwas zuruecknehmen laesst.
+   Die Flaeche misst 24 px im Quadrat: das kleinste Ziel, das sich verlaesslich
+   treffen laesst. Ohne Rahmen und Fuellung, anders als die drei uebrigen
+   Kreuze des Werkzeugs - die stehen frei neben einer Zeile, dieses sitzt im
+   Feld und braucht dort keinen zweiten Rahmen. */
+.clear-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:24px;height:24px;display:none;align-items:center;justify-content:center;
+  background:none;border:none;border-radius:4px;cursor:pointer;
+  color:var(--muted);transition:color .15s}
+.clear-btn svg{width:14px;height:14px;display:block;pointer-events:none}
+/* Warm wie an .bearb-weg, .bearb-sich-weg und .mx-panel-zu: dieselbe Geste,
+   dieselbe Antwort. Vorher ging dieses eine Kreuz auf --text. */
+.clear-btn:hover{color:var(--warm)}
 
 /* ── Export: Knopf mit Klappmenue ── */
 .export-wrap{position:relative;margin-left:8px}
@@ -1093,7 +1121,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
   <div class="search-row">
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="q" placeholder="Kongress oder Thema suchen &hellip;" oninput="onInput()"><button class="clear-btn" id="clearBtn" onclick="clearSearch()" title="Suche löschen">&times;</button>
+      <input type="text" id="q" placeholder="Kongress oder Thema suchen &hellip;" oninput="onInput()"><button type="button" class="clear-btn" id="clearBtn" onclick="clearSearch()" title="Suche löschen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="mode-group">
       <button class="mode-btn active" data-mode="all"    onclick="setModus('all')">Alle Inhalte</button>
@@ -3697,7 +3725,7 @@ function starteAnsicht(){
 }
 function onInput(){
   const btn = document.getElementById('clearBtn');
-  btn.style.display = document.getElementById('q').value ? 'block' : 'none';
+  btn.style.display = document.getElementById('q').value ? 'flex' : 'none';
   render();
 }
 function clearSearch(){
