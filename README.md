@@ -12,6 +12,7 @@ bestehen.
 | `index.html` | das Werkzeug; eine Datei, wie zuvor |
 | `konfiguration.js` | Adresse und öffentlicher Schlüssel der Datenbank |
 | `schema.sql` | Aufbau der Datenbank, einmalig einzuspielen |
+| `Änderungslog_Jahresvorschau.md` | Änderungen an `index.html`, neueste oben; beginnt am 08.09.2026 |
 | `werkzeug/` | Hilfsskripte der Übernahme, für den Betrieb nicht nötig |
 
 ## Datenbank
