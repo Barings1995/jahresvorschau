@@ -317,6 +317,14 @@ Liste links behält beim Wechsel der Ausgabe ihre Rollposition — sie wird bei
 jedem Zeichnen neu aufgebaut, ihr Stand wird dabei aber gemerkt und wieder
 gesetzt.
 
+Auch ein Wechsel des Jahrgangs führt nicht zurück an den Anfang: dieselbe
+Stelle wird drüben wieder aufgeschlagen, sofern der Jahrgang sie führt.
+Gesucht wird über die Titelnummer — sie ist über alle Jahrgänge dieselbe — und
+über die Heftnummer, nicht über den Platz in der Liste; ein Jahrgang kann mehr
+oder weniger Hefte führen. Gibt es die Stelle drüben nicht, bleibt die rechte
+Seite leer. Ein angefangener Entwurf wandert nicht mit: er gehört zum vorigen
+Jahrgang und verfällt beim Wechsel, aufgeschlagen wird der Stand des neuen.
+
 Kongresse werden hier nur zugeordnet, nicht angelegt. Zugeordnetes steht als
 feste Zeile mit einem `×` daneben; darunter führt ein Auswahlfeld *Kongress
 hinzufügen …* die Kongresse des Jahrgangs — gegliedert in *Termin fehlt* und

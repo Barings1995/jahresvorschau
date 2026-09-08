@@ -1452,6 +1452,9 @@ function standStart(){ return (DATEN[jahr] && DATEN[jahr].stand) || ''; }
 
 function waehleJahrgang(y){
   if(!DATEN[y]) return;
+  // Zuerst gemerkt, dann umgestellt: bearbMerken() liest die Heftnummer noch
+  // aus dem alten Jahrgang.
+  const bearbMerk = bearbMerken();
   jahr     = y;
   JOURNALS = DATEN[y].titel;
   setzeKongresse(DATEN[y]);
@@ -1459,7 +1462,9 @@ function waehleJahrgang(y){
   GESAMT   = JOURNALS.reduce((s,j)=>s+j.issues.length,0);
   activeJ.clear();
   mxSel.clear();
-  // Ein angefangener Entwurf gehoert zum vorigen Jahrgang und verfaellt hier.
+  // Die gewaehlte Stelle in der Ausgabenansicht ist oben gemerkt und wird
+  // unten wiederhergestellt. Ein angefangener Entwurf gehoert dagegen zum
+  // vorigen Jahrgang und verfaellt hier.
   bearbAuswahl = null; entwurf = null; entwurfRein = null;
   bearbStandText = ""; bearbStandArt = ""; sicherungen = [];
   baueChips();
@@ -1476,6 +1481,7 @@ function waehleJahrgang(y){
   // die neuen Tabellen und brauchen ihn nicht erneut.
   const ku=document.getElementById('kongUmstellenBtn');
   if(ku) ku.hidden = !!(DATEN[y] && DATEN[y].umgestellt);
+  bearbWiederholen(bearbMerk);
   render();
   // Die Sicherungspunkte haengen am Jahrgang; oben sind sie geleert worden.
   if(bearbOffen) sicherungenHolen();
@@ -3917,12 +3923,13 @@ async function bearbFrei(){
       'Verwerfen');
 }
 
-function bearbBeginn(auswahl, roh){
+function bearbBeginn(auswahl, roh, still){
   bearbAuswahl = auswahl;
   entwurf = roh;
   entwurfRein = JSON.stringify(entwurf);
   bearbStandText = ''; bearbStandArt = '';
-  render();
+  // "still" nur fuer den Jahrgangswechsel: der zeichnet ohnehin gleich neu.
+  if(!still) render();
 }
 
 function kongUmgestellt(){ return !!(DATEN[jahr] && DATEN[jahr].umgestellt); }
@@ -3931,8 +3938,9 @@ function kongAusIssue(liste){
   return kongUmgestellt() ? (liste||[]).slice() : (liste||[]).map(kongressText);
 }
 
-async function bearbWaehle(titelId, index){
-  if(!await bearbFrei()) return;
+// Das Oeffnen steht fuer sich, ohne Rueckfrage: beim Jahrgangswechsel ist der
+// Entwurf schon verfallen, dort waere sie ein zweites Mal gestellt.
+function bearbOeffneAusgabe(titelId, index, still){
   const t = JOURNALS.find(j=>j.id===titelId);
   const iss = t && t.issues[index];
   if(!iss) return;
@@ -3943,7 +3951,12 @@ async function bearbWaehle(titelId, index){
   bearbBeginn({ art:'ausgabe', titelId, index },
     { id: iss.id, heft: iss.heft, et: iss.et||'', as: iss.as||'',
       du: iss.du||'', eh: iss.eh||'', top: iss.top||'', sw: iss.sw||'',
-      a: kongAusIssue(iss.a), b: kongAusIssue(iss.b) });
+      a: kongAusIssue(iss.a), b: kongAusIssue(iss.b) }, still);
+}
+
+async function bearbWaehle(titelId, index){
+  if(!await bearbFrei()) return;
+  bearbOeffneAusgabe(titelId, index);
 }
 
 // Eine neue Ausgabe ist zunaechst nur ein leerer Entwurf. Angelegt wird sie
@@ -3955,8 +3968,7 @@ async function bearbNeueAusgabe(titelId){
     { id:null, heft:'', et:'', as:'', du:'', eh:'', top:'', sw:'', a:[], b:[] });
 }
 
-async function bearbWaehleTitel(titelId){
-  if(!await bearbFrei()) return;
+function bearbOeffneTitel(titelId, still){
   const t = JOURNALS.find(j=>j.id===titelId);
   if(!t) return;
   // auflage bleibt hier Text: der Entwurf wird zum Vergleich als JSON
@@ -3964,7 +3976,37 @@ async function bearbWaehleTitel(titelId){
   // Aenderung, obwohl dasselbe dasteht.
   bearbBeginn({ art:'titel', titelId },
     { id:t.id, short:t.short||'', full:t.full||'',
-      auflage:String(t.auflage||0), hex:t.hex||'#00285a' });
+      auflage:String(t.auflage||0), hex:t.hex||'#00285a' }, still);
+}
+
+async function bearbWaehleTitel(titelId){
+  if(!await bearbFrei()) return;
+  bearbOeffneTitel(titelId);
+}
+
+// ─── Dieselbe Stelle nach einem Jahrgangswechsel ───────────────────────────
+// Gemerkt wird die Titelnummer und, bei einer Ausgabe, die Heftnummer. Der
+// Listenplatz taugt dafuer nicht: ein Jahrgang kann mehr oder weniger Hefte
+// fuehren, und Heft 3 stuende dann auf einmal an der Stelle von Heft 4. Die
+// Titelnummer ist ueber alle Jahrgaenge dieselbe (siehe schema.sql).
+// Ein angefangener Entwurf wird nicht mitgenommen - er gehoert zum vorigen
+// Jahrgang. Fehlt die Stelle drueben, bleibt es beim bisherigen Verhalten:
+// keine Auswahl.
+function bearbMerken(){
+  if(!bearbAuswahl || bearbAuswahl.neu) return null;
+  if(bearbAuswahl.art!=='ausgabe') return { art:bearbAuswahl.art, titelId:bearbAuswahl.titelId };
+  const t = JOURNALS.find(j=>j.id===bearbAuswahl.titelId);
+  const iss = t && t.issues[bearbAuswahl.index];
+  return iss ? { art:'ausgabe', titelId:bearbAuswahl.titelId, heft:iss.heft } : null;
+}
+
+function bearbWiederholen(merk){
+  if(!merk) return;
+  const t = JOURNALS.find(j=>j.id===merk.titelId);
+  if(!t) return;
+  if(merk.art==='titel') return bearbOeffneTitel(t.id, true);
+  const i = t.issues.findIndex(iss=>String(iss.heft)===String(merk.heft));
+  if(i>=0) bearbOeffneAusgabe(t.id, i, true);
 }
 
 async function bearbNeuerTitel(){
