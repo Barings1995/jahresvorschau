@@ -544,29 +544,36 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   table.tab tfoot td{height:0;padding:0;border-top:.5px solid var(--border)}
   table.tab tr{break-inside:avoid}
   /* Im Druck ist die Tabelle schmaler und die Schrift kleiner, deshalb eigene
-     Werte: 38 % geben der Kongressspalte 99 mm statt 72 mm ohne Vorgabe – damit
-     brechen 20 statt 87 der 181 Eintraege um. 45 % waeren gemessen und von
-     Marcus verworfen: die Kongressspalte haette 118 mm und nur 10 Umbrueche,
-     dafuer wuerden Titel und Schwerpunkt deutlich haeufiger umbrechen. Einzug
-     36 px passt zur 6pt-Beschriftung, die Fortsetzungszeile steht damit genau
-     unter dem Namen.
-     Hier standen zwischenzeitlich 38,1 %: das Pixel Luft am Satzspiegel (siehe
-     main weiter oben) nimmt dieser Spalte 0,38 px, und an einem Bestand hing
-     daran eine Seite. Nachgemessen ist das Zufall. Die Hoehe der Tabelle faellt
-     ueber der Spaltenbreite in Stufen, und die Stufe bei 395 px ist die
-     kleinste von allen: sie bringt drei von 582 Zeilenkaesten, waehrend 37,5
-     auf 38 % gar nichts bringt und 39 auf 39,5 % gleich zehn. Ob diese drei
-     Zeilen eine Seite sparen, entscheidet der Bestand, nicht die Breite - an 31
-     Bestandsgroessen zwischen 129 und 201 Kongresszuordnungen gemessen (134 bis
-     148 lueckenlos) unterscheiden sich 38 und 38,1 % in dreien: bei 138, 139
-     und 140 Zuordnungen. Beim heutigen Bestand sind beide seitengleich. Die
-     Zehntelstelle kauft also nichts Verlaessliches, und ein runder Wert ist
-     leichter zu behalten. Ein fester Wert statt der Prozentangabe kommt nicht
-     in Frage: 105 mm traefe quer zwar dieselbe Breite, gaebe der Spalte hoch
-     aber 44,7 % - genau die 45 %, die oben verworfen sind. calc(38% + 1px)
-     ebenso wenig, das behandelt Chrome in der Spaltenberechnung wie "auto" und
-     die Spalte sprang auf 543 px. */
-  .t-kong{font-size:7pt;min-width:0;width:38%}
+     Werte. Der Wert hing lange bei 38 %, festgelegt zu einer Zeit, als in der
+     Zelle allein der Kongressname stand. Seit die Kongresse einen eigenen Satz
+     bilden, setzt kongressAus() "Name, Zeitraum, Ort" zusammen - zwanzig bis
+     fuenfundzwanzig Zeichen mehr je Eintrag, und im heutigen Bestand traegt
+     jeder Kongress einen Ort und fast jeder ein Datum. Bei 38 % brach damit
+     fast die Haelfte aller Eintraege um, und die Tabelle brauchte in beiden
+     Jahrgaengen eine siebte Seite.
+     Nachgemessen am Bestand aus der Datenbank, A4 quer, Chrome (Jahrgang
+     2027, 169 Eintraege):
+       38 %  7 Seiten   75 Umbrueche   Schwerpunkt  88 Zeilen   Titel  90
+       40 %  6 Seiten   62 Umbrueche   Schwerpunkt  92 Zeilen   Titel  90
+       42 %  6 Seiten   33 Umbrueche   Schwerpunkt 105 Zeilen   Titel  90
+       43 %  6 Seiten   28 Umbrueche   Schwerpunkt 107 Zeilen   Titel  90
+       45 %  6 Seiten   28 Umbrueche   Schwerpunkt 122 Zeilen   Titel 100
+     2026 verhaelt sich gleich. Ab 40 % faellt die siebte Seite weg; ab 45 %
+     beginnt die Titelspalte umzubrechen - das Feld, das schon frueher
+     verworfen wurde. 42 % ist die Stelle, an der die Kongressspalte den
+     groessten Teil ihrer Umbrueche loswird, ohne dass die Titelspalte etwas
+     abgibt; bezahlt wird mit siebzehn Zeilen mehr in "Schwerpunkt", wo ohnehin
+     jede zweite Zelle umbricht. 43 % naehme sich damit fast nichts, ist aber
+     der unrundere Wert.
+     Dass der Gewinn nicht am heutigen Umfang haengt, ist an neun
+     Bestandsgroessen zwischen 30 und 169 Eintraegen geprueft: 42 % ist
+     nirgends schlechter als 38 % und spart in vier davon eine Seite.
+     Ein fester Wert statt der Prozentangabe kommt weiterhin nicht in Frage:
+     er traefe quer und hoch verschiedene Anteile. calc(42% + 1px) ebenso
+     wenig, das behandelt Chrome in der Spaltenberechnung wie "auto".
+     Einzug 36 px passt zur 6pt-Beschriftung, die Fortsetzungszeile steht damit
+     genau unter dem Namen. */
+  .t-kong{font-size:7pt;min-width:0;width:42%}
   .t-kong .ke{padding-left:36px;text-indent:-36px}
   .t-kong .ke b{font-size:6pt;min-width:0}
   .t-thema{min-width:0}
