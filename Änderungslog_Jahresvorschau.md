@@ -21,6 +21,72 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-08 (später) — Jahrgangswechsel behält die gewählte Stelle
+
+**Anlass.** Marcus: „Wenn man in der Datenpflege und in der Ausgabenansicht im
+Bearbeiten-Menü der Jahresvorschau das Jahr wechselt, soll die zuletzt
+ausgewählte Stelle erhalten bleiben und nicht wieder auf die oberste Auswahl
+springen (sofern im geänderten Jahrgang enthalten)." Der Eintrag hier betrifft
+die Jahresvorschau; die gleichlautende Änderung an `Datenpflege.html` steht im
+`Änderungslog_Datenpflege.md` der Angebotswerkzeuge.
+
+**Der Befund.** `waehleJahrgang()` setzte `bearbAuswahl` unbesehen auf `null`.
+Wer Heft 4 der *Ärzte Zeitung* in 2027 offen hatte und nach 2026 wechselte, um
+denselben Anzeigenschluss zu vergleichen, stand vor einer leeren rechten Seite
+und musste sich durch die Liste zurückklicken.
+
+**Was sich geändert hat.** Gemerkt wird die Stelle, bevor der Jahrgang
+umgestellt wird (`bearbMerken()`), und nach dem Umstellen wieder geöffnet
+(`bearbWiederholen()`):
+
+- **Titelnummer** als Merkmal für den Titel. Sie ist laut `schema.sql` über alle
+  Jahrgänge dieselbe (`primary key (jahr, id)`, `id` aus der Heftplanung).
+- **Heftnummer** als Merkmal für die Ausgabe — **nicht** der Listenplatz. Ein
+  Jahrgang kann mehr oder weniger Hefte führen; nach dem Platz gegriffen, stünde
+  auf einmal Heft 3 da, wo Heft 4 gewählt war. Nachgemessen: bei einem Titel,
+  dessen Liste in 2026 um zwei Hefte kürzer beginnt, wandert Heft 6 von Platz 5
+  auf Platz 3 — und wird richtig getroffen.
+- **Fehlt die Stelle drüben**, bleibt es beim bisherigen Verhalten: keine
+  Auswahl.
+- **Ein angefangener Entwurf wandert nicht mit.** Er gehört zum vorigen
+  Jahrgang und verfällt wie bisher; geöffnet wird die Stelle mit dem Stand des
+  neuen Jahrgangs. Eine noch nicht angelegte Ausgabe (»+ Ausgabe«) und ein noch
+  nicht angelegter Titel sind gar keine Stelle — sie werden nicht gemerkt.
+
+**Nebenbei aufgeteilt.** `bearbWaehle()` und `bearbWaehleTitel()` trugen die
+Rückfrage nach einer offenen Änderung und das Öffnen in einem Stück. Das Öffnen
+steht jetzt für sich (`bearbOeffneAusgabe()`, `bearbOeffneTitel()`); beim
+Jahrgangswechsel ist der Entwurf bereits verfallen, dort wäre die Rückfrage ein
+zweites Mal gestellt worden. `bearbBeginn()` bekam dafür ein drittes Argument
+`still`: der Jahrgangswechsel zeichnet ohnehin gleich danach neu, ein zweiter
+Durchlauf über 169 Einträge wäre umsonst.
+
+**Nachweis.** Prüfskript `jw_pruef.mjs` (Chrome headless, Bestand aus der
+Datenbank), sieben Fälle:
+
+| Fall | vorher | nach dem Wechsel |
+|---|---|---|
+| Ausgabe in beiden Jahrgängen | 2027 Titel 1, Heft 4 (Platz 3) | 2026 Titel 1, Heft 4 (Platz 3), Formular zeigt den 2026er Stand |
+| und wieder zurück | 2026 | 2027, dieselbe Stelle |
+| Stammdaten eines Titels | 2027 FORUM DKG | 2026 FORUM DKG |
+| Heftnummer an anderer Stelle | 2027 Titel 3, Heft 6 (Platz 5) | 2026 Titel 3, Heft 6 (**Platz 3**) |
+| Heft gibt es drüben nicht | Heft 4 | keine Auswahl |
+| Titel gibt es drüben nicht | FORUM DKG | keine Auswahl |
+| noch nicht angelegte Ausgabe | »+ Ausgabe« | keine Auswahl |
+
+In jedem Fall genau **eine** markierte Zeile in der Liste, und das Formular
+rechts zeigt dieselbe Ausgabe.
+
+**Nichts schlägt nach außen durch.** Golden Test `pruef.mjs`: alle zehn
+Signaturen der fünf Ansichten in beiden Jahrgängen unverändert. Die 33 übrigen
+Prüfskripte (`mx_pruef` bis `kt2_pruef`, ohne das von Haus aus unruhige
+`gleit_pruef`) zeichenweise gleich zum Stand vorher.
+
+**Commit** 2dc7bac · **MD5 vorher** 98b07b149291eaa473fcab4b5df00950 ·
+**MD5 nachher** 550852fb73194e38a0e6bc10bff7c252 · **noch nicht gepusht**
+
+---
+
 ## 2026-09-08 — Kongressspalte im PDF-Export auf 42 %: eine Seite weniger
 
 **Anlass.** Marcus fragte, ob die 38 % für die Kongressspalte im PDF-Export der
