@@ -2002,18 +2002,21 @@ function sammleKongresse(q){
       // Kongresseintraegen heraus.
       if(ohneVerstrichene && verstrichen(iss)) return;
       const eintraege=[];
-      if(zeigtA()) iss.a.forEach(n=>eintraege.push([kongressText(n),'auslage']));
-      if(zeigtB()) iss.b.forEach(n=>eintraege.push([kongressText(n),'bericht']));
+      // Die Kennung wandert mit: der Kasten wird zwar ueber den Wortlaut
+      // gebildet, seinen Platz in der Liste gibt aber der Zeitraum, und der
+      // steht am Kongresssatz, nicht im Text.
+      if(zeigtA()) iss.a.forEach(n=>eintraege.push([kongressText(n),'auslage',n]));
+      if(zeigtB()) iss.b.forEach(n=>eintraege.push([kongressText(n),'bericht',n]));
       // Nur wenn das Thema in diesem Modus ueberhaupt angezeigt wird, darf es
       // Eintraege durch die Suche lassen – sonst staenden hier Kongresse ohne
       // erkennbaren Bezug zum Suchbegriff.
       const themaTreffer = ql && zeigeThema()
         && ((iss.top||'')+' '+(iss.sw||'')).toLowerCase().includes(ql);
-      eintraege.forEach(([n,art])=>{
+      eintraege.forEach(([n,art,kid])=>{
         if(ql && !n.toLowerCase().includes(ql) && !themaTreffer) return;
         const name=kongName(n);
         if(!gruppen.has(name)) gruppen.set(name,[]);
-        gruppen.get(name).push({j,iss,art,roh:n});
+        gruppen.get(name).push({j,iss,art,roh:n,kid});
       });
     });
   });
@@ -2022,10 +2025,11 @@ function sammleKongresse(q){
 
 // Beschriftung des Kastens: der Wortlaut aus der Heftplanung, damit dort dasselbe
 // steht wie in den uebrigen Ansichten und ein Suchbegriff immer sichtbar ist.
-// Sortiert und gruppiert wird weiterhin ueber den Namen der Zuordnungsliste –
-// sonst stuenden alle Kongresse mit Zaehlnummer ("132.", "67th", "XVth") vorn.
-// Sollten in der Heftplanung doch einmal zwei Schreibweisen auftauchen, gewinnt
-// die haeufigere; bei Gleichstand die alphabetisch erste.
+// Gruppiert wird weiterhin ueber den Namen der Zuordnungsliste, sortiert
+// dagegen ueber den Zeitraum – der Name entscheidet nur noch, was ein Kasten
+// ist, nicht mehr, wo er steht. Sollten in der Heftplanung doch einmal zwei
+// Schreibweisen auftauchen, gewinnt die haeufigere; bei Gleichstand die
+// alphabetisch erste.
 function kastenName(name,arr){
   if(name.startsWith('»')) return name;   // feste Rubrik behaelt ihre Beschriftung
   const zaehl=new Map();
@@ -2035,9 +2039,31 @@ function kastenName(name,arr){
 
 function renderKongress(q){
   const gruppen=sammleKongresse(q);
-  // alphabetisch; feste Rubriken (kein echter Kongress) stehen am Ende
+  // Nach dem Kongresstermin, nicht nach dem Namen: die Liste liest sich damit
+  // wie das Jahr selbst, und der Zeitraum steht ohnehin in jeder Ueberschrift.
+  // Ein Kasten kann mehrere Saetze buendeln - die Zuordnungsliste fuehrt
+  // verschiedene Schreibweisen auf einen Namen zusammen -, dann zaehlt der
+  // frueheste Beginn. Ein nur als Wortlaut bekannter Zeitraum ("September")
+  // ist kein Datum und traegt deshalb keinen; danach zu sortieren hiesse, den
+  // Monatsersten zu behaupten, den niemand gesagt hat.
+  const termine=new Map();
+  const termin=name=>{
+    if(!termine.has(name)) termine.set(name, gruppen.get(name).reduce((frueh,e)=>{
+      const k=KONG.get(e.kid), von=(k&&k.von)||'';
+      return von && (!frueh || von<frueh) ? von : frueh;
+    },''));
+    return termine.get(name);
+  };
+  // Drei Stufen: feste Rubriken (kein echter Kongress) ganz ans Ende, davor die
+  // Kongresse ohne Datum, und vorn der Jahreslauf. Bei gleichem Beginn - im
+  // Bestand kommt das vor - bleibt es beim Namen.
   const rubrik=n=>n.startsWith('»')?1:0;
-  const namen=[...gruppen.keys()].sort((a,b)=>rubrik(a)-rubrik(b)||a.localeCompare(b,'de'));
+  const namen=[...gruppen.keys()].sort((a,b)=>{
+    const r=rubrik(a)-rubrik(b); if(r) return r;
+    const ta=termin(a), tb=termin(b);
+    if(ta!==tb) return !ta ? 1 : !tb ? -1 : (ta<tb ? -1 : 1);
+    return a.localeCompare(b,'de');
+  });
   const html=namen.map(name=>{
     const arr=gruppen.get(name).sort((a,b)=>a.iss.et.localeCompare(b.iss.et));
     const hefte=new Set(arr.map(e=>e.j.id+'|'+e.iss.heft)).size;

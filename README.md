@@ -89,6 +89,16 @@ Angezeigt wird der zusammengesetzte Wortlaut `Langname, Zeitraum, Ort` — genau
 der, der zuvor als Zeichenkette dastand. Nachgemessen an beiden Jahrgängen: in
 allen fünf Ansichten Zeichen für Zeichen dasselbe.
 
+Die Ansicht *Kongressliste* ordnet ihre Kästen nach dem Beginn des Kongresses,
+nicht nach dem Namen — die Liste liest sich damit wie das Jahr selbst, und der
+Zeitraum steht ohnehin in jeder Überschrift. Bündelt ein Kasten mehrere
+Schreibweisen desselben Kongresses, zählt der früheste Beginn. Wer nur einen
+unscharfen Zeitraum trägt (»September 2027«), hat kein Datum und steht deshalb
+hinter dem Jahreslauf, dort alphabetisch; ebenso hält es die Kongressansicht der
+Arbeitsansicht. Ganz am Ende bleiben die festen Rubriken, die kein Kongress
+sind. Innerhalb eines Kastens stehen die Ausgaben weiter nach ihrem
+Erscheinungstermin.
+
 ### Umstellen
 
 Die Spalten `ausgabe.auslagen` und `ausgabe.berichte` bleiben vorerst stehen.
