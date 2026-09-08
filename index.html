@@ -935,15 +935,26 @@ p.bearb-stand:not(:empty){margin-top:9px}
    waehrend der Tabellenkasten bei 25 blieb). Innen gezeichnet kostet der
    Streifen keine Breite.
    Das kostet aber Platz nach innen: der Rand lag vor dem Polster, der
-   Schatten liegt darin. Das linke Polster traegt die drei Pixel deshalb
-   mit - 7 statt 4 -, damit zwischen Streifen und Text dieselben vier Pixel
-   bleiben wie zuvor. Die Regel steht mit .mx-tab davor, sonst gilt sie
-   nicht: .mx-tab td ist das genauere Muster und hat das Polster dieser
-   Zelle immer schon gesetzt. (Die frueheren 12/16/14 Pixel an dieser
-   Stelle waren aus demselben Grund wirkungslos - gemessen 4px, seit es
-   die Heftleiste gibt.) */
+   Schatten liegt darin - die drei Pixel des Streifens gehen vom linken
+   Polster ab und muessen dort aufgeschlagen werden. Die Regel steht mit
+   .mx-tab davor, sonst gilt sie nicht: .mx-tab td ist das genauere Muster
+   und hat das Polster dieser Zelle immer schon gesetzt. (Die frueheren
+   12/16/14 Pixel an dieser Stelle waren aus demselben Grund wirkungslos -
+   gemessen 4px, seit es die Heftleiste gibt.)
+   Das Polster war lange so knapp bemessen, dass zwischen Streifen und Text
+   dieselben vier Pixel blieben wie in jeder anderen Zelle. Damit stand der
+   Inhalt zwar genau unter dem Kongressnamen der Zeile darueber (gemessen
+   32 zu 33 Pixel), aber die Ueberschrift klebte an der drei Pixel starken
+   Navy-Kante - vier Pixel sind zu wenig, um daneben zu bestehen, waehrend
+   die Chips im selben Kasten innen acht halten. Jetzt 15 Pixel: der Text
+   steht zwoelf Pixel frei neben dem Streifen und sieben Pixel weiter innen
+   als der Kongressname. Die Zugehoerigkeit zur Zeile darueber traegt der
+   Streifen, nicht die Kante; ein aufgeklappter Bereich, der ein Stueck
+   weiter innen sitzt als die Zeile, die ihn geoeffnet hat, liest sich als
+   darunterliegend. Rechts und oben/unten dieselbe Luft, sonst waere der
+   Kasten einseitig gepolstert. */
 .mx-tab td.mx-inline-zelle{background:var(--navy-faint);
-  box-shadow:inset 3px 0 0 var(--navy);padding:5px 4px 5px 7px;text-align:left}
+  box-shadow:inset 3px 0 0 var(--navy);padding:8px 12px 8px 15px;text-align:left}
 .mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
 .mx-panel-titel{font-size:.88rem;font-weight:600;color:var(--navy)}
 .mx-panel-unter{font-size:.74rem;color:var(--muted);margin-top:2px}
