@@ -21,6 +21,83 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-08 (abends) — Das Löschzeichen im Suchfeld ist jetzt gezeichnet
+
+**Anlass.** Marcus bat um eine Prüfung, ob die Gestaltung des Suchfeldes zur
+Designsprache des Werkzeugs passt — „vor allem die des X in Bezug auf
+Schriftart, Farbe etc.".
+
+**Der Befund.** Das Feld selbst passt; das × nicht. `.clear-btn` setzte kein
+`font-family:inherit`, und ein `<button>` erbt die Schrift nicht von allein.
+Gemessen im Browser: **Arial**, als einzige Stelle der Oberfläche — überall
+sonst steht Source Sans 3. Das Zeichen ist in Arial **9,34 px** breit, in
+Source Sans 3 **7,95 px**: 17 % breiter, mit kräftigerem Strich. Dasselbe
+Muster wie die „Erblücken", die am 05.09.2026 in den Angebotswerkzeugen
+geschlossen wurden. Die drei verwandten Kreuze der Jahresvorschau
+(`.bearb-weg`, `.bearb-sich-weg`, `.mx-panel-zu`) tragen `font-family:inherit`
+alle.
+
+Vier weitere Abweichungen, gemessen:
+
+| | Suchfeld-× vorher | die drei anderen × | Lupe im selben Feld |
+|---|---|---|---|
+| Schrift | **Arial** | `inherit` | – |
+| Größe | **16 px** (1 rem) | 14,4 / 16,8 px | 16 px, Strich 2 |
+| Farbe | `--muted` ✓ | `--muted` | `--muted` ✓ |
+| Zeigerzustand | **`--text`** | `--warm` | – |
+| Fläche | **17,3 × 20 px** | 30 × 29 / 26 × 26 | – |
+
+Dazu: der Text lief unter das Zeichen. Das Feld hatte rechts 14 px
+Innenabstand, der Knopf begann 27,4 px vor der Kante — **13,3 px
+Überdeckung**, sichtbar ab etwa 45 Zeichen.
+
+**Was sich geändert hat.** Marcus hat aus vier vorgelegten Fassungen die
+gezeichnete gewählt:
+
+- Das × ist ein `<svg>` im selben 24er-Raster wie die Lupe, Strich 2, runde
+  Enden wie an den Symbolen von *Daten* und *Export*. Mit 14 px bleibt es
+  kleiner als die Lupe (16 px): die Lupe sagt, was das Feld ist, das Kreuz nur,
+  dass sich etwas zurücknehmen lässt.
+- Zeigerzustand auf `--warm`, wie an den drei anderen Kreuzen — dieselbe Geste,
+  dieselbe Antwort.
+- Fläche 24 × 24 px, das kleinste Ziel, das sich verlässlich treffen lässt.
+  Eingeblendet wird sie jetzt als `flex`, nicht als `block`; das Zeichen sitzt
+  darin mittig.
+- `.search-wrap input{padding-right:34px}` (8 + 24) — der Text endet jetzt
+  2 px vor dem Knopf statt 13,3 px dahinter. Bewusst nur hier und nicht an
+  `input[type=text]`: die Felder in den Rückfragen tragen kein Zeichen.
+- `type="button"` nachgetragen, das die übrigen Knöpfe des Werkzeugs führen.
+
+Ohne Rahmen und Füllung bleibt es — anders als die drei anderen Kreuze, die
+frei neben einer Zeile stehen. Dieses sitzt im Feld und braucht dort keinen
+zweiten Rahmen.
+
+**Ein Fund beim Prüfen des eigenen Eingriffs.** Der erste Wurf sah richtig aus,
+war es aber nicht: `.search-wrap svg` (die Regel für die Lupe) griff auch auf
+das neue Zeichen und setzte ihm `position:absolute`, `left:11px` und vor allem
+`color:var(--muted)` — womit der Zeigerzustand des Knopfes wirkungslos blieb.
+Aufgefallen ist es am Bildbeleg, nicht am Code: das Kreuz blieb blau. Die Regel
+heißt jetzt `.search-wrap>svg` — die Lupe ist unmittelbares Kind, das Kreuz
+steckt im Knopf.
+
+**Nachweis.** `x_pruef.mjs`: Fläche 24 × 24, Zeichnung 14 × 14 im Raster
+`0 0 24 24`, Strich 2, runde Enden, Farbe `--muted` geerbt (nicht mehr eigens
+gesetzt), Zeigerzustand `--warm`, Innenabstand rechts 34 px, Überdeckung −2 px.
+`x_kopie.mjs`: in der weitergereichten HTML-Kopie stehen Lupe und Zeichnung
+unverändert, das Feld ist leer und der Knopf verborgen. Bildbelege im
+Kritzelordner: `x_vgl_crop.png` (die vier Fassungen), `x_neu_crop.png`,
+`x_neu_lang_crop.png` (lange Eingabe), `x_hover_crop.png`.
+
+**Nichts schlägt nach außen durch.** Golden Test `pruef.mjs`: alle zehn
+Signaturen der fünf Ansichten in beiden Jahrgängen unverändert. 35 Prüfskripte
+zeichenweise gleich zum Stand vorher (ohne `gleit_pruef`, das von Haus aus
+unruhig ist, und ohne `x_pruef` selbst).
+
+**Commit** 246db09 · **MD5 vorher** 550852fb73194e38a0e6bc10bff7c252 ·
+**MD5 nachher** 4bf78c54979cc6631903cf2eebdcae77 · **noch nicht gepusht**
+
+---
+
 ## 2026-09-08 (später) — Jahrgangswechsel behält die gewählte Stelle
 
 **Anlass.** Marcus: „Wenn man in der Datenpflege und in der Ausgabenansicht im
