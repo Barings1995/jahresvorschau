@@ -21,6 +21,48 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-09 — Die Hand steht jetzt auch über dem Häkchen
+
+**Anlass.** Marcus fuhr im Dialog *Kongress bearbeiten* mit der Maus über das
+Häkchen „Findet in Deutschland, Österreich oder der Schweiz statt": über dem
+Schriftzug erschien die Hand, über dem Kästchen selbst nicht.
+
+**Die Ursache.** Das `cursor:pointer` stand allein am `<label>` (`.bearb-haken`,
+Zeile 694). Ein natives `input[type=checkbox]` bringt aber seinen eigenen
+Zeiger mit und erbt den des Elternteils nicht — im Browser gemessen `default`
+über dem Kästchen, `pointer` daneben. Klickbar war das Kästchen die ganze Zeit;
+nur zu sehen war es nicht.
+
+**Dieselbe Lücke ein zweites Mal.** `.dlg-haken` (Zeile 412) im Dialog
+*Jahrgang anlegen* trug denselben Fehler — beide Häkchen der Oberfläche, beide
+gemessen mit `default`. Der Schalter der Kongressansicht (`.switch`) ist nicht
+betroffen: dort ist das Kästchen unsichtbar gestellt, die Hand kommt von der
+gezeichneten Wippe.
+
+**Die Änderung.** `cursor:pointer` an beiden Eingabefeldern ergänzt, dazu ein
+Kommentar an `.bearb-haken`, der die Erblücke benennt — damit die Regel bei
+einer späteren Aufräumaktion nicht als überflüssig gestrichen wird.
+
+**Nachweis.** Neues Prüfskript `zeiger_pruef.mjs` liest über beiden Zeilen den
+errechneten Zeiger und zusätzlich, welches Element unter der Mitte des
+Kästchens liegt:
+
+| | vorher | nachher |
+| --- | --- | --- |
+| Kongressdialog, Schriftzug | pointer | pointer |
+| Kongressdialog, Kästchen (15 × 15 px) | **default** | pointer |
+| Jahrgang anlegen, Schriftzug | pointer | pointer |
+| Jahrgang anlegen, Kästchen (13 × 13 px) | **default** | pointer |
+
+Die 18 übrigen Prüfskripte laufen zeichenweise gleich zum Stand vorher, der
+Golden Test (`pruef.mjs`, zehn Signaturen aus fünf Ansichten und zwei
+Jahrgängen) unverändert.
+
+**Commit** `2d78e44` · MD5 `4bf78c54979cc6631903cf2eebdcae77` →
+`60e205aaec238999ea53bf77b20ddf17` · noch nicht gepusht
+
+---
+
 ## 2026-09-08 (abends) — Das Löschzeichen im Suchfeld ist jetzt gezeichnet
 
 **Anlass.** Marcus bat um eine Prüfung, ob die Gestaltung des Suchfeldes zur

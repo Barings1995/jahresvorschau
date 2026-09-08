@@ -411,7 +411,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .dlg-feld input:focus{border-color:var(--navy);outline:none}
 .dlg-haken{display:flex;align-items:flex-start;gap:7px;font-size:.79rem;
   color:var(--text);margin-bottom:4px;cursor:pointer}
-.dlg-haken input{margin-top:2px;flex:none}
+.dlg-haken input{margin-top:2px;flex:none;cursor:pointer}
 /* Der Hinweiskasten gehoert zum Haekchen darueber. Folgt darunter das
    naechste Haekchen, stossen beide sonst ohne Luft aneinander und die
    Zusammengehoerigkeit ist nicht mehr zu sehen: der Abstand zwischen den
@@ -690,10 +690,14 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .bearb-gruppe{margin-bottom:14px}
 .bearb-gruppe > .bearb-feld{margin-bottom:6px}
 /* Haekchen im Kongressdialog: eine Zeile, Kaestchen und Text nebeneinander -
-   anders als die uebrigen Felder, bei denen die Beschriftung darueber steht */
+   anders als die uebrigen Felder, bei denen die Beschriftung darueber steht.
+   Das cursor:pointer braucht das Kaestchen eigenhaendig: ein natives
+   input[type=checkbox] bringt seinen eigenen Zeiger mit und erbt den des
+   Labels nicht, sonst zeigt die Hand nur ueber dem Schriftzug. */
 .bearb-haken{display:flex;align-items:center;gap:8px;font-size:.72rem;
   font-weight:600;color:var(--navy);cursor:pointer}
-.bearb-haken input{width:15px;height:15px;margin:0;flex:none;accent-color:var(--navy)}
+.bearb-haken input{width:15px;height:15px;margin:0;flex:none;accent-color:var(--navy);
+  cursor:pointer}
 .bearb-hakenhinweis{display:block;margin-top:3px;font-size:.68rem;
   font-weight:400;color:var(--muted);line-height:1.35}
 .bearb-zeile{display:flex;gap:6px;margin-bottom:5px}
