@@ -58,7 +58,7 @@ Die 18 übrigen Prüfskripte laufen zeichenweise gleich zum Stand vorher, der
 Golden Test (`pruef.mjs`, zehn Signaturen aus fünf Ansichten und zwei
 Jahrgängen) unverändert.
 
-**Commit** `2d78e44` · MD5 `4bf78c54979cc6631903cf2eebdcae77` →
+**Commit** `f945d29` · MD5 `4bf78c54979cc6631903cf2eebdcae77` →
 `60e205aaec238999ea53bf77b20ddf17` · noch nicht gepusht
 
 ---
