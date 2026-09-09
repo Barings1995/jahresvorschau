@@ -75,8 +75,8 @@ Kongressbezug und einem Doppelheft „1–2" als Gegenprobe, durch Chrome headle
 | Bearbeiten: Liste, Kopf, Feldbeschriftung, Hinweis | „Sonderheft", Kopf „… · Sonderheft", Feld „Heft", Hinweis nennt den Fall |
 | 19 vorhandene Prüfskripte, vorher/nachher | zeichengleich — bestehende Jahrgänge unverändert |
 
-**Beleg.** MD5 `9636d063d15cbb65b759108806212a5f` →
-`14dce8cce12b5390bde320e104931d7d`. Commit siehe unten; noch nicht gepusht.
+**Beleg.** Commit `6cdab66` · MD5 `9636d063d15cbb65b759108806212a5f` →
+`14dce8cce12b5390bde320e104931d7d` · noch nicht gepusht.
 
 ## 2026-09-09 (Nachtrag) — Der Knopf heißt „Als Excel sichern"
 
