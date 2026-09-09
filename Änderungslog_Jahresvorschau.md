@@ -234,7 +234,7 @@ Rubrik und kein Schwerpunkt — eine redaktionelle Frage, getrennt zu
 entscheiden.
 
 **Commit** `bac809c` · MD5 `60e205aaec238999ea53bf77b20ddf17` →
-`f801a08e3edada7d66a3a1ab1ca5f53c` · noch nicht gepusht
+`f801a08e3edada7d66a3a1ab1ca5f53c` · gepusht
 
 ---
 
@@ -276,7 +276,7 @@ Golden Test (`pruef.mjs`, zehn Signaturen aus fünf Ansichten und zwei
 Jahrgängen) unverändert.
 
 **Commit** `f945d29` · MD5 `4bf78c54979cc6631903cf2eebdcae77` →
-`60e205aaec238999ea53bf77b20ddf17` · noch nicht gepusht
+`60e205aaec238999ea53bf77b20ddf17` · gepusht
 
 ---
 
@@ -353,7 +353,7 @@ zeichenweise gleich zum Stand vorher (ohne `gleit_pruef`, das von Haus aus
 unruhig ist, und ohne `x_pruef` selbst).
 
 **Commit** 246db09 · **MD5 vorher** 550852fb73194e38a0e6bc10bff7c252 ·
-**MD5 nachher** 4bf78c54979cc6631903cf2eebdcae77 · **noch nicht gepusht**
+**MD5 nachher** 4bf78c54979cc6631903cf2eebdcae77 · **gepusht**
 
 ---
 
@@ -419,7 +419,7 @@ Prüfskripte (`mx_pruef` bis `kt2_pruef`, ohne das von Haus aus unruhige
 `gleit_pruef`) zeichenweise gleich zum Stand vorher.
 
 **Commit** 2dc7bac · **MD5 vorher** 98b07b149291eaa473fcab4b5df00950 ·
-**MD5 nachher** 550852fb73194e38a0e6bc10bff7c252 · **noch nicht gepusht**
+**MD5 nachher** 550852fb73194e38a0e6bc10bff7c252 · **gepusht**
 
 ---
 
@@ -500,7 +500,7 @@ Beispiel-PDFs für 40 % und 42 % (Jahrgang 2027, nach Erscheinungstermin und nac
 Titel sortiert) lagen Marcus zur Auswahl vor.
 
 **Commit** `32e31ac` · **MD5 vorher** `b5160959683759c0b6b2ae0a840e0d0c` ·
-**MD5 nachher** `98b07b149291eaa473fcab4b5df00950` · **noch nicht gepusht**.
+**MD5 nachher** `98b07b149291eaa473fcab4b5df00950` · **gepusht**.
 
 ## 2026-09-08 — Aufgeklappte Heftwahl: Inhalt rückt vom blauen Streifen ab
 
