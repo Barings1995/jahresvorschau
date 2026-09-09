@@ -21,6 +21,63 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-10 — Ein Sonderheft heißt „Sonderheft", nicht „Heft Sonderheft"
+
+**Anlass.** Marcus: in manchen Jahren führt der eine oder andere Titel ein
+Sonderheft — eine zusätzliche Ausgabe, die nicht durchnummeriert wird, sondern
+schlicht „Sonderheft" oder „Supplement" heißt.
+
+**Befund.** Eintragen ließ sich das schon vorher: `heft` ist in beiden
+Datenbanken Text, nicht Zahl (`schema.sql`, mit dem Kommentar „ist Text, nicht
+Zahl: es gibt Doppelhefte"), nirgends steht ein `Number()` oder `parseInt`
+darauf, und sortiert wird durchgängig nach `reihenfolge` — ein Sonderheft
+bleibt also in der Folge dort stehen, wo es eingesetzt wird, auch zwischen 4
+und 5. Die Eindeutigkeit ist `unique (titel_id, heft)`; die Bezeichnung ist ein
+Wert wie jeder andere. Falsch war allein das vorangestellte Wort: aus
+„Sonderheft" wurde überall „Heft Sonderheft".
+
+**Die Regel.** Zwei kleine Funktionen, `istHeftnummer` und `heftText`: das Wort
+„Heft" steht nur vor einem Wert, der wie eine Nummer aussieht — eine Zahl, auch
+mit Buchstaben dahinter („4a"), oder eine Spanne aus zweien, gleich mit welchem
+Strich („1-2", „1–2", „1/2"). Alles andere ist frei eingetragen und benennt
+sich selbst. Eine Auswahlliste gibt es dafür bewusst nicht: die Namen wechseln
+von Jahr zu Jahr, eine feste Liste wäre schon im nächsten unvollständig.
+
+**Geändert.** Neun Stellen, an denen das Wort fest vor dem Wert stand:
+
+| Ort | vorher | mit einem Sonderheft |
+|---|---|---|
+| Kachel, Monatsliste, Kongressliste | Heft 4 | Sonderheft |
+| Jahresmatrix (Kurzform) | H 4 | Sonderheft |
+| Sprechblase der Kongressmatrix | Heft 4 · ET … | Sonderheft · ET … |
+| Bearbeiten: Titelliste, Kopf, Löschfrage | Heft 4 | Sonderheft |
+| Excel-Eingang: die beiden Beanstandungen | …, Heft 4 | …, Sonderheft |
+
+Das Feld im Bearbeiten-Dialog heißt jetzt „Heft" statt „Heftnummer" — eine
+Nummer ist es nicht mehr zwingend. Der Hinweis darunter nennt beide Fälle.
+
+**Nicht mitgeändert.** Die Datenbank: keine Migration, keine neue Spalte, kein
+DDL. Die Spaltenüberschrift der Tabellenansicht bleibt „Heft" (sie überschreibt
+viele Zeilen), ebenso die Spalte im Excel-Abzug. Die Zahlenausrichtung der
+Tabellenzelle (`.t-num`) setzt nur `tabular-nums` und `nowrap`, keine
+Rechtsbündigkeit — an ihr war nichts zu ändern. Die Sortierung der Spalte
+„Heft" bleibt der Zeichenvergleich, der sie schon vorher war; ein Sonderheft
+landet darin hinter allen Zahlen.
+
+**Nachweis.** Prüfbestand mit einem Sonderheft an einer Ausgabe mit
+Kongressbezug und einem Doppelheft „1–2" als Gegenprobe, durch Chrome headless:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Regel allein, 15 Fälle | „4"→Heft 4, „1–2"→Heft 1–2, „4a"→Heft 4a, „Sonderheft"→Sonderheft, leer→leer |
+| Kachel, Monatsliste, Jahresmatrix, Tabelle, Kongressliste | jeweils „Sonderheft", daneben weiter „Heft 1–2" bzw. „H 1–2" |
+| „Heft Sonderheft" oder „H Sonderheft" in einer der fünf Ansichten | nirgends |
+| Bearbeiten: Liste, Kopf, Feldbeschriftung, Hinweis | „Sonderheft", Kopf „… · Sonderheft", Feld „Heft", Hinweis nennt den Fall |
+| 19 vorhandene Prüfskripte, vorher/nachher | zeichengleich — bestehende Jahrgänge unverändert |
+
+**Beleg.** MD5 `9636d063d15cbb65b759108806212a5f` →
+`14dce8cce12b5390bde320e104931d7d`. Commit siehe unten; noch nicht gepusht.
+
 ## 2026-09-09 (Nachtrag) — Der Knopf heißt „Als Excel sichern"
 
 Marcus wies darauf hin, dass die beiden Knöpfe in der Datenpflege „Aus Excel

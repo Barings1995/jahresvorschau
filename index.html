@@ -1762,6 +1762,24 @@ function toggleJ(id){
 // gezeigt – sonst stuende in Kachel, Liste, Tabelle und Druck "undefined".
 function fmt(s){if(!s)return'–';const[y,m,d]=s.split('-');return`${d}.${m}.${y}`}
 
+// Vor eine Heftnummer gehoert das Wort "Heft", vor eine Bezeichnung nicht: ein
+// Sonderheft heisst "Sonderheft" oder "Supplement", nicht "Heft Sonderheft".
+// Als Nummer gilt eine Zahl, auch mit Buchstaben dahinter ("4a"), und eine
+// Spanne aus zweien, gleich mit welchem Strich ("1-2", "1–2", "1/2"). Alles
+// andere ist frei eingetragen und benennt sich selbst.
+function istHeftnummer(heft){
+  return /^\d+[a-zA-Z]?(\s*[–—/-]\s*\d+[a-zA-Z]?)?$/.test(String(heft==null?'':heft).trim());
+}
+// Das Wort und die Nummer bleiben zusammen: schmales geschuetztes Leerzeichen,
+// wie es im ganzen Werkzeug davor steht. In der Jahresmatrix ist jede Kachel
+// schmal, dort steht die Nummer als "H 4"; eine Bezeichnung ist in beiden
+// Formen dieselbe.
+function heftText(heft,kurz){
+  const h=String(heft==null?'':heft).trim();
+  if(!h) return '';
+  return istHeftnummer(h) ? (kurz?'H':'Heft')+'\u202f'+h : h;
+}
+
 // Taggenauer Vergleich auf der ISO-Zeichenkette: kein Zeitanteil, keine
 // Zeitzonenfalle. Ein Anzeigenschluss am heutigen Tag gilt noch nicht als
 // verstrichen. heute() ist hochgezogen und daher hier schon verfuegbar.
@@ -1885,7 +1903,7 @@ function cardHtml(j,iss,q){
   return`<div class="card" style="--jcol:${j.hex}">
     <div class="card-top">
       <span class="badge" style="background:${j.hex}22;color:${j.hex};border:1px solid ${j.hex}44">${esc(j.short)}</span>
-      <span class="heft-info"><span class="heft-num">Heft ${esc(iss.heft)}</span><br>${j.auflage.toLocaleString('de-DE')} Expl.</span>
+      <span class="heft-info"><span class="heft-num">${esc(heftText(iss.heft))}</span><br>${j.auflage.toLocaleString('de-DE')} Expl.</span>
     </div>
     <div class="dates">${datesHtml(iss,'date-col')}</div>
     ${inhaltBloecke(iss,q)}
@@ -1912,7 +1930,7 @@ function renderListe(items,q){
       return`<details class="lrow" style="--jcol:${j.hex}"${q?' open':''}>
         <summary>
           <span class="ltitle">${esc(j.short)}</span>
-          <span class="lheft">Heft ${esc(iss.heft)}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
+          <span class="lheft">${esc(heftText(iss.heft))}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
           ${datesHtml(iss,'ldate')}
           <span class="lthema">${hl(thema,q)}</span>
           <span class="lchev">&#9654;</span>
@@ -1945,7 +1963,7 @@ function renderMatrix(items,q){
       if(!arr.length){h+='<span class="mx-empty">&ndash;</span>';}
       arr.forEach(iss=>{
         const key=j.id+'|'+iss.heft;
-        h+=`<button class="mx-chip${q?' hit':''}${mxSel.has(key)?' sel':''}" style="--jcol:${j.hex}" onclick="mxPick('${key}')" title="ET ${fmt(iss.et)} &middot; AS ${fmt(iss.as)}">H ${esc(iss.heft)}<small>${iss.et.slice(8)}.${iss.et.slice(5,7)}.</small></button>`;
+        h+=`<button class="mx-chip${q?' hit':''}${mxSel.has(key)?' sel':''}" style="--jcol:${j.hex}" onclick="mxPick('${key}')" title="ET ${fmt(iss.et)} &middot; AS ${fmt(iss.as)}">${esc(heftText(iss.heft,true))}<small>${iss.et.slice(8)}.${iss.et.slice(5,7)}.</small></button>`;
       });
       h+='</td>';
     }
@@ -2129,7 +2147,7 @@ function renderKongress(q){
       const thema=zeigeThema() ? iss.t.join(' · ') : '';
       return`<div class="kentry" style="--jcol:${j.hex}">
         <span class="ktitel">${esc(j.short)}</span>
-        <span class="kheft">Heft ${esc(iss.heft)}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
+        <span class="kheft">${esc(heftText(iss.heft))}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
         <span class="kart ${art}">${art==='auslage'?'Auslage':'Bericht'}</span>
         ${datesHtml(iss,'kdate')}
         <span class="kthema">${hl(thema,q)}</span>
@@ -2691,11 +2709,11 @@ function werteBlattAus(tab){
     // danach wird sortiert, nach seinem Monat gruppiert und die Spalte in der
     // Jahresmatrix bestimmt. Fehlt er, entstuende eine Monatsgruppe ohne Namen
     // und die Ausgabe fiele aus der Matrix – lieber gleich abbrechen.
-    if(!iss.et) ohneEt.push(`${y} · ${kurz}, Heft ${heft}`);
+    if(!iss.et) ohneEt.push(`${y} · ${kurz}, ${heftText(heft)}`);
     // Eine kopierte Zeile mit vergessener Heftnummer wuerde dieselbe Ausgabe
     // zweimal anlegen; in der Matrix teilten sich beide sogar ein Feld.
     const schluessel=y+'|'+kurz+'|'+heft;
-    if(gesehen.has(schluessel)) doppelte.push(`${y} · ${kurz}, Heft ${heft}`);
+    if(gesehen.has(schluessel)) doppelte.push(`${y} · ${kurz}, ${heftText(heft)}`);
     gesehen.add(schluessel);
 
     if(!jahre[y]) jahre[y]={stand:standZeile,titel:[],nachName:{}};
@@ -4344,7 +4362,7 @@ async function ausgabeEntfernen(){
   const iss = t && t.issues[bearbAuswahl.index];
   if(!iss) return;
   if(!await frage('Ausgabe entfernen?',
-    '<p>Heft ' + esc(iss.heft) + ' von ' + esc(t.short) + ' wird aus der Datenbank entfernt.</p>' +
+    '<p>' + esc(heftText(iss.heft) || 'Diese Ausgabe') + ' von ' + esc(t.short) + ' wird aus der Datenbank entfernt.</p>' +
     '<p>Termine, Themen und Kongresseinträge dieser Ausgabe gehen dabei verloren.</p>',
     'Entfernen')) return;
   bearbArbeitet('Wird entfernt …');
@@ -4682,15 +4700,17 @@ function formAusgabeHtml(){
               oninput="bearbFeld('${k}',this.value)"></label>`).join('');
   return `
     <div class="bearb-kopf">${esc(t?t.short:'')} &middot; ${
-      neu ? 'neue Ausgabe' : 'Heft ' + esc(entwurf.heft)}</div>
+      neu ? 'neue Ausgabe' : esc(heftText(entwurf.heft))}</div>
     <div class="bearb-unterkopf">Jahrgang ${jahrgang()} &middot; ${
       neu ? 'Die Ausgabe entsteht erst mit &raquo;Anlegen&laquo;'
           : 'Änderungen werden erst mit &raquo;Speichern&laquo; übernommen'}</div>
 
-    <label class="bearb-feld">Heftnummer
+    <label class="bearb-feld">Heft
       <input type="text" value="${escA(entwurf.heft)}"
              oninput="bearbFeld('heft',this.value)">
-      <span class="hinweis">Auch Doppelhefte, etwa &raquo;1&ndash;2&laquo;</span></label>
+      <span class="hinweis">Eine Nummer, auch ein Doppelheft wie &raquo;1&ndash;2&laquo;. Ausgaben ohne
+        Nummer tragen ihre Bezeichnung, etwa &raquo;Sonderheft&laquo;; das Wort &raquo;Heft&laquo;
+        wird ihnen nicht vorangestellt</span></label>
 
     <div class="bearb-reihe">${termine}</div>
 
@@ -5098,7 +5118,7 @@ function mxHeftwahlHtml(k, t){
     const ab = mxHeftAbstand(k, iss);
     const chip = `<button type="button" class="mx-hl-chip ${mxArt}${istDrin?' an':''}"
       onclick="mxToggle('${k.id}',${t.id},'${esc(iss.heft)}','${mxArt}')"
-      title="${escA(`Heft ${iss.heft} · ${mxArt==='auslage'?'ET':'AS'} ${fmt(termin)}${
+      title="${escA(`${heftText(iss.heft)} · ${mxArt==='auslage'?'ET':'AS'} ${fmt(termin)}${
         ab?' · '+ab:''} — ${wort}${istDrin?' entfernen':' zuordnen'}`)}"><span class="mx-hl-nr">${
       esc(iss.heft)}</span><span class="mx-hl-dat">${esc(mxKurzTermin(termin))}</span><span class="mx-hl-ab">${
       esc(ab)}</span></button>`;
@@ -5309,7 +5329,7 @@ function renderBearbeiten(){
     const eintraege = t.issues.map((iss,i)=>
       `<button type="button" class="bearb-eintrag${gewaehltIst('ausgabe',t.id,i)?' gewaehlt':''}"
         onclick="bearbWaehle(${t.id},${i})">
-        <span>Heft ${esc(iss.heft)}</span>
+        <span>${esc(heftText(iss.heft))}</span>
         <span class="bd">${fmt(iss.et)}</span></button>`).join('');
     const n = t.issues.length;
     // Der Titelkopf fuehrt zu seinen Stammdaten. Die Zahl daneben sagt, wie
