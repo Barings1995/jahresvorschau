@@ -21,6 +21,115 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-09 — Aus Schwerpunkt und Top-Thema werden Themenschwerpunkte
+
+**Anlass.** Marcus fiel auf, dass das Werkzeug zwei Wörter für dieselbe Sache
+führte: In der Datenleiste hieß der Inhaltsfilter *Themenschwerpunkte*, in den
+Ansichten stand darüber *Schwerpunkt*. Aus der Frage, welches Wort und welche
+Zahl richtig sei, wurde die eigentliche: ob die Trennung in *Schwerpunkt* und
+*Top-Thema* überhaupt noch etwas trägt.
+
+**Der Befund aus der Datenbank.** Lesende Abfrage über alle 108 Ausgaben beider
+Jahrgänge: Ein Top-Thema führen ausschließlich die zwanzig Ausgaben der Ärzte
+Zeitung ONKOLOGIE UND HÄMATOLOGIE 2026 und 2027. In **allen zwanzig** ist auch
+der Schwerpunkt belegt — das Top-Thema tritt nie allein auf. Inhaltlich sind
+beide gleichrangig; 2027/3 etwa führt *Pankreaskarzinom – Auf dem Weg zu
+kurativen Konzepten?* neben *Lymphome – neue Substanzen, neue Hoffnung*. Marcus
+hat die Gleichrangigkeit bestätigt.
+
+**Was die Trennung kostete.** Drei Dinge, die einzeln kaum auffielen:
+
+- *Die Ansichten waren sich uneins, welches Feld führt.* Kachel und Monatsliste
+  stellten das Top-Thema voran, Tabelle und Excel den Schwerpunkt. Beide
+  Reihenfolgen standen gleichzeitig im Werkzeug.
+- *Die Kachel setzte eine Rangordnung, die es nicht gibt.* `.ttxt` war normal
+  gesetzt in `--text`, `.stxt` kursiv und `--muted` — der Schwerpunkt las sich
+  wie eine Fußnote zum Top-Thema.
+- *In der Datenbank sind die Namen vertauscht.* Das Top-Thema lag in der Spalte
+  `thema`, der Schwerpunkt in `sonderthema`.
+
+**Die Änderung.** An die Stelle von `iss.sw` und `iss.top` tritt `iss.t`, eine
+Liste mit einem oder zwei gleichrangigen Einträgen.
+
+- **Zwei Plätze, keine offene Liste.** Mehr als zwei kommt nicht vor, und die
+  Datenbank hat mit `thema`/`sonderthema` genau zwei Spalten. Die Änderung
+  kommt deshalb **ohne DDL und ohne Migration** aus — es ändert sich die
+  Darstellung, nicht der Bestand.
+- **Reihenfolge.** Der bisherige Schwerpunkt steht vorn: er ist der Eintrag,
+  den jeder Titel führt. `t[0] = sonderthema`, `t[1] = thema`. Damit gilt
+  überall die Ordnung, die Tabelle und Excel schon hatten; Kachel und
+  Monatsliste drehen sich um.
+- **Die Beschriftung geht mit der Zahl.** Auf der Kachel steht
+  *Themenschwerpunkt* bei einem Eintrag, *Themenschwerpunkte* bei zweien. Die
+  Spaltenköpfe in Tabelle und Excel stehen immer im Plural — sie überschreiben
+  viele Zeilen.
+- **Der Bearbeiten-Dialog** führt statt zweier benannter Felder eine Gruppe mit
+  zwei Plätzen, gebaut aus demselben Muster wie Kongressauslagen und
+  -berichte. Der Knopf *Zeile hinzufügen* steht nur, solange weniger als zwei
+  Einträge da sind. Der Hinweistext, der bisher nur das Sonderfeld
+  entschuldigte, entfällt.
+- **Zwei Wege der Rückwärtsverträglichkeit.** Die Excel-Spalte heißt
+  jetzt *Themenschwerpunkte* und führt einen Eintrag je Zeile; der alte
+  Spaltenname *Schwerpunkt* und der alte Zeilenvorsatz `Top-Thema:` bleiben
+  lesbar. Ebenso Sicherungspunkte: `themenAusSatz` liest einen vor September
+  2026 angelegten Punkt weiter richtig — ohne das hätte ein Zurücksetzen alle
+  Themen des Jahrgangs gelöscht.
+
+**Nachweis.** Prüfbestand neu aus der Datenbank gezogen (`fixture_bauen.mjs`):
+die Rohzeilen der fünf Tabellen laufen durch das `inDatenForm` der jeweiligen
+Fassung, damit jede Seite genau das bekommt, was ihr eigener Ladeweg baut.
+Ergebnis: 108 Ausgaben, davon 20 mit zwei Einträgen und 88 mit einem — genau
+der Datenbankbefund.
+
+Neues Prüfskript `thema_pruef.mjs`:
+
+| geprüft | Ergebnis |
+| --- | --- |
+| Kachel mit zwei Themen | eine Beschriftung »Themenschwerpunkte«, zwei Einträge |
+| Kachel mit einem Thema | »Themenschwerpunkt«, ein Eintrag |
+| Schriftbild beider Einträge | 12,8 px · `rgb(0,40,90)` · nicht kursiv, identisch |
+| Reihenfolge in Kachel, Liste, Tabelle, Kongressansicht | in allen vier gleich |
+| »Top-Thema« in einer der fünf Ansichten | nirgends mehr |
+| Tabellen-Spaltenkopf | »Themenschwerpunkte« |
+| Suche nach einem Wort aus dem zweiten Eintrag | 1 Treffer; ohne Themenfilter 0 |
+| Inhaltsfilter »Themenschwerpunkte« allein | 54 Ausgaben — alle mit Eintrag |
+
+Neues Prüfskript `exthema_pruef.mjs` für den Excel-Rundlauf:
+
+| geprüft | Ergebnis |
+| --- | --- |
+| Spaltenkopf in Blatt 1 und 2 | »Themenschwerpunkte«, alter Name weg |
+| Vorsatz `Top-Thema:` in der Ausgabe | kommt nicht mehr vor |
+| geschriebene Zelle wieder eingelesen | Zeichen für Zeichen dieselbe Liste |
+| alte Form `Update NSCLC ⏎ Top-Thema: …` | ergibt beide Themen in der richtigen Folge |
+| drei Zeilen in einer Zelle | zwei Einträge, nichts geht verloren |
+| Kopfzeile mit altem Namen *Schwerpunkt* | wird ohne Beanstandung angenommen |
+
+**Druckansicht** mit erzwungenen `@media print`-Regeln gemessen: Beschriftung
+6,5 pt, beide Einträge 8 pt, gleiche Farbe, nicht kursiv.
+
+**HTML-Kopie**: `baueKopie()` in einen Rahmen gehängt und darin nachgesehen —
+54 Kacheln, richtige Beschriftung, richtige Einträge; der Datenblock führt nur
+noch `t`, kein `sw` und kein `top`.
+
+**Nichts schlägt nach außen durch.** Golden Test `pruef.mjs`: alle zehn
+Statuszeilen der fünf Ansichten in beiden Jahrgängen unverändert, die
+Jahresmatrix zeichenweise gleich. Prüfreihe über 21 Skripte: 18 gleich, drei
+Abweichungen, alle erklärt — `thema_pruef` und `exthema_pruef` sind neu und
+können auf der alten Fassung nicht zutreffen; `druck_pruef` zählt im
+Ausgabenformular 8 statt 6 Löschzeichen, weil die beiden Themenzeilen jetzt
+je eines tragen.
+
+**Nicht Teil dieser Änderung.** Dass in den vier Kongressheften der Ärzte
+Zeitung »Wirtschaft / Gesundheitspolitik« als Thema geführt wird, ist eine
+Rubrik und kein Schwerpunkt — eine redaktionelle Frage, getrennt zu
+entscheiden.
+
+**Commit** `PLATZHALTER` · MD5 `60e205aaec238999ea53bf77b20ddf17` →
+`f801a08e3edada7d66a3a1ab1ca5f53c` · noch nicht gepusht
+
+---
+
 ## 2026-09-09 — Die Hand steht jetzt auch über dem Häkchen
 
 **Anlass.** Marcus fuhr im Dialog *Kongress bearbeiten* mit der Maus über das

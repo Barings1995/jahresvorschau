@@ -159,9 +159,11 @@ mark{background:rgba(238,125,17,.18);color:var(--warm);border-radius:2px;padding
 /* thema */
 .thema{margin-top:11px;padding-top:9px;border-top:2px solid var(--navy-faint)}
 .tlbl{font-size:.61rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--warm);margin-bottom:2px}
+/* Alle Themen einer Ausgabe stehen gleich da: gleiche Groesse, gleiche Farbe,
+   kein Kursiv. Frueher war eines davon abgesetzt und las sich dadurch als
+   Fussnote zum anderen - eine Rangfolge, die es nicht gibt. */
 .ttxt{font-size:.8rem;color:var(--text);line-height:1.4;text-wrap:pretty}
-.slbl{margin-top:6px}
-.stxt{font-size:.76rem;color:var(--muted);line-height:1.4;font-style:italic}
+.ttxt+.ttxt{margin-top:5px}
 
 /* legend */
 /* Bearbeiten ist keine Ansicht neben den anderen, sondern ein eigener
@@ -270,7 +272,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
    Vorgabe bekaeme die Spalte zu wenig und die Tabelle wuerde deutlich hoeher.
    Der Wert muss prozentual sein, damit er mit der Tabellenbreite waechst: ein
    fester Pixelwert liess bei breitem Fenster den gesamten Ueberschuss an
-   "Schwerpunkt" gehen, waehrend "Kongresse" schmal stehen blieb. Bei schmalen
+   "Themenschwerpunkte" gehen, waehrend "Kongresse" schmal stehen blieb. Bei schmalen
    Fenstern schrumpft die Spalte weiterhin bis auf min-width. */
 .t-kong{color:var(--muted);font-size:.7rem;min-width:220px;width:40%}
 .t-kong b{color:var(--navy);font-weight:600;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em}
@@ -284,7 +286,6 @@ table.tab tbody tr:hover td{background:var(--surface2)}
 .t-kong .ke{padding-left:48px;text-indent:-48px}
 .t-kong .ke b{display:inline-block;min-width:46px;text-indent:0}
 .t-thema{min-width:200px}
-.t-thema b.tt{color:var(--warm);font-weight:600;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em}
 
 /* ── Ansicht: Kongresse ── */
 .kgroup{background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden}
@@ -517,7 +518,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   .ci.hit{background:none;border-left:2px solid var(--accent);border-radius:0;padding:1px 0 1px 5px;margin:1px 0}
   .ctype{font-size:6.5pt;margin-bottom:3px}
   .thema{margin-top:8px;padding-top:6px}
-  .ttxt{font-size:8pt}.stxt{font-size:7.5pt}.tlbl{font-size:6.5pt}
+  .ttxt{font-size:8pt}.tlbl{font-size:6.5pt}
 
   /* ── Liste ── */
   .mgroup{margin-bottom:12px}
@@ -605,7 +606,6 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   .t-kong .ke{padding-left:36px;text-indent:-36px}
   .t-kong .ke b{font-size:6pt;min-width:0}
   .t-thema{min-width:0}
-  .t-thema b.tt{font-size:6pt}
   .t-titel{min-width:0}
   .sar{display:none}
 
@@ -1782,9 +1782,9 @@ function hl(txt,q){
   return t.replace(new RegExp(`(${qe})`, 'gi'),'<mark>$1</mark>');
 }
 
-// Zeigt die aktuelle Auswahl Auslagen, Berichte, Schwerpunkt und Top-Thema?
+// Zeigt die aktuelle Auswahl Auslagen, Berichte und Themenschwerpunkte?
 // Die drei Fragen gelten für Anzeige, Suche und Export gleichermassen. Der
-// Inhaltsfilter fasst Schwerpunkt und Top-Thema als eigene Inhaltsart auf.
+// Inhaltsfilter fasst die Themenschwerpunkte als eigene Inhaltsart auf.
 function zeigtA(){ return modus.size===0 || modus.has('auslage'); }
 function zeigtB(){ return modus.size===0 || modus.has('bericht'); }
 function zeigeThema(){ return modus.size===0 || modus.has('thema'); }
@@ -1796,7 +1796,7 @@ function sichtbareFelder(iss){
   const f=[];
   if(zeigtA())     f.push(...iss.a.map(kongressText));
   if(zeigtB())     f.push(...iss.b.map(kongressText));
-  if(zeigeThema()) f.push(iss.top||'', iss.sw||'');
+  if(zeigeThema()) f.push(...iss.t);
   return f;
 }
 
@@ -1817,7 +1817,7 @@ function passt(iss,q){
   if(modus.size>0){
     const hat = (modus.has('auslage') && iss.a.length>0)
              || (modus.has('bericht') && iss.b.length>0)
-             || (modus.has('thema')   && !!(iss.top||iss.sw));
+             || (modus.has('thema')   && iss.t.length>0);
     if(!hat) return false;
   }
   return matches(iss,q);
@@ -1854,26 +1854,25 @@ function kongBlock(liste,q,art){
   return`<div class="cs">${kopf}<ul class="clist">${items}</ul></div>`;
 }
 
+// Eine Beschriftung ueber der ganzen Liste, nicht eine je Eintrag: die
+// Eintraege sind gleichrangig. Nur die Zahl geht mit - bei einem Eintrag
+// verspraeche der Plural mehr, als dort steht.
 function themaBlock(iss,q){
-  if(!iss.top&&!iss.sw)return'';
-  let h='<div class="thema">';
-  if(iss.top)h+=`<div class="tlbl">Top-Thema</div><div class="ttxt">${hl(iss.top,q)}</div>`;
-  if(iss.sw)h+=`<div class="tlbl slbl">Schwerpunkt</div><div class="stxt">${hl(iss.sw,q)}</div>`;
-  return h+'</div>';
+  if(!iss.t.length) return '';
+  const wort = iss.t.length>1 ? 'Themenschwerpunkte' : 'Themenschwerpunkt';
+  return `<div class="thema"><div class="tlbl">${wort}</div>`
+    + iss.t.map(w=>`<div class="ttxt">${hl(w,q)}</div>`).join('')
+    + '</div>';
 }
 
-// Schwerpunkt und Top-Thema in einer einzigen Spalte: der Schwerpunkt fuehrt,
-// das nur bei der Aerzte Zeitung belegte Top-Thema steht darunter mit
-// Beschriftung. Auf der Kachel bleiben beide getrennt (themaBlock).
+// Eine Zelle, ein Eintrag je Zeile - dieselbe Form, die Kongressauslagen und
+// -berichte schon nutzen und die ausListenZelle wieder auseinandernimmt.
 function themaText(iss){          // Excel: eine Zelle mit Zeilenumbruch
-  return [iss.sw||'', iss.top?('Top-Thema: '+iss.top):''].filter(Boolean).join('\n');
+  return iss.t.join('\n');
 }
 
 function themaZelle(iss,q){       // Tabellenansicht
-  let h='';
-  if(iss.sw)  h+=`<div>${hl(iss.sw,q)}</div>`;
-  if(iss.top) h+=`<div><b class="tt">Top-Thema</b> ${hl(iss.top,q)}</div>`;
-  return h||'&ndash;';
+  return iss.t.map(w=>`<div>${hl(w,q)}</div>`).join('') || '&ndash;';
 }
 
 function inhaltBloecke(iss,q){
@@ -1909,7 +1908,7 @@ function renderListe(items,q){
   return Object.keys(monate).sort().map(k=>{
     const [y,m]=k.split('-'), arr=monate[k];
     const zeilen=arr.map(({j,iss})=>{
-      const thema=zeigeThema() ? [iss.top,iss.sw].filter(Boolean).join(' · ') : '';
+      const thema=zeigeThema() ? iss.t.join(' · ') : '';
       return`<details class="lrow" style="--jcol:${j.hex}"${q?' open':''}>
         <summary>
           <span class="ltitle">${esc(j.short)}</span>
@@ -1978,7 +1977,7 @@ const TAB_SPALTEN=[
   {k:'et',     t:'ET'},         {k:'as',  t:'AS'},
   {k:'du',     t:'DU'},         {k:'eh',  t:'EH'},
   {k:'auflage',t:'Auflage'},
-  {k:'sw',     t:'Schwerpunkt'},
+  {k:'t',      t:'Themenschwerpunkte'},
   {k:'kong',   t:'Kongresse', nosort:true}
 ];
 
@@ -1986,15 +1985,18 @@ function sortWert(it,k){
   if(k==='titel')  return it.j.short;
   if(k==='auflage')return it.j.auflage;
   if(k==='heft')   return it.iss.heft;
+  // Die Themen sind eine Liste; sortiert wird nach dem ersten Eintrag, so wie
+  // die Spalte ihn auch zuerst zeigt.
+  if(k==='t')      return it.iss.t.join(' ');
   return it.iss[k]||'';
 }
 
 // Die Spalten folgen dem Inhaltsfilter, damit die Tabelle nicht mehr behauptet
-// als der Kopf: ohne Thema faellt "Schwerpunkt" weg, ohne Auslagen und Berichte
+// als der Kopf: ohne Thema faellt "Themenschwerpunkte" weg, ohne Auslagen und Berichte
 // die Spalte "Kongresse" – sie stuende dort sonst als reine Strichspalte.
 function tabSpalten(){
   return TAB_SPALTEN.filter(s=>{
-    if(s.k==='sw')   return zeigeThema();
+    if(s.k==='t')    return zeigeThema();
     if(s.k==='kong') return zeigtA() || zeigtB();
     return true;
   });
@@ -2005,7 +2007,7 @@ function tabZelle(s,j,iss,q){
     case 'titel':   return`<td class="t-titel" style="color:${j.hex}">${esc(j.short)}</td>`;
     case 'heft':    return`<td class="t-num">${esc(iss.heft)}</td>`;
     case 'auflage': return`<td class="t-num">${j.auflage.toLocaleString('de-DE')}</td>`;
-    case 'sw':      return`<td class="t-thema">${themaZelle(iss,q)}</td>`;
+    case 't':       return`<td class="t-thema">${themaZelle(iss,q)}</td>`;
     case 'kong': {
       // Jeder Kongress steht in einer eigenen Zeile. Im Fliesstext waren die
       // Eintraege nur durch Semikolon getrennt – weil die Namen selbst Kommas,
@@ -2067,7 +2069,7 @@ function sammleKongresse(q){
       // Eintraege durch die Suche lassen – sonst staenden hier Kongresse ohne
       // erkennbaren Bezug zum Suchbegriff.
       const themaTreffer = ql && zeigeThema()
-        && ((iss.top||'')+' '+(iss.sw||'')).toLowerCase().includes(ql);
+        && iss.t.join(' ').toLowerCase().includes(ql);
       eintraege.forEach(([n,art,kid])=>{
         if(ql && !n.toLowerCase().includes(ql) && !themaTreffer) return;
         const name=kongName(n);
@@ -2124,7 +2126,7 @@ function renderKongress(q){
     const arr=gruppen.get(name).sort((a,b)=>a.iss.et.localeCompare(b.iss.et));
     const hefte=new Set(arr.map(e=>e.j.id+'|'+e.iss.heft)).size;
     const zeilen=arr.map(({j,iss,art})=>{
-      const thema=zeigeThema() ? [iss.top,iss.sw].filter(Boolean).join(' · ') : '';
+      const thema=zeigeThema() ? iss.t.join(' · ') : '';
       return`<div class="kentry" style="--jcol:${j.hex}">
         <span class="ktitel">${esc(j.short)}</span>
         <span class="kheft">Heft ${esc(iss.heft)}<small>${j.auflage.toLocaleString('de-DE')} Expl.</small></span>
@@ -2575,19 +2577,21 @@ function ausExcelDatum(w){
   return i ? `${i[1]}-${i[2]}-${i[3]}` : '';
 }
 
-// Die Spalte "Schwerpunkt" fasst beide Themenfelder zusammen: der Schwerpunkt
-// steht oben, das nur bei der Aerzte Zeitung belegte Top-Thema darunter mit
-// Beschriftung. Geprueft: kein Themenfeld enthaelt einen Zeilenumbruch und
-// keines beginnt mit "Top-Thema" – die Zelle laesst sich daher eindeutig
-// wieder auseinandernehmen.
+// Die Spalte "Themenschwerpunkte" fuehrt einen Eintrag je Zeile. Aeltere
+// Ausgaben dieses Werkzeugs schrieben das zweite Thema mit dem Vorsatz
+// "Top-Thema:" – eine solche Zeile wird entkleidet und ans Ende gestellt,
+// damit eine bisher geschriebene Datei unveraendert richtig laedt.
+// Mehr als zwei Zeilen kann die Datenbank nicht halten; ueberzaehlige werden
+// deshalb an den zweiten Eintrag angehaengt, statt verlorenzugehen.
 function ausThemaZelle(w){
   const zeilen=String(w==null?'':w).split(/\r?\n/).map(z=>z.trim()).filter(Boolean);
-  let top='', sw=[];
+  const vorne=[], hinten=[];
   zeilen.forEach(z=>{
     const m=/^Top-?Thema:\s*(.*)$/i.exec(z);
-    if(m) top=m[1].trim(); else sw.push(z);
+    if(m) hinten.push(m[1].trim()); else vorne.push(z);
   });
-  return {top, sw:sw.join(' ')};
+  const alle=vorne.concat(hinten).filter(Boolean);
+  return alle.length<=2 ? alle : [alle[0], alle.slice(1).join(' ')];
 }
 
 function ausListenZelle(w){
@@ -2613,7 +2617,7 @@ function naechsteTitelId(){
 // ── Blatt auswerten ──
 const PFLICHTSPALTEN=['Jahrgang','Titel','Heft','Erscheinungstermin (ET)',
   'Anzeigenschluss (AS)','Druckunterlagen (DU)',
-  'Ein-/Durchhefter und Beilagen (EH)','Auflage','Schwerpunkt',
+  'Ein-/Durchhefter und Beilagen (EH)','Auflage','Themenschwerpunkte',
   'Kongressauslagen','Kongressberichte'];
 
 function werteBlattAus(tab){
@@ -2631,6 +2635,11 @@ function werteBlattAus(tab){
   if(!kopfR) throw new Error('In der Datei wurde keine Kopfzeile mit der Spalte '
     +'»Jahrgang« gefunden.\n\nErwartet wird das Blatt »Ausgaben«, das dieses '
     +'Werkzeug unter »Export → Als Excel« schreibt.');
+
+  // Bis September 2026 hiess die Themenspalte "Schwerpunkt". Wer eine damals
+  // geschriebene Datei laedt, soll sie nicht neu benennen muessen.
+  if(spalte['Schwerpunkt']!==undefined && spalte['Themenschwerpunkte']===undefined)
+    spalte['Themenschwerpunkte']=spalte['Schwerpunkt'];
 
   const fehlend=PFLICHTSPALTEN.filter(s=>!spalte[s]);
   if(fehlend.length) throw new Error('In der Tabelle fehlen Spalten:\n\n'
@@ -2668,7 +2677,7 @@ function werteBlattAus(tab){
     // gar nicht gemeint war – und Jahrgaenge entstehen leichter, als sie
     // wieder verschwinden. Deshalb hier eine enge Pruefung.
     if(!/^\d{4}$/.test(y) || +y<2000 || +y>2100){ krummeJahre.add(y); continue; }
-    const thema=ausThemaZelle(g('Schwerpunkt'));
+    const themen=ausThemaZelle(g('Themenschwerpunkte'));
     const iss={heft,
       et:ausExcelDatum(g('Erscheinungstermin (ET)')),
       as:ausExcelDatum(g('Anzeigenschluss (AS)')),
@@ -2676,8 +2685,7 @@ function werteBlattAus(tab){
       eh:ausExcelDatum(g('Ein-/Durchhefter und Beilagen (EH)')),
       a:ausListenZelle(g('Kongressauslagen')),
       b:ausListenZelle(g('Kongressberichte'))};
-    if(thema.top) iss.top=thema.top;
-    if(thema.sw)  iss.sw =thema.sw;
+    iss.t=themen;
 
     // Der Erscheinungstermin ist das einzige wirklich unentbehrliche Datum:
     // danach wird sortiert, nach seinem Monat gruppiert und die Spalte in der
@@ -3000,7 +3008,7 @@ async function jahrgangSchreiben(y, stand, titel){
     jahr:y, titel_id:t.id, reihenfolge:n+1, heft:iss.heft,
     erscheinung:iss.et||null, anzeigenschluss:iss.as||null,
     druckunterlagen:iss.du||null, anlieferung:iss.eh||null,
-    thema:iss.top||'', sonderthema:iss.sw||'',
+    sonderthema:iss.t[0]||'', thema:iss.t[1]||'',
     auslagen:iss.a||[], berichte:iss.b||[]})));
   if(zeilen.length)
     await dbAnfrage('/rest/v1/ausgabe',
@@ -3349,8 +3357,9 @@ const XLSX_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
 // Blatt 1: eine Zeile je Ausgabe. Blatt 2: eine Zeile je Kongress-Eintrag.
 // Die Spalten folgen dem Inhaltsfilter – sind nur Berichte gewaehlt, taucht
 // keine Auslagen-Spalte auf, damit die Datei nicht mehr behauptet als der Kopf.
-// Fuer die Spalte "Schwerpunkt" gilt dasselbe: ohne gewaehlte Themenschwerpunkte
-// faellt sie weg, weil das Thema dann auch am Bildschirm ausgeblendet ist.
+// Fuer die Spalte "Themenschwerpunkte" gilt dasselbe: ohne gewaehlte
+// Themenschwerpunkte faellt sie weg, weil sie dann auch am Bildschirm
+// ausgeblendet sind.
 function excelBlaetter(q){
   const items  = collect(q);
   const zeigeA = zeigtA();
@@ -3364,7 +3373,7 @@ function excelBlaetter(q){
   const kopf1=['Jahrgang','Titel','Heft','Erscheinungstermin (ET)','Anzeigenschluss (AS)',
     'Druckunterlagen (DU)','Ein-/Durchhefter und Beilagen (EH)','Auflage'];
   const breiten1=[9,40,7,13,13,13,16,9];
-  if(zeigeT){ kopf1.push('Schwerpunkt');      breiten1.push(46); }
+  if(zeigeT){ kopf1.push('Themenschwerpunkte'); breiten1.push(46); }
   if(zeigeA){ kopf1.push('Kongressauslagen'); breiten1.push(46); }
   if(zeigeB){ kopf1.push('Kongressberichte'); breiten1.push(46); }
 
@@ -3397,7 +3406,7 @@ function excelBlaetter(q){
     'Erscheinungstermin (ET)','Anzeigenschluss (AS)','Druckunterlagen (DU)',
     'Ein-/Durchhefter und Beilagen (EH)','Auflage'];
   const breiten2=[52,15,20,10,40,7,13,13,13,16,9];
-  if(zeigeT){ kopf2.push('Schwerpunkt'); breiten2.push(44); }
+  if(zeigeT){ kopf2.push('Themenschwerpunkte'); breiten2.push(44); }
   const zeilen2=eintraege.map(e=>{
     const z=[{w:e.k.lang},{w:kongressZeitraum(e.k)},{w:e.k.ort||''},{w:e.art},
       {w:e.j.short},{w:e.iss.heft},
@@ -3982,7 +3991,7 @@ function bearbOeffneAusgabe(titelId, index, still){
   // bleibt es beim Freitext.
   bearbBeginn({ art:'ausgabe', titelId, index },
     { id: iss.id, heft: iss.heft, et: iss.et||'', as: iss.as||'',
-      du: iss.du||'', eh: iss.eh||'', top: iss.top||'', sw: iss.sw||'',
+      du: iss.du||'', eh: iss.eh||'', t: (iss.t||[]).slice(),
       a: kongAusIssue(iss.a), b: kongAusIssue(iss.b) }, still);
 }
 
@@ -3997,7 +4006,7 @@ async function bearbNeueAusgabe(titelId){
   if(!await bearbFrei()) return;
   if(!JOURNALS.some(j=>j.id===titelId)) return;
   bearbBeginn({ art:'ausgabe', titelId, neu:true },
-    { id:null, heft:'', et:'', as:'', du:'', eh:'', top:'', sw:'', a:[], b:[] });
+    { id:null, heft:'', et:'', as:'', du:'', eh:'', t:[], a:[], b:[] });
 }
 
 function bearbOeffneTitel(titelId, still){
@@ -4138,10 +4147,12 @@ function ausgabeAusEntwurf(){
     anzeigenschluss: leerZuNull(entwurf.as),
     druckunterlagen: leerZuNull(entwurf.du),
     anlieferung:     leerZuNull(entwurf.eh),
-    thema:       entwurf.top,
-    sonderthema: entwurf.sw,
-    // Die beiden Alt-Textspalten werden weiter mitgeschrieben; umgestellt
-    // steht im Entwurf aber eine Kennung, kein Wortlaut.
+    // Die zwei Themenspalten sind Platz eins und zwei derselben Liste;
+    // sonderthema fuehrt. Die beiden Kongress-Alttextspalten werden weiter
+    // mitgeschrieben; umgestellt steht im Entwurf aber eine Kennung, kein
+    // Wortlaut.
+    sonderthema: entwurf.t[0] || '',
+    thema:       entwurf.t[1] || '',
     auslagen: kongAlsText(entwurf.a),
     berichte: kongAlsText(entwurf.b)
   };
@@ -4154,7 +4165,7 @@ function entwurfInAusgabe(iss){
   iss.heft = entwurf.heft;
   iss.et = entwurf.et; iss.as = entwurf.as;
   iss.du = entwurf.du; iss.eh = entwurf.eh;
-  iss.top = entwurf.top; iss.sw = entwurf.sw;
+  iss.t = entwurf.t.map(w=>w.trim()).filter(Boolean);
   if(kongUmgestellt()){
     // Kein Weg ueber kongressEintragen: aus dem Ausgabenformular heraus soll
     // kein Kongress entstehen koennen. Gewaehlt wurde aus den Saetzen des
@@ -4365,6 +4376,14 @@ async function titelEntfernen(){
 
 // Ohne Angabe der gezeigte Jahrgang. Vor dem Excel-Eingang wird auch ein
 // Jahrgang gesichert, der gerade nicht auf dem Schirm steht.
+// Sicherungspunkte, die vor September 2026 entstanden sind, fuehren die Themen
+// noch als zwei benannte Felder. Beim Zuruecksetzen muss ein solcher Punkt
+// weiter lesbar sein - sonst stuende der Jahrgang danach ohne Themen da.
+function themenAusSatz(iss){
+  if(Array.isArray(iss.t)) return iss.t.slice();
+  return [iss.sw, iss.top].map(w=>(w||'').trim()).filter(Boolean);
+}
+
 function jahrgangAlsBlock(y){
   const jetzt = !y || y===jahrgang();
   const stand = jetzt ? standText() : ((DATEN[y] && DATEN[y].stand) || '');
@@ -4373,7 +4392,7 @@ function jahrgangAlsBlock(y){
     id:j.id, kurz:j.short, voll:j.full, auflage:j.auflage, hex:j.hex,
     issues: j.issues.map(iss=>({
       heft:iss.heft, et:iss.et, as:iss.as, du:iss.du, eh:iss.eh,
-      top:iss.top, sw:iss.sw,
+      t:themenAusSatz(iss),
       a:iss.a.map(kongressText), b:iss.b.map(kongressText) }))
   })) };
 }
@@ -4439,7 +4458,7 @@ async function sicherungZurueck(id, wie){
     // innen, deshalb die Umbenennung.
     await jahrgangSchreiben(j, block.stand || '', block.titel.map(t=>({
       id:t.id, short:t.kurz, full:t.voll, auflage:t.auflage, hex:t.hex,
-      issues:t.issues })));
+      issues:t.issues.map(iss=>({...iss, t:themenAusSatz(iss)})) })));
 
     entwurf = null; entwurfRein = null; bearbAuswahl = null;
     DATEN = await datenHolen();
@@ -4485,6 +4504,29 @@ function kongVorschlaege(){
 // Zwei Aufbauten, ein Rahmen. Umgestellt wird nur noch aus den Kongressen des
 // Jahrgangs gewaehlt; der Freitext bleibt allein fuer einen Jahrgang stehen,
 // der seine Kongresse noch als Text an der Ausgabe fuehrt.
+// Die Themen einer Ausgabe stehen in einer Gruppe untereinander, nicht in
+// zwei benannten Feldern: sie sind gleichrangig. Zwei ist die Obergrenze -
+// mehr kann die Datenbank nicht halten, und mehr kommt auch nicht vor.
+function themenGruppe(){
+  const zeilen = entwurf.t.map((wert,i)=>
+    `<div class="bearb-zeile">
+       <input type="text" data-art="t" value="${escA(wert)}"
+              placeholder="Thema dieser Ausgabe"
+              oninput="bearbListe('t',${i},this.value)">
+       <button type="button" class="bearb-weg" title="Zeile entfernen"
+               onclick="bearbZeileWeg('t',${i})">&times;</button>
+     </div>`).join('');
+  return `<div class="bearb-gruppe">
+    <span class="bearb-feld">Themenschwerpunkte
+      <span class="hinweis">H&ouml;chstens zwei Eintr&auml;ge; ein zweiter kommt
+        in der Regel nur in der &Auml;rzte Zeitung ONKOLOGIE UND H&Auml;MATOLOGIE
+        vor</span></span>
+    ${zeilen || '<p class="bearb-leerhinweis">Keine Einträge.</p>'}
+    ${entwurf.t.length < 2 ? `<button type="button" class="bearb-zu"
+        onclick="bearbZeileZu('t')">Zeile hinzufügen</button>` : ''}
+  </div>`;
+}
+
 function zeilenGruppe(art, beschriftung, hinweis){
   return `<div class="bearb-gruppe">
     <span class="bearb-feld">${beschriftung}
@@ -4589,15 +4631,7 @@ function formAusgabeHtml(){
 
     <div class="bearb-reihe">${termine}</div>
 
-    <label class="bearb-feld">Themenschwerpunkt
-      <input type="text" value="${escA(entwurf.sw)}"
-             oninput="bearbFeld('sw',this.value)"></label>
-    <label class="bearb-feld">Top-Thema
-      <input type="text" value="${escA(entwurf.top)}"
-             oninput="bearbFeld('top',this.value)">
-      <span class="hinweis">Nur in der &Auml;rzte Zeitung ONKOLOGIE UND
-        H&Auml;MATOLOGIE gebr&auml;uchlich; die &uuml;brigen Titel f&uuml;hren
-        allein einen Themenschwerpunkt</span></label>
+    ${themenGruppe()}
 
     ${zeilenGruppe('a','Kongressauslagen','Diese Ausgabe liegt auf dem Kongress aus')}
     ${zeilenGruppe('b','Kongressberichte','Über den Kongress wird berichtet')}
@@ -5443,7 +5477,10 @@ function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
       et: a.erscheinung || '', as: a.anzeigenschluss || '',
       du: a.druckunterlagen || '', eh: a.anlieferung || '',
       a: a.auslagen || [], b: a.berichte || [],
-      top: a.thema || '', sw: a.sonderthema || ''
+      // Ein Feld, hoechstens zwei Eintraege: die beiden Spalten sind Platz
+      // eins und zwei derselben Liste. sonderthema fuehrt, weil es der
+      // Eintrag ist, den jeder Titel hat.
+      t: [a.sonderthema, a.thema].map(w=>(w||'').trim()).filter(Boolean)
     });
   }
   // Umgestellte Jahrgaenge fuehren ihre Kongresse in eigenen Tabellen. Steht
