@@ -280,6 +280,51 @@ Beides schreibt nicht in die Angebotswerkzeuge zurück — kein zweiter
 Datenbankschlüssel, kein Schreibzugriff über Projektgrenzen. Das Ergebnis wird
 abgelegt und von Hand übernommen.
 
+#### Der Weg in die Datenpflege
+
+Die Datei lässt sich **nicht** über *Aus Excel laden* in die Datenpflege
+einlesen. Der Versuch endet mit „In der Datei fehlt das Tabellenblatt
+»Preise«." Das ist kein Fehler, sondern die Sperre an der richtigen Stelle:
+jener Eingang erwartet den vollständigen Abzug — Blatt »Preise« zwingend,
+»Termine« dazu — und **ersetzt jeden darin enthaltenen Jahrgang im Ganzen**.
+Eine Datei ohne Preiszeilen nähme dem Jahrgang also sämtliche Preise.
+
+Übernommen wird stattdessen in vier Schritten:
+
+1. In der Datenpflege *Abzug sichern*. Es entsteht
+   `Angebotsdaten_JJJJ-MM-TT.xlsx` mit den Blättern Info, Preise und Termine.
+2. Beide Dateien öffnen und das Blatt »Termine« der Kongress-Datei in die
+   Abzugsmappe kopieren, dort als Blatt `Kongresse`. Im Abzug beginnen die
+   Daten in Zeile 2, in der Kongress-Datei erst in Zeile 6: drei Vorspannzeilen,
+   eine Leerzeile, dann die Kopfzeile in Zeile 5.
+3. Beide Blätter bekommen rechts der Daten eine Hilfsspalte mit dem Schlüssel
+   aus Jahrgang, Titel und Heft — `=$A2&"|"&$B2&"|"&$C2` im Abzug, dasselbe ab
+   Zeile 6 im Blatt `Kongresse`. Die Verkettung mit `&` gleicht dabei aus, dass
+   der Jahrgang im Abzug als Zahl und in der Kongress-Datei als Text steht; die
+   Titelnamen sind in beiden wortgleich. Damit lassen sich Themenschwerpunkte
+   und Kongresse holen (Hilfsspalte hier `L`, Blattbereich bis Zeile 100):
+
+   ```
+   =WENNFEHLER(INDEX(Kongresse!I$6:I$100;VERGLEICH($L2;Kongresse!$L$6:$L$100;0));"")
+   =WENNFEHLER(INDEX(Kongresse!J$6:J$100;VERGLEICH($L2;Kongresse!$L$6:$L$100;0));"")
+   ```
+
+   Der Verweis über den Schlüssel ist nötig, weil die Zeilenfolge in beiden
+   Dateien verschieden ist: die Jahresvorschau ordnet nach Titelkennung, der
+   Abzug beginnt mit »Die Onkologie« und führt neben den sechs Onkologie-Titeln
+   dreizehn weitere.
+4. Die beiden Ergebnisspalten **nur über dem Block des betroffenen Jahrgangs**
+   als Werte in die Spalten I und J einsetzen — die sechs Onkologie-Titel
+   stehen dort zusammenhängend am Anfang jedes Jahrgangs. Außerhalb dieses
+   Blocks liefert der Verweis leere Zeichenketten und würde vorhandene Einträge
+   der übrigen Titel löschen. Danach die Hilfsspalten und das Blatt `Kongresse`
+   entfernen, speichern und den Abzug über *Aus Excel laden* einlesen. Der
+   Bericht zeigt vorher, welche Jahrgänge ersetzt werden; vor jedem entsteht
+   ohne Zutun ein Sicherungspunkt.
+
+Jahrgänge, die die Jahresvorschau nicht führt, und Titel außerhalb der
+Onkologie bleiben auf diesem Weg unangetastet.
+
 ## Bearbeiten
 
 Der Arbeitsschirm steht im Menü *Daten* an erster Stelle, nicht in der

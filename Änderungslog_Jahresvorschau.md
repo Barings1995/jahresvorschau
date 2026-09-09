@@ -21,6 +21,54 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-09 — Der Weg der Kongress-Datei in die Datenpflege, festgehalten
+
+**Anlass.** Marcus versuchte, die Datei aus *Export → Kongresse für die
+Datenpflege* in der Datenpflege über *Aus Excel laden* einzulesen. Die
+Datenpflege wies sie ab: „In der Datei fehlt das Tabellenblatt »Preise«."
+
+**Der Befund.** Kein Defekt, sondern eine Sperre an der richtigen Stelle. Der
+Excel-Eingang der Datenpflege (`Datenpflege.html`, `excelLesen`) erwartet den
+vollständigen Abzug — Blatt »Preise« zwingend, »Termine« dazu — und ersetzt
+jeden darin enthaltenen Jahrgang im Ganzen. Die Kongress-Datei führt ein
+einziges Blatt und keine einzige Preiszeile; angenommen, hätte sie dem Jahrgang
+sämtliche Preise genommen. Die Datei ist als Abschreibvorlage gebaut, nicht als
+Ladedatei, und die Menü- und Dialogtexte sagen das auch — nur die Fehlermeldung
+der Datenpflege nennt eben nur das fehlende Blatt.
+
+**Nachgemessen** (lesend, gegen die Datenbank und gegen `Angebotsdaten.xlsx`):
+
+| Frage | Ergebnis |
+|---|---|
+| Stimmen die Titelnamen überein? | ja, alle sechs wortgleich (`titel.kurz` ↔ Spalte B), auch „FORUM DKG" und die Hefte „1–2"/„7–8" mit Halbgeviertstrich |
+| Trifft der Schlüssel Jahrgang·Titel·Heft? | 108 von 108 Ausgaben, keine ohne Treffer |
+| Stimmt die Zeilenfolge? | nein — die Jahresvorschau ordnet nach Titelkennung (ÄZ zuerst), der Abzug beginnt mit »Die Onkologie« und führt dreizehn weitere Titel dazwischen. Spalte J blind einzusetzen geht schief. |
+| Stehen die Onkologie-Titel im Abzug beieinander? | ja, als Block: 2026 in den Zeilen 2–55, 2027 in 142–195, je 54 Zeilen |
+
+**Die Änderung.** Nur Dokumentation, kein Eingriff ins Werkzeug. `README.md`
+bekommt unter *Ausgabe für die Datenpflege* den Abschnitt *Der Weg in die
+Datenpflege*: warum der direkte Eingang abweist, und die Übernahme in vier
+Schritten — Abzug sichern, das Blatt der Kongress-Datei in die Abzugsmappe
+kopieren, Themenschwerpunkte und Kongresse über einen Schlüssel aus Jahrgang,
+Titel und Heft holen (`INDEX`/`VERGLEICH`, Verkettung mit `&`, weil der
+Jahrgang hier als Zahl und dort als Text steht), die Werte allein über dem
+Block des betroffenen Jahrgangs einsetzen und den ergänzten Abzug einlesen.
+
+Der Hinweis, die Werte nur über diesem Block einzusetzen, ist kein Beiwerk:
+außerhalb liefert der Verweis leere Zeichenketten und löschte damit die
+Einträge der dreizehn übrigen Titel.
+
+**Nicht Teil dieser Änderung.** Ein eigener, schmaler Eingang in der
+Datenpflege, der genau diese einblättrige Datei liest und ausschließlich
+Themenschwerpunkte und Kongresse an vorhandenen Terminen fortschreibt — ohne
+Ersetzen, ohne Preise. Vorgeschlagen und zurückgestellt; die Handarbeit oben
+bleibt vorerst der Weg.
+
+**Commit** `—` · `index.html` unverändert (MD5 `f801a08e…`) · geändert nur
+`README.md` und dieses Log
+
+---
+
 ## 2026-09-09 — Aus Schwerpunkt und Top-Thema werden Themenschwerpunkte
 
 **Anlass.** Marcus fiel auf, dass das Werkzeug zwei Wörter für dieselbe Sache
