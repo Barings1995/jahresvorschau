@@ -125,7 +125,7 @@ Zeitung »Wirtschaft / Gesundheitspolitik« als Thema geführt wird, ist eine
 Rubrik und kein Schwerpunkt — eine redaktionelle Frage, getrennt zu
 entscheiden.
 
-**Commit** `PLATZHALTER` · MD5 `60e205aaec238999ea53bf77b20ddf17` →
+**Commit** `bac809c` · MD5 `60e205aaec238999ea53bf77b20ddf17` →
 `f801a08e3edada7d66a3a1ab1ca5f53c` · noch nicht gepusht
 
 ---
