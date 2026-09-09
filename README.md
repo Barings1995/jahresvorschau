@@ -296,7 +296,7 @@ eingesetzten Zeilennummern des jeweiligen Jahrgangs führt.
 
 Übernommen wird stattdessen in vier Schritten:
 
-1. In der Datenpflege *Abzug sichern*. Es entsteht
+1. In der Datenpflege *Als Excel sichern*. Es entsteht
    `Angebotsdaten_JJJJ-MM-TT.xlsx` mit den Blättern Info, Preise und Termine.
 2. Beide Dateien öffnen und das Blatt »Termine« der Kongress-Datei in die
    Abzugsmappe kopieren, dort als Blatt `Kongresse`. Im Abzug beginnen die

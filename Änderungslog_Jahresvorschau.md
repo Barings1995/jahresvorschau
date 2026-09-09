@@ -21,6 +21,21 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-09 (Nachtrag) — Der Knopf heißt „Als Excel sichern"
+
+Marcus wies darauf hin, dass die beiden Knöpfe in der Datenpflege „Aus Excel
+laden …" und „Als Excel sichern" heißen. Schritt 1 des Hinweisblattes nannte
+den zweiten „Abzug sichern" — das ist das Wort für die Datei, nicht für den
+Knopf, und wer danach sucht, findet ihn nicht. Im Hinweisblatt und im
+`README.md` steht jetzt der Wortlaut des Knopfes.
+
+Nachgemessen: das Blatt „Termine" weiterhin zeichengleich, 22 Prüfskripte
+zeichengleich, Hinweisblatt neu ausgelesen und Zeile für Zeile gelesen.
+
+**Commit** `—` · MD5 `c6541fad…` → `9636d063…`
+
+---
+
 ## 2026-09-09 (später) — Die Kongress-Datei erklärt sich selbst
 
 **Anlass.** Der Weg in die Datenpflege stand nach dem vorigen Eintrag nur im
