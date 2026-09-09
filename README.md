@@ -259,8 +259,9 @@ gefüllte Form. Die Kopfzeile der Matrix zählt die noch offenen Felder mit.
 
 ### Ausgabe für die Datenpflege
 
-*Export → Kongresse für die Datenpflege* gibt den Jahrgang als
-Excel-Datei aus, im Aufbau des Blattes »Termine« von `Angebotsdaten.xlsx` —
+*Export → Kongresse für die Datenpflege* gibt den Jahrgang als Excel-Datei aus.
+Sie führt zwei Blätter: `Hinweise` mit dem Weg in die Datenpflege und, dahinter,
+`Termine` im Aufbau des gleichnamigen Blattes von `Angebotsdaten.xlsx` —
 Jahrgang, Titel, Heft, Monat, ET, AS, DU-Schluss, EH-Termin,
 Themenschwerpunkte und, in der letzten Spalte, die Kongresszeile in deren
 Schreibweise: `Kurzname (Auslage), Zeitraum, Ort`, mehrere Kongresse einer
@@ -288,6 +289,10 @@ einlesen. Der Versuch endet mit „In der Datei fehlt das Tabellenblatt
 jener Eingang erwartet den vollständigen Abzug — Blatt »Preise« zwingend,
 »Termine« dazu — und **ersetzt jeden darin enthaltenen Jahrgang im Ganzen**.
 Eine Datei ohne Preiszeilen nähme dem Jahrgang also sämtliche Preise.
+
+Dieselbe Anleitung steht in der Datei selbst: ihr ist ein Blatt `Hinweise`
+vorangestellt, das vor `Termine` steht und die vier Schritte mit den bereits
+eingesetzten Zeilennummern des jeweiligen Jahrgangs führt.
 
 Übernommen wird stattdessen in vier Schritten:
 

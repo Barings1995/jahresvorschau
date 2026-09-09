@@ -21,6 +21,51 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-09 (später) — Die Kongress-Datei erklärt sich selbst
+
+**Anlass.** Der Weg in die Datenpflege stand nach dem vorigen Eintrag nur im
+`README.md`. Marcus wollte ihn dort haben, wo er gebraucht wird: in der
+erzeugten Datei, als eigenes Blatt vor »Termine«.
+
+**Die Änderung.** `Export → Kongresse für die Datenpflege` gibt die Datei jetzt
+mit zwei Blättern aus. Vorn steht `Hinweise`, eine einzelne Textspalte von 104
+Zeichen Breite und 35 Zeilen: dass die Datei eine Abschreibvorlage ist und
+keine Ladedatei; warum der Excel-Eingang der Datenpflege sie abweist und was
+geschähe, würde er es nicht; die Übernahme in vier Schritten; warum ein Verweis
+und nicht Einfügen von Hand; und die Warnung, die Werte nur über den Zeilen des
+eigenen Jahrgangs einzusetzen. Dahinter unverändert `Termine`.
+
+Die Zeilennummern im Hinweisblatt sind keine Platzhalter: `datenpflegeBlatt`
+rechnet die letzte belegte Zeile aus (Kopf in Zeile 5, Daten ab 6) und setzt sie
+in beide Formeln ein. Für den Jahrgang 2026 mit 54 Ausgaben steht dort also
+`Kongresse!I$6:I$59`, nicht ein geratener Bereich.
+
+Neu sind `dpHinweisZeilen(letzte)` und `hinweisBlattXml(zeilen)`;
+`baueDatenpflegeXlsx` nimmt zwei Blätter statt einem. Der Abschlussdialog nennt
+das neue Blatt und sagt in einem Satz, dass die Datei sich in der Datenpflege
+nicht direkt einlesen lässt. `README.md` verweist an beiden Stellen darauf.
+
+**Nachweis.**
+
+| Prüfung | Ergebnis |
+|---|---|
+| Blatt »Termine« der erzeugten Datei, vorher gegen nachher | **zeichengleich**; auch `styles.xml` unverändert |
+| Aufbau der Mappe | zwei Blätter in der Folge `Hinweise`, `Termine`; alle sieben Teile wohlgeformt; jede `r:id` löst auf, jede Beziehung zeigt auf eine vorhandene Datei, jeder Teil hat einen Content-Type, keine Stilnummer außerhalb der sieben `cellXfs` |
+| Zeilenrechnung | 54 Ausgaben → letzte Zeile 59; das Blatt nennt »Zeilen 6 bis 59« und dieselben Grenzen in beiden Formeln |
+| Prüfreihe (22 Skripte gegen `9081373`) | 22-mal zeichengleich |
+| Goldener Test, zehn Signaturen | zeichengleich |
+| Abschlussdialog | „… Das vorangestellte Blatt „Hinweise" beschreibt Schritt für Schritt, wie die Angaben in die Datenpflege gelangen. Direkt einlesen lässt sich die Datei dort nicht — der Excel-Eingang erwartet den vollständigen Abzug." |
+
+In Excel geöffnet wurde die Datei nicht: dafür gibt es auf dieser Maschine
+keinen Weg ohne Fenster. Geprüft ist der Aufbau der Mappe, nicht die Anzeige.
+
+**Nicht Teil dieser Änderung.** Weiterhin kein eigener Eingang in der
+Datenpflege für diese Datei.
+
+**Commit** `—` · MD5 `f801a08e…` → `c6541fad…`
+
+---
+
 ## 2026-09-09 — Der Weg der Kongress-Datei in die Datenpflege, festgehalten
 
 **Anlass.** Marcus versuchte, die Datei aus *Export → Kongresse für die

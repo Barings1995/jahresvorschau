@@ -3512,6 +3512,59 @@ function dpMonat(iso){
   return MONATE[Number(iso.slice(5,7))-1] || '';
 }
 
+// Ein Blatt aus einer einzigen Spalte Text. Es steht vor „Termine", weil die
+// Datei sonst aussieht wie eine Ladedatei und in der Datenpflege abgewiesen
+// wird - der Weg gehoert deshalb in die Datei selbst, nicht nur ins Handbuch.
+function dpHinweisZeilen(letzte){
+  const F=(w,s)=>({w,s});
+  return [
+    F(`Kongresse für die Datenpflege — Jahrgang ${jahr}`,4),
+    F(`Erzeugt aus der Jahresvorschau, Stand ${standText()}`,5),
+    F('',0),
+    F('Diese Datei ist eine Abschreibvorlage, keine Ladedatei.',6),
+    F('Sie lässt sich in der Datenpflege NICHT über „Aus Excel laden" einlesen. Jener Eingang erwartet',0),
+    F('den vollständigen Abzug mit dem Blatt „Preise" und ersetzt jeden darin enthaltenen Jahrgang im',0),
+    F('Ganzen — eine Datei ohne Preiszeilen nähme dem Jahrgang sämtliche Preise.',0),
+    F('',0),
+    F('So werden die Angaben übernommen',6),
+    F('1. In der Datenpflege „Abzug sichern". Es entsteht Angebotsdaten_JJJJ-MM-TT.xlsx mit den',0),
+    F('    Blättern Info, Preise und Termine.',0),
+    F('2. Das Blatt „Termine" dieser Datei in die Abzugsmappe kopieren, dort als Blatt „Kongresse".',0),
+    F(`    Die Daten stehen dort in den Zeilen 6 bis ${letzte}, im Abzug ab Zeile 2.`,0),
+    F('3. In beiden Blättern rechts der Daten eine Hilfsspalte L mit dem Schlüssel anlegen:',0),
+    F('    im Abzug ab Zeile 2:            =$A2&"|"&$B2&"|"&$C2',0),
+    F('    im Blatt „Kongresse" ab Zeile 6: =$A6&"|"&$B6&"|"&$C6',0),
+    F('    Damit im Abzug die Spalten I und J holen (ab Zeile 2, nach unten ziehen):',0),
+    F(`    =WENNFEHLER(INDEX(Kongresse!I$6:I$${letzte};VERGLEICH($L2;Kongresse!$L$6:$L$${letzte};0));"")`,0),
+    F(`    =WENNFEHLER(INDEX(Kongresse!J$6:J$${letzte};VERGLEICH($L2;Kongresse!$L$6:$L$${letzte};0));"")`,0),
+    F(`4. Die beiden Ergebnisspalten NUR über den Zeilen des Jahrgangs ${jahr} als Werte in die Spalten`,0),
+    F('    I und J einsetzen. Danach die Hilfsspalten und das Blatt „Kongresse" entfernen, speichern',0),
+    F('    und den Abzug über „Aus Excel laden" einlesen.',0),
+    F('',0),
+    F('Warum ein Verweis und nicht Einfügen von Hand',6),
+    F('Die Zeilenfolge ist in beiden Dateien verschieden: hier stehen die Titel in der Ordnung der',0),
+    F('Jahresvorschau, im Abzug beginnt das Blatt „Termine" mit „Die Onkologie" und führt dreizehn',0),
+    F('weitere Titel dazwischen. Die Titelnamen selbst sind in beiden Dateien wortgleich, deshalb',0),
+    F('trifft der Schlüssel aus Jahrgang, Titel und Heft eindeutig. Die Verkettung mit & gleicht dabei',0),
+    F('aus, dass der Jahrgang im Abzug als Zahl und hier als Text steht.',0),
+    F('',0),
+    F(`Außerhalb der Zeilen des Jahrgangs ${jahr} liefert der Verweis leere Zeichenketten. Würden die`,5),
+    F('Spalten dort mit eingesetzt, verlören die übrigen Titel ihre Einträge.',5),
+    F('',0),
+    F('Die Kongresszeile selbst steht im Blatt „Termine" in Spalte J, in der Schreibweise der',5),
+    F('Angebotswerkzeuge: Kurzname (Auslage), Zeitraum, Ort — je Kongress eine eigene Zeile.',5)
+  ];
+}
+
+// Eine Spalte, eine Zeile je Textzeile: kein Kopf, kein Filter, keine Fixierung.
+function hinweisBlattXml(zeilen){
+  const aus=zeilen.map((z,i)=>`<row r="${i+1}">`+zelle('A'+(i+1),z.w,'s',z.s)+`</row>`);
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
+    `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">`+
+    `<cols><col min="1" max="1" width="104" customWidth="1"/></cols>`+
+    `<sheetData>`+aus.join('')+`</sheetData></worksheet>`;
+}
+
 function datenpflegeBlatt(){
   const kopf = ['Jahrgang','Titel','Heft','Monat','ET','AS','DU-Schluss','EH-Termin',
     'Themenschwerpunkte','Kongresse'];
@@ -3533,14 +3586,17 @@ function datenpflegeBlatt(){
     [`Angebotswerkzeuge, Blatt „Termine", Spalte „Kongresse" (J)`,0],
     [`Erzeugt aus der Jahresvorschau, Stand ${standText()}`,5]
   ];
-  return {xml: blattXml(breiten,vorspann,kopf,zeilen), ausgaben:zeilen.length,
-    mitKongress, ohneTermin};
+  // Kopfzeile in Zeile 5, Daten ab 6 - dieselbe Rechnung, die blattXml anstellt.
+  const letzte = 5 + zeilen.length;
+  return {xml: blattXml(breiten,vorspann,kopf,zeilen),
+    hinweis: hinweisBlattXml(dpHinweisZeilen(letzte)),
+    ausgaben:zeilen.length, mitKongress, ohneTermin};
 }
 
-// Eigene, schlanke Zip-Verpackung statt baueXlsx wiederzuverwenden: ein Blatt,
-// kein zweites, keine Bedingungen - so bleibt der geprüfte Excel-Export
-// unangetastet.
-function baueDatenpflegeXlsx(blattXmlText){
+// Eigene, schlanke Zip-Verpackung statt baueXlsx wiederzuverwenden: zwei feste
+// Blaetter, keine Bedingungen - so bleibt der geprüfte Excel-Export unangetastet.
+// „Hinweise" steht vorn, damit der Weg beim Öffnen zuerst dasteht.
+function baueDatenpflegeXlsx(hinweisXmlText, blattXmlText){
   const NS='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
   const teile=[
     {name:'[Content_Types].xml', text:
@@ -3550,6 +3606,7 @@ function baueDatenpflegeXlsx(blattXmlText){
       `<Default Extension="xml" ContentType="application/xml"/>`+
       `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>`+
       `<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`+
+      `<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`+
       `<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>`+
       `</Types>`},
     {name:'_rels/.rels', text:
@@ -3560,15 +3617,18 @@ function baueDatenpflegeXlsx(blattXmlText){
     {name:'xl/workbook.xml', text:
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
       `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="${NS}">`+
-      `<sheets><sheet name="Termine" sheetId="1" r:id="rId1"/></sheets></workbook>`},
+      `<sheets><sheet name="Hinweise" sheetId="1" r:id="rId1"/>`+
+      `<sheet name="Termine" sheetId="2" r:id="rId2"/></sheets></workbook>`},
     {name:'xl/_rels/workbook.xml.rels', text:
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`+
       `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`+
       `<Relationship Id="rId1" Type="${NS}/worksheet" Target="worksheets/sheet1.xml"/>`+
+      `<Relationship Id="rId2" Type="${NS}/worksheet" Target="worksheets/sheet2.xml"/>`+
       `<Relationship Id="rId9" Type="${NS}/styles" Target="styles.xml"/>`+
       `</Relationships>`},
     {name:'xl/styles.xml', text:XLSX_STYLES},
-    {name:'xl/worksheets/sheet1.xml', text:blattXmlText}
+    {name:'xl/worksheets/sheet1.xml', text:hinweisXmlText},
+    {name:'xl/worksheets/sheet2.xml', text:blattXmlText}
   ];
   const enc=new TextEncoder();
   return zipBauen(teile.map(t=>({name:t.name,bytes:enc.encode(t.text)})));
@@ -3577,7 +3637,7 @@ function baueDatenpflegeXlsx(blattXmlText){
 async function datenpflegeExport(){
   schliesseExport();
   const b = datenpflegeBlatt();
-  const bytes = baueDatenpflegeXlsx(b.xml);
+  const bytes = baueDatenpflegeXlsx(b.hinweis, b.xml);
   const url = URL.createObjectURL(new Blob([bytes.buffer||bytes],
     {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
   const a = document.createElement('a');
@@ -3591,7 +3651,10 @@ async function datenpflegeExport(){
     `<p>${b.mitKongress} von ${b.ausgaben} Ausgaben tragen mindestens einen Kongress.</p>`+
     `<p>Die Datei „Kongresse_Datenpflege_${esc(jahr)}.xlsx" steht im Download-Ordner bereit,`+
     ` im Aufbau des Blattes „Termine": Jahrgang, Titel und Heft führen die Zeile,`+
-    ` die letzte Spalte trägt den Wortlaut für die Spalte „Kongresse".${hinweis}</p>`,
+    ` die letzte Spalte trägt den Wortlaut für die Spalte „Kongresse".${hinweis}</p>`+
+    `<p>Das vorangestellte Blatt „Hinweise" beschreibt Schritt für Schritt, wie die`+
+    ` Angaben in die Datenpflege gelangen. Direkt einlesen lässt sich die Datei dort`+
+    ` nicht — der Excel-Eingang erwartet den vollständigen Abzug.</p>`,
     'Schließen');
 }
 
