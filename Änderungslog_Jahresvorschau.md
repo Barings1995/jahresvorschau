@@ -64,7 +64,7 @@ Themenschwerpunkte und Kongresse an vorhandenen Terminen fortschreibt — ohne
 Ersetzen, ohne Preise. Vorgeschlagen und zurückgestellt; die Handarbeit oben
 bleibt vorerst der Weg.
 
-**Commit** `—` · `index.html` unverändert (MD5 `f801a08e…`) · geändert nur
+**Commit** `9081373` · `index.html` unverändert (MD5 `f801a08e…`) · geändert nur
 `README.md` und dieses Log
 
 ---
