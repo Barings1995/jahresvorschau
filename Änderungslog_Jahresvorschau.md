@@ -21,6 +21,59 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-10 — Nachtrag: „undefined" als Monatskopf, Heftbezeichnung über den Terminen
+
+**Anlass.** Marcus hat vier Bildschirmfotos der Ausgabe „Facharzttraining"
+geschickt (best practice onkologie 2026). Sie zeigten dreierlei: das Wort
+„Heft" noch vor der Bezeichnung, eine Monatsgruppe namens „UNDEFINED" und eine
+Heftbezeichnung, die quer über die Terminspalten läuft.
+
+**Zum ersten Punkt keine Änderung.** Die ausgelieferte Datei trug die
+Sonderheft-Regel bereits; `heftText` aus der *live geladenen* Seite
+herausgeschnitten und ausgeführt, ergibt `"Facharzttraining"` ohne Vorsatz und
+`"Heft 9"` mit. Die Bilder stammen aus dem Zwischenspeicher des Browsers.
+
+**Befund zum Monatskopf.** Die Monatsliste gruppierte über
+`it.iss.et.slice(0,7)`. Ohne Erscheinungstermin war der Schlüssel leer,
+`MONATE[NaN]` ergab `undefined`, und der Kopf las sich — durch
+`text-transform` in Großbuchstaben — als „UNDEFINED". Der Excel-Eingang lässt
+Ausgaben ohne ET gar nicht erst herein (`ohneEt`), der Bearbeiten-Dialog aber
+schon; genau so ist die Ausgabe entstanden.
+
+**Befund zur Spaltenbreite.** Die Heftspalte war in Liste und Kongressliste
+fest auf 66 px gesetzt — bemessen auf „Heft 12". Gemessen im Browser:
+„Facharzttraining" braucht 98 px, also 32 px Überlauf in die Spalte „ET".
+
+**Geändert.**
+- `renderListe`: Ausgaben ohne Erscheinungstermin sammeln sich unter dem
+  Schlüssel `OHNE_ET` und stehen als eigene Gruppe „Erscheinungstermin offen"
+  hinter allen Monaten; die Sortierung stellt sie ausdrücklich ans Ende, statt
+  sich auf die Zeichenfolge zu verlassen.
+- Die Heftspur wächst mit: `66px` → `minmax(66px,max-content)` in
+  `.lrow>summary` und `.kentry`, ebenso in den beiden Druckrastern
+  (`52px` und `50px`).
+
+**Nicht mitgeändert.** Die Jahresmatrix lässt eine Ausgabe ohne ET weiterhin
+aus — sie hat dort keine Spalte. Der Bearbeiten-Dialog nimmt eine Ausgabe ohne
+Termin weiterhin an; das ist gewollt, solange die Planung noch offen ist.
+
+**Nachweis.**
+- `jv_heft_probe.mjs`: `heftText` aus der ausgelieferten Datei, acht Fälle.
+- `jv_liste_probe.mjs`: `renderListe` mit vier Ausgaben, zwei davon ohne ET →
+  Köpfe `September 2026 (1)`, `Oktober 2026 (1)`, `Erscheinungstermin offen
+  (2)`, kein „undefined" im erzeugten HTML; Gegenprobe ohne fehlende Termine
+  ergibt unverändert `September 2026`, `Oktober 2026`.
+- `jv_spalte.html` in Chrome headless gemessen: alt Spur 66 / Text 98 /
+  Überlauf 32; neu Spur 98 / Überlauf 0. Eine Zeile mit „Heft 9" behält 66 px,
+  ihre ET-Spalte beginnt unverändert bei 353 px — nur die lange Zeile rückt um
+  19 px. Die Ausrichtung der übrigen Zeilen bleibt also erhalten.
+- `node --check` über beide Inline-Skriptblöcke.
+
+**Beleg.** MD5 vorher `14dce8cce12b5390bde320e104931d7d`, nachher
+`18f71c2137c8561b128fb1e280e43ad5`. Commit: `COMMIT` — noch nicht gepusht.
+
+---
+
 ## 2026-09-10 — Ein Sonderheft heißt „Sonderheft", nicht „Heft Sonderheft"
 
 **Anlass.** Marcus: in manchen Jahren führt der eine oder andere Titel ein

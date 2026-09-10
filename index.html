@@ -213,7 +213,7 @@ body.bearbmodus .filter-row{opacity:.38;pointer-events:none}
 .mhead{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--navy);padding-bottom:6px;border-bottom:2px solid var(--navy-faint);margin-bottom:6px;display:flex;align-items:baseline;gap:10px}
 .mcount{font-size:.68rem;font-weight:400;letter-spacing:.02em;color:var(--muted);text-transform:none}
 .lrow{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--jcol,var(--border));border-radius:5px;margin-bottom:5px;overflow:hidden}
-.lrow>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(150px,1.5fr) 66px repeat(4,82px) minmax(170px,2fr) 16px;gap:10px;align-items:center;padding:8px 11px}
+.lrow>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(150px,1.5fr) minmax(66px,max-content) repeat(4,82px) minmax(170px,2fr) 16px;gap:10px;align-items:center;padding:8px 11px}
 .lrow>summary::-webkit-details-marker{display:none}
 .lrow>summary:hover{background:var(--surface2)}
 .ltitle{font-size:.73rem;font-weight:700;color:var(--jcol,var(--navy));line-height:1.25}
@@ -295,7 +295,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
    ueber die ganze Breite auseinanderziehen wuerde. */
 .kn-txt{min-width:0}
 .kcount{font-size:.68rem;font-weight:400;color:var(--muted);white-space:nowrap}
-.kentry{display:grid;grid-template-columns:minmax(150px,1.5fr) 66px 74px repeat(4,82px) minmax(150px,1.8fr);gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--surface3);font-size:.73rem}
+.kentry{display:grid;grid-template-columns:minmax(150px,1.5fr) minmax(66px,max-content) 74px repeat(4,82px) minmax(150px,1.8fr);gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--surface3);font-size:.73rem}
 .kentry:hover{background:var(--surface2)}
 .ktitel{font-weight:700;color:var(--jcol,var(--navy));line-height:1.25}
 /* Heft und Auflage untereinander, Termine zweizeilig - genau wie in der Liste */
@@ -524,7 +524,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   .mgroup{margin-bottom:12px}
   .mhead{break-after:avoid;font-size:8pt;margin-bottom:5px}
   .lrow{break-inside:avoid;margin-bottom:3px;border-left-width:3px}
-  .lrow>summary{grid-template-columns:minmax(0,1.4fr) 52px repeat(4,64px) minmax(0,1.6fr);gap:7px;padding:5px 8px}
+  .lrow>summary{grid-template-columns:minmax(0,1.4fr) minmax(52px,max-content) repeat(4,64px) minmax(0,1.6fr);gap:7px;padding:5px 8px}
   /* Die Regeln fuer schmale Fenster greifen auch auf der Druckseite und wuerden
      Titel, Heft und Thema je ueber die volle Breite ziehen – hier zuruecknehmen */
   .ltitle,.lheft,.lthema{grid-column:auto}
@@ -613,7 +613,7 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   .kgroup{margin-bottom:7px;break-inside:avoid}
   .kname{background:none;border-bottom:1.5px solid var(--navy);padding:5px 8px;font-size:8.5pt;break-after:avoid}
   .kcount{font-size:7pt}
-  .kentry{grid-template-columns:minmax(0,1.4fr) 50px 54px repeat(4,64px) minmax(0,1.6fr);gap:7px;padding:4px 8px;font-size:7.5pt;border-top:.5px solid var(--border)}
+  .kentry{grid-template-columns:minmax(0,1.4fr) minmax(50px,max-content) 54px repeat(4,64px) minmax(0,1.6fr);gap:7px;padding:4px 8px;font-size:7.5pt;border-top:.5px solid var(--border)}
   .ktitel,.kthema{grid-column:auto}
   .kart{background:none!important;border:1px solid currentColor;font-size:6pt;padding:1px 4px}
   .kart.auslage{color:var(--warm)}
@@ -1920,11 +1920,18 @@ function renderCards(items,q){
 }
 
 // ─── Ansicht: Liste nach Monaten ───────────────────────────────────────────
+// Gruppiert wird nach dem Monat des Erscheinungstermins. Fehlt er - der
+// Excel-Eingang laesst das nicht zu, der Bearbeiten-Dialog schon -, gaebe der
+// Schluessel nichts her und die Ueberschrift hiesse "undefined". Solche
+// Ausgaben sammeln sich deshalb unter einem eigenen Kopf und stehen hinten.
+const OHNE_ET='ohne-et';
 function renderListe(items,q){
   const monate={};
-  items.forEach(it=>{const k=it.iss.et.slice(0,7);(monate[k]=monate[k]||[]).push(it);});
-  return Object.keys(monate).sort().map(k=>{
+  items.forEach(it=>{const k=it.iss.et?it.iss.et.slice(0,7):OHNE_ET;(monate[k]=monate[k]||[]).push(it);});
+  return Object.keys(monate).sort((a,b)=>
+      a===OHNE_ET ? 1 : b===OHNE_ET ? -1 : a.localeCompare(b)).map(k=>{
     const [y,m]=k.split('-'), arr=monate[k];
+    const kopf = k===OHNE_ET ? 'Erscheinungstermin offen' : `${MONATE[+m-1]} ${y}`;
     const zeilen=arr.map(({j,iss})=>{
       const thema=zeigeThema() ? iss.t.join(' · ') : '';
       return`<details class="lrow" style="--jcol:${j.hex}"${q?' open':''}>
@@ -1938,7 +1945,7 @@ function renderListe(items,q){
         <div class="ldetail">${inhaltBloecke(iss,q)}</div>
       </details>`;
     }).join('');
-    return`<section class="mgroup"><div class="mhead">${MONATE[+m-1]} ${y}<span class="mcount">${arr.length} Ausgabe${arr.length!==1?'n':''}</span></div>${zeilen}</section>`;
+    return`<section class="mgroup"><div class="mhead">${esc(kopf)}<span class="mcount">${arr.length} Ausgabe${arr.length!==1?'n':''}</span></div>${zeilen}</section>`;
   }).join('');
 }
 
