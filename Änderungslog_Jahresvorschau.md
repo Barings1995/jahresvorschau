@@ -70,7 +70,7 @@ Termin weiterhin an; das ist gewollt, solange die Planung noch offen ist.
 - `node --check` über beide Inline-Skriptblöcke.
 
 **Beleg.** MD5 vorher `14dce8cce12b5390bde320e104931d7d`, nachher
-`18f71c2137c8561b128fb1e280e43ad5`. Commit: `COMMIT` — noch nicht gepusht.
+`18f71c2137c8561b128fb1e280e43ad5`. Commit: `a3b5a88` — noch nicht gepusht.
 
 ---
 
