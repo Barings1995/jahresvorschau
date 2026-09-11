@@ -58,7 +58,7 @@ kann das grundsätzlich nur für eine Breite treffen.
 - Golden Test gleich.
 
 **Beleg.** MD5 vorher `43be37f7ffc23d618e49b1d2d37d6316`, nachher
-`85115dc7d612514f6bdc73c5c430bfc4`. Commit: siehe unten, noch nicht gepusht.
+`85115dc7d612514f6bdc73c5c430bfc4`. Commit: `4fb252e` — noch nicht gepusht.
 
 ---
 
