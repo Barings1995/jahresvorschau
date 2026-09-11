@@ -74,7 +74,7 @@ neben dem Umschalter, die Liste als Dialog.
 - Prüfreihe: 18 von 19 gleich, `nummern2_pruef` ist ein Zufallstest.
 - Golden Test gleich.
 
-**Beleg.** MD5 vorher `6d42bb01130ea18623d0ce512582c362`, nachher `7c87606ac5e3a2756905f2e91cdfe4e1`. Commit `COMMIT`.
+**Beleg.** MD5 vorher `6d42bb01130ea18623d0ce512582c362`, nachher `7c87606ac5e3a2756905f2e91cdfe4e1`. Commit `f23f41b`.
 
 ---
 
