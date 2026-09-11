@@ -21,6 +21,47 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Kongressmatrix: Rollfeld gemessen statt fester Abzug
+
+**Anlass.** Nach dem Push von `be02b53` meldete Marcus mit einem
+Bildschirmfoto, dass der Rollbalken der ganzen Seite in der Ansicht „Nach
+Kongress“ weiter da ist, nur kürzer. Der Nachweis im vorigen Eintrag war
+falsch: Die Probe hatte gemessen, bevor die Webschriften geladen waren. Mit
+geladenen Schriften steht die Tabelle 11 px tiefer, und die Seite rollte bei
+1400 px Breite um 8 px mit. Bei 1200 px Breite bricht die Kopfleiste in zwei
+Zeilen um, dann waren es 50 px. Ein fester Abzug wie `calc(100vh - 290px)`
+kann das grundsätzlich nur für eine Breite treffen.
+
+**Geändert.**
+- Neue Funktion `mxHoeheAnpassen()`. Sie setzt die Höhe des Rollfelds auf den
+  Platz bis zum Fensterrand, abzüglich dessen, was bis zum Ende von `main`
+  folgt, also dessen Innenabstand. Die Mindesthöhe bleibt bei 340 px.
+- Sie läuft nach jedem Zeichnen der Arbeitsansicht, und zwar vor dem
+  Zurückstellen der gemerkten Rollstände. Außerdem läuft sie nach dem Laden
+  der Schriften (`document.fonts.ready`) und bei jeder Größenänderung des
+  Fensters.
+- Der Wert im Stylesheet bleibt nur als Ausgangswert bis zur ersten Messung.
+  Der Kommentar dort ist entsprechend angepasst.
+
+**Nachweis.**
+- `roll_diag.mjs` wartet auf die geladenen Schriften und blendet den
+  Kontobereich ein. Gemessen wurde in neun Fenstergrößen von 900×800 bis
+  1920×1200: Die Seite rollt überall um 0 px mit. Ausnahme sind 900×800 und
+  1400×650, wo wie vorgesehen die Mindesthöhe greift.
+- `resize_pruef.mjs`: Die Kopfleiste wird nachträglich 45 px höher. Ohne
+  Neuberechnung rollte die Seite dann um 45 px, nach dem Resize-Ereignis
+  wieder um 0 px.
+- Prüfreihe gegen den gepushten Stand: 17 von 19 gleich.
+  - `voll_pruef`: Das Rollfeld ist 823 statt 821 px hoch, jetzt exakt
+    bemessen.
+  - `nummern2_pruef`: Zufallstest.
+- Golden Test gleich.
+
+**Beleg.** MD5 vorher `43be37f7ffc23d618e49b1d2d37d6316`, nachher
+`85115dc7d612514f6bdc73c5c430bfc4`. Commit: siehe unten, noch nicht gepusht.
+
+---
+
 ## 2026-09-11 — Arbeitsansicht: Etikett im Kopf statt Zeile „Bearbeiten · Jahrgang“
 
 **Anlass.** Über dem Umschalter „Nach Ausgabe / Nach Kongress“ stand eine
@@ -46,6 +87,8 @@ B1 (Daten-Knopf hervorgehoben) in Springer-Blau und D (Etikett am Titel).
   nutzt. Nachgemessen: Bei 290 px rollt die Seite nicht mit, bei 285 px
   schon. Der alte Wert 310 ließ die Seite trotz der Absicht im Kommentar um
   ein paar Pixel mitrollen, sodass zwei Rollbalken nebeneinanderstanden.
+  *Nachtrag: Diese Messung war falsch, weil die Webschriften noch nicht
+  geladen waren. Die Seite rollte weiter mit. Behoben im Eintrag darüber.*
 - Zwei Kommentare, die noch auf die Statuszeile verwiesen, sind nachgezogen.
 
 **Nachweis.**

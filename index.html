@@ -835,14 +835,12 @@ p.bearb-stand:not(:empty){margin-top:9px}
    stehen bleiben: ein klebendes Element haelt sich an seinem naechsten
    rollenden Vorfahren fest, und bei overflow:auto ist das dieser Kasten.
    Dieselbe Bauart wie die Ausgabenliste links (.bearb-liste), die ihre
-   Titelkoepfe seit jeher so festhaelt. Die Hoehe ist so bemessen, dass
-   Kopfleiste, Umschalterzeile und Tabelle zusammen ins Fenster passen - die
-   Seite selbst rollt dann gar nicht, es stehen also nicht zwei Rollbalken
-   nebeneinander. Wird das Fenster sehr flach, greift die Mindesthoehe und die
-   Seite rollt wieder mit. Nachgemessen am 11.09.2026, als die Statuszeile aus
-   der Arbeitsansicht fiel: bei 290 px rollt die Seite nicht, bei 285 px schon.
-   Die fruehere 310 rechnete die Statuszeile mit und liess die Seite trotzdem
-   um ein paar Pixel mitrollen. */
+   Titelkoepfe seit jeher so festhaelt. Die Hoehe setzt mxHoeheAnpassen() so,
+   dass Kopfleiste, Umschalterzeile und Tabelle zusammen ins Fenster passen -
+   die Seite selbst rollt dann gar nicht, es stehen also nicht zwei Rollbalken
+   nebeneinander. Der Wert hier ist nur der Ausgangswert bis zur ersten Messung.
+   Wird das Fenster sehr flach, greift die Mindesthoehe und die Seite rollt
+   wieder mit. */
 .mx-scroll{overflow:auto;max-height:calc(100vh - 290px);min-height:340px;
   background:var(--surface);border:1px solid var(--border);
   border-radius:6px}
@@ -3791,6 +3789,9 @@ function render(){
     mxRollZurueck = false;
     res.className='bearbansicht';
     res.innerHTML=renderBearbeiten();
+    // Vor dem Zurueckstellen der Rollstaende: erst die endgueltige Hoehe,
+    // sonst schnitte ein zu kleines Feld den gemerkten Stand ab.
+    mxHoeheAnpassen();
     if(listeStand){
       const neueListe = res.querySelector('.bearb-liste');
       if(neueListe) neueListe.scrollTop = listeStand;
@@ -5008,6 +5009,28 @@ function mxZeileHtml(k, offen){
 // Zaehlung, Art-Umschalter und "+ Neuer Kongress". Stuende er wie in der
 // Ausgabenansicht als eigener Block darueber, bliebe links davon eine leere
 // Bank, und die Tabelle saesse 55 statt 14 Pixel unter dem Umschalter.
+// Hoehe des Rollfelds der Kongressmatrix: genau bis zum Fensterrand, damit die
+// Seite selbst nicht mitrollt und nicht zwei Rollbalken nebeneinander stehen.
+// Gemessen statt als fester Abzug im Stylesheet, weil die Hoehe darueber nicht
+// feststeht: die Kopfleiste bricht bei schmalerem Fenster in zwei Zeilen um,
+// die Webschriften kommen erst nach dem ersten Zeichnen, und die Notiz nach
+// dem Speichern steht nur einen Durchgang lang da. Der feste Abzug in .mx-scroll
+// traf das nur bei einer Breite und liess die Seite sonst 8 bis 50 px mitrollen.
+// Unter dem Feld zaehlt, was bis zum Ende von main folgt (dessen Innenabstand);
+// das haengt, anders als die Seitenhoehe, nicht davon ab, wie hoch das Feld
+// gerade ist. Die Mindesthoehe bleibt: im sehr flachen Fenster rollt die Seite.
+function mxHoeheAnpassen(){
+  const mx = document.querySelector('.mx-scroll');
+  if(!mx) return;
+  const main = document.querySelector('main');
+  const r = mx.getBoundingClientRect();
+  const unten = main.getBoundingClientRect().bottom - r.bottom;
+  const hoehe = Math.floor(innerHeight - (r.top + scrollY) - unten);
+  mx.style.maxHeight = Math.max(340, hoehe) + 'px';
+}
+window.addEventListener('resize', mxHoeheAnpassen);
+if(document.fonts) document.fonts.ready.then(mxHoeheAnpassen);
+
 function renderKongressmatrix(umschalter){
   const kopfZeile = rechts =>
     `<div class="mx-kopf">${umschalter}<div class="mx-kopf-re">${rechts}</div></div>`;
