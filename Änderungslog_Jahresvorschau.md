@@ -67,7 +67,7 @@ wie „Nach Kongress“, und der Speichern-Knopf bleibt fest stehen.
 - Prüfreihe: 18 von 19 gleich, `nummern2_pruef` ist ein Zufallstest.
 - Golden Test gleich.
 
-**Beleg.** MD5 vorher `713b365fec22c0f5653daab6c3dfdc1b`, nachher `6d42bb01130ea18623d0ce512582c362`. Commit: *(folgt)*. Nicht gepusht.
+**Beleg.** MD5 vorher `713b365fec22c0f5653daab6c3dfdc1b`, nachher `6d42bb01130ea18623d0ce512582c362`. Commit `86dc883`. Nicht gepusht.
 
 ---
 
