@@ -60,7 +60,7 @@ ist offen.
 - Golden Test gleich.
 
 **Beleg.** MD5 vorher `85115dc7d612514f6bdc73c5c430bfc4`, nachher
-`713b365fec22c0f5653daab6c3dfdc1b`. Commit: *(folgt)*. Nicht gepusht.
+`713b365fec22c0f5653daab6c3dfdc1b`. Commit `c011919`. Nicht gepusht.
 
 ---
 
