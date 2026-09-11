@@ -56,7 +56,7 @@ Browsern.
   Zufallstest.
 - Golden-Test: gleich.
 
-**Beleg.** MD5 `7c87606a…` → `a3bbd31d685c3ff27be1b427ad70a72e`, Commit `738f416`.
+**Beleg.** MD5 `7c87606a…` → `a3bbd31d685c3ff27be1b427ad70a72e`, Commit `738f416`. Gepusht (`1383d60..c8ac73a`), ausgelieferte Seite prüfsummengleich.
 
 ---
 
