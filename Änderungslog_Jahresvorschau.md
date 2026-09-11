@@ -46,7 +46,7 @@ rechts. Der Kommentar dazu ist nachgezogen.
   links.
 
 **Beleg.** MD5 vorher `7849d0ea5ac2caeaa1086bfb09c2ae23`, nachher
-`382dc3550c3491c89075997b99efc44b`. Commit: folgt.
+`382dc3550c3491c89075997b99efc44b`. Commit: `45d0506` — noch nicht gepusht.
 
 ---
 
