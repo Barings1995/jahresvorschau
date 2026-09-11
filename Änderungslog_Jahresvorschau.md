@@ -21,6 +21,63 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Sicherungspunkte hinter einem Knopf neben dem Umschalter
+
+**Anlass.** Der Kasten mit den Sicherungspunkten stand in der rechten Spalte
+unter dem Formular und nahm dort Platz weg. Er gilt aber für den ganzen
+Jahrgang, nicht für die gewählte Ausgabe. In der Ansicht „Nach Kongress“ war er
+gar nicht zu erreichen. Marcus wählte von drei Vorschlägen Weg A: ein Knopf
+neben dem Umschalter, die Liste als Dialog.
+
+**Geändert.**
+- Neben „Nach Ausgabe / Nach Kongress“ steht der Knopf „Sicherungspunkte“ mit
+  der Anzahl als kleiner Zahl. Die Zahl bleibt während des Abrufs und nach
+  einem Fehlschlag weg (`sicherungZahl()`), statt eine alte oder falsche Null zu
+  zeigen. Den Knopf gibt es in beiden Unteransichten; in der Kongressansicht
+  steht er in deren Kopfzeile.
+- `bearbUmschalterHtml()` liefert dafür Umschalter und Knopf gemeinsam in
+  `.bearb-oben`.
+- Ein Klick öffnet `sicherungenZeigen()`, einen Dialog nach dem Muster von
+  `frage()`. Er enthält einen Satz zur Erklärung, dieselbe Liste wie bisher
+  (Zurücksetzen, ×) und im Fuß „Schließen“ und „Sicherungspunkt anlegen“.
+  Escape schließt ihn, außer eine Rückfrage liegt darüber (z-Wert 450, die
+  Rückfragen 500). Ein zweiter Klick öffnet keinen zweiten Dialog.
+- Die Liste im Dialog trägt die alte Kennung `bearbSicherungen`, deshalb frischt
+  `sicherungenHolen()` sie unverändert auf. Die Funktion setzt jetzt auch die
+  Zahl im Knopf neu.
+- Meldungen zu Anlegen, Zurücksetzen und Entfernen gehen über `sichMeldung()`
+  in den Fuß des Dialogs, solange er offen ist. Die Zeile unter dem Formular
+  läge dahinter.
+- Der Kasten `.bearb-sicherung` und seine Kopfzeile sind entfernt, ebenso ihre
+  Regeln. Im Druck wird statt `.bearb-sicherung` jetzt `.bearb-oben`
+  ausgeblendet.
+- Anlegen, Zurücksetzen und Entfernen arbeiten wie bisher. Excel-Laden und
+  Kongress-Umstellung legen weiter selbst einen Sicherungspunkt an.
+
+**Nachweis.**
+- `sich_diag.mjs` bei 1400×900 und 1200×800, mit einer Nachbildung der
+  Datenbankzugriffe.
+- Die Seite rollt mit und ohne Auswahl nicht mit. Der alte Kasten ist fort.
+- Der Knopf steht 10 px rechts vom Umschalter, auf gleicher Mitte, und zeigt
+  „2“.
+- Der Dialog öffnet mit zwei Zeilen, der Fokus liegt auf „Schließen“.
+- Rückfrage beim Anlegen:
+  - Sie liegt darüber.
+  - Escape schließt nur sie, der Dialog bleibt offen.
+- Anlegen mit Bezeichnung ergibt drei Zeilen und die Meldung „Sicherungspunkt
+  angelegt“ im Dialog. Die Zahl im Knopf steht dann auf 3.
+- Entfernen ergibt wieder zwei Zeilen.
+- Escape schließt den Dialog.
+- In der Kongressansicht steht der Knopf in der Kopfzeile, die Seite rollt
+  nicht.
+- Bildschirmfoto bei 1400×900 mit offenem Dialog.
+- Prüfreihe: 18 von 19 gleich, `nummern2_pruef` ist ein Zufallstest.
+- Golden Test gleich.
+
+**Beleg.** MD5 vorher `6d42bb01130ea18623d0ce512582c362`, nachher `7c87606ac5e3a2756905f2e91cdfe4e1`. Commit `COMMIT`.
+
+---
+
 ## 2026-09-11 — Ausgabenansicht: rechte Spalte rollt in sich, Speichern bleibt stehen
 
 **Anlass.** Im vorigen Eintrag blieb offen, dass die Seite bei gewählter Ausgabe

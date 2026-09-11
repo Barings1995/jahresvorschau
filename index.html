@@ -482,7 +482,7 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
   /* Die Bearbeiten-Ansicht ist Werkzeug, keine Druckvorlage. druckeMit schliesst
      sie vorher; die Klasse am Ergebnisbereich traegt beide Unteransichten
      (nach Ausgabe wie nach Kongress) und ist das Sicherheitsnetz dafuer. */
-  #results.bearbansicht,.bearb,.bearb-sicherung{display:none!important}
+  #results.bearbansicht,.bearb,.bearb-oben{display:none!important}
   /* Ein Pixel Luft rechts fuer den gesamten Satzspiegel. Chrome zeichnet jede
      Kante auf ganze Pixel und rundet dabei auf: der Druckbereich ist 1039,39 px
      breit (quer, A4, 11 mm Rand), gezeichnet wurde bis 1040. Bei den waagerechten
@@ -693,8 +693,8 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 
 .bearb-form{background:var(--surface);border:1px solid var(--border);
   border-radius:6px;padding:16px 18px}
-/* Die rechte Spalte rollt in sich, wie die Liste links: Formular und
-   Sicherungspunkte zusammen sind hoeher als jedes uebliche Fenster, und die
+/* Die rechte Spalte rollt in sich, wie die Liste links: das Formular einer
+   Ausgabe mit vielen Kongressen ist hoeher als jedes uebliche Fenster, und die
    Seite selbst soll nicht mitrollen. Die Hoehe setzt rechtsHoeheAnpassen();
    74vh ist nur der Ausgangswert. Einspaltig (schmales Fenster) rollt wieder
    die Seite - ein Rollfeld unter der Liste liefe dort auf seine Mindesthoehe. */
@@ -789,12 +789,21 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-stand.gut{color:#25855a}
 .bearb-stand.schlecht{color:var(--warm)}
 
-/* Sicherungspunkte */
-.bearb-sicherung{margin-top:16px;background:var(--surface);
-  border:1px solid var(--border);border-radius:6px;padding:14px 18px}
-.bearb-sich-kopf{display:flex;align-items:center;justify-content:space-between;
-  gap:10px;margin-bottom:9px}
-.bearb-sich-kopf h3{font-size:.85rem;font-weight:600;color:var(--navy)}
+/* Sicherungspunkte. Sie gelten fuer den ganzen Jahrgang, nicht fuer die
+   gewaehlte Ausgabe, und stehen deshalb nicht mehr unter dem Formular, sondern
+   hinter einem Knopf neben dem Umschalter - in beiden Unteransichten. Die
+   Liste oeffnet sich als Dialog; die Zahl im Knopf sagt vorab, wie viele es
+   gibt. */
+.bearb-oben{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.bearb-oben .bearb-umschalter{margin-bottom:0}
+.mx-kopf .bearb-oben{margin-bottom:0}
+.bearb-sichknopf{display:flex;align-items:center;gap:7px;padding:7px 12px}
+.bs-zahl{min-width:18px;padding:1px 5px;font-size:.68rem;text-align:center;
+  font-variant-numeric:tabular-nums;color:var(--navy);background:var(--surface3);
+  border-radius:9px}
+.bs-zahl:empty{display:none}
+.sich-erkl{color:var(--muted);margin-bottom:10px}
+.dlg-stand.gut{color:#25855a}
 /* Vier feste Spalten statt eines Fliesssatzes: sonst wandern Zeitpunkt und
    Knopf mit der Laenge der Bezeichnung, und die Zeilen stehen versetzt. */
 .bearb-sich-zeile{display:grid;grid-template-columns:1fr max-content max-content max-content;
@@ -4574,6 +4583,65 @@ async function sicherungenHolen(){
   sicherungenLaeuft = false;
   const b = document.getElementById('bearbSicherungen');
   if(b) b.innerHTML = sicherungListeHtml();
+  const z = document.getElementById('bearbSichZahl');
+  if(z) z.textContent = sicherungZahl();
+}
+
+// Die Zahl im Knopf steht nur, solange sie stimmt: waehrend des Abrufs und nach
+// einem Fehlschlag bleibt sie weg, statt eine alte oder eine falsche Null zu
+// zeigen.
+function sicherungZahl(){
+  return (sicherungenLaeuft || sicherungenFehler) ? '' : String(sicherungen.length);
+}
+
+// Meldungen der Sicherungspunkte gehen in den Dialog, solange er offen ist -
+// die Zeile unter dem Formular laege dahinter.
+function sichMeldung(text, art){
+  const e = document.getElementById('sichStand');
+  if(e){ e.textContent = text; e.className = 'dlg-stand' + (art ? ' ' + art : ''); }
+  else bearbStand(text, art);
+}
+
+// Der Dialog mit der Liste. Gebaut wie frage(): ein eigenes Blatt, das wieder
+// verschwindet. Sein z-Wert liegt unter dem der Rueckfragen, die aus ihm heraus
+// kommen (Anlegen, Zuruecksetzen, Entfernen), und ueber dem der Seite.
+// Die Liste darin traegt dieselbe Kennung wie frueher der Kasten unter dem
+// Formular; sicherungenHolen() frischt sie deshalb unveraendert auf.
+// Escape schliesst ihn - aber nicht, solange eine Rueckfrage darueber steht:
+// die faengt Escape vorher ab.
+function sicherungenZeigen(){
+  if(document.getElementById('sichDialog')) return;
+  const back = document.createElement('div');
+  back.className = 'daten-dialog offen';
+  back.id = 'sichDialog';
+  back.style.zIndex = '450';
+  back.setAttribute('role','dialog');
+  back.setAttribute('aria-modal','true');
+  back.setAttribute('aria-labelledby','sichKopf');
+  back.innerHTML =
+    '<div class="dlg-blatt">' +
+      '<h3 class="dlg-kopf" id="sichKopf">Sicherungspunkte · Jahrgang ' + esc(jahrgang()) + '</h3>' +
+      '<div class="dlg-inhalt">' +
+        '<p class="sich-erkl">Ein Sicherungspunkt hält den ganzen Jahrgang fest. ' +
+        'Zurücksetzen ersetzt den Jahrgang durch den gesicherten Stand.</p>' +
+        '<div id="bearbSicherungen">' + sicherungListeHtml() + '</div>' +
+      '</div>' +
+      '<div class="dlg-fuss">' +
+        '<span class="dlg-stand" id="sichStand"></span>' +
+        '<button class="dlg-btn" data-w="zu">Schließen</button>' +
+        '<button class="dlg-btn dlg-ok" data-w="neu">Sicherungspunkt anlegen</button>' +
+      '</div>' +
+    '</div>';
+  const zu = () => {
+    document.removeEventListener('keydown', escSich);
+    back.remove();
+  };
+  function escSich(e){ if(e.key === 'Escape') zu(); }
+  back.querySelector('[data-w="zu"]').onclick = zu;
+  back.querySelector('[data-w="neu"]').onclick = sicherungAnlegen;
+  document.addEventListener('keydown', escSich);
+  document.body.appendChild(back);
+  back.querySelector('[data-w="zu"]').focus();
 }
 
 async function sicherungSchreiben(y, wie){
@@ -4592,8 +4660,8 @@ async function sicherungAnlegen(){
   try{
     await sicherungSchreiben(jahrgang(), wie.trim());
     await sicherungenHolen();
-    bearbStand('Sicherungspunkt angelegt', 'gut');
-  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+    sichMeldung('Sicherungspunkt angelegt', 'gut');
+  }catch(fehler){ sichMeldung(fehlertext(fehler), 'schlecht'); }
 }
 
 async function sicherungZurueck(id, wie){
@@ -4602,7 +4670,7 @@ async function sicherungZurueck(id, wie){
     '<p>Alle seither vorgenommenen Änderungen gehen dabei verloren.</p>',
     'Zurücksetzen')) return;
   try{
-    bearbStand('Wird zurückgesetzt …', '');
+    sichMeldung('Wird zurückgesetzt …', '');
     const treffer = await dbAnfrage('/rest/v1/sicherung?id=eq.' +
       encodeURIComponent(id) + '&select=inhalt');
     const block = treffer && treffer[0] && treffer[0].inhalt;
@@ -4621,8 +4689,8 @@ async function sicherungZurueck(id, wie){
     if(KONG_TABELLEN) await kongresseUebernehmen(j);
     waehleJahrgang(j);
     await sicherungenHolen();
-    bearbStand('Auf den gesicherten Stand zurückgesetzt', 'gut');
-  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+    sichMeldung('Auf den gesicherten Stand zurückgesetzt', 'gut');
+  }catch(fehler){ sichMeldung(fehlertext(fehler), 'schlecht'); }
 }
 
 // Ein Sicherungspunkt verfaellt nicht von selbst und wird auch nicht still
@@ -4637,8 +4705,8 @@ async function sicherungEntfernen(id, wie){
     await dbAnfrage('/rest/v1/sicherung?id=eq.' + encodeURIComponent(id),
       {method:'DELETE', headers:{Prefer:'return=minimal'}});
     await sicherungenHolen();
-    bearbStand('Der Sicherungspunkt wurde entfernt', 'gut');
-  }catch(fehler){ bearbStand(fehlertext(fehler), 'schlecht'); }
+    sichMeldung('Der Sicherungspunkt wurde entfernt', 'gut');
+  }catch(fehler){ sichMeldung(fehlertext(fehler), 'schlecht'); }
 }
 
 // ── Darstellung ─────────────────────────────────────────────────────────────
@@ -4907,7 +4975,12 @@ function mxArtUmschalterHtml(){
 function bearbUmschalterHtml(){
   const btn = (v,t) => `<button type="button" class="bu-btn${bearbAnsicht===v?' aktiv':''}"
     onclick="bearbAnsichtSetzen('${v}')">${t}</button>`;
-  return `<div class="bearb-umschalter">${btn('ausgabe','Nach Ausgabe')}${btn('kongress','Nach Kongress')}</div>`;
+  return `<div class="bearb-oben">
+    <div class="bearb-umschalter">${btn('ausgabe','Nach Ausgabe')}${btn('kongress','Nach Kongress')}</div>
+    <button type="button" class="bearb-zu bearb-sichknopf" onclick="sicherungenZeigen()"
+      title="Sicherungspunkte des Jahrgangs anlegen, zurücksetzen und entfernen">Sicherungspunkte<span
+      class="bs-zahl" id="bearbSichZahl">${sicherungZahl()}</span></button>
+  </div>`;
 }
 
 // ─── Kongressmatrix ─────────────────────────────────────────────────────────
@@ -5493,14 +5566,6 @@ function renderBearbeiten(){
     <div class="bearb-rechts" data-wahl="${escA(JSON.stringify(bearbAuswahl||null))}">
       <div class="bearb-form" id="bearbForm">${formInhaltHtml()}</div>
       <p class="bearb-stand" id="bearbStand"></p>
-      <div class="bearb-sicherung">
-        <div class="bearb-sich-kopf">
-          <h3>Sicherungspunkte</h3>
-          <button type="button" class="bearb-zu" onclick="sicherungAnlegen()">
-            Sicherungspunkt anlegen</button>
-        </div>
-        <div id="bearbSicherungen">${sicherungListeHtml()}</div>
-      </div>
     </div>
   </div>
   <datalist id="kongVorschlag">${
