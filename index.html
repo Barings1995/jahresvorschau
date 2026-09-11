@@ -52,8 +52,13 @@ h1 .accent{color:var(--accent)}
    ist. Frueher stand dafuer eine eigene Zeile "Bearbeiten · Jahrgang ..." ueber
    dem Umschalter; der Jahrgang steht aber schon im Titel, und die Zeile kostete
    30 px Hoehe. Die Schrift ist die der Bedienung, nicht die des Titels - es ist
-   ein Zustand, kein Teil des Namens. Orange wie der Akzent im Titel. */
-.bm-etikett{display:none;margin-left:14px;padding:3px 9px;border:1.5px solid var(--accent);border-radius:4px;color:var(--accent);font-family:'Source Sans 3',Arial,Helvetica,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;line-height:1.2;text-transform:uppercase;vertical-align:middle}
+   ein Zustand, kein Teil des Namens. Orange wie der Akzent im Titel.
+   Die negativen Raender oben und unten sind gleich gross; weil das Etikett
+   mittig sitzt, bleibt es optisch an derselben Stelle, beansprucht aber keine
+   Zeilenhoehe mehr. Ohne sie ragte es in Safari bei 110 % Zoom knapp unter die
+   Titelzeile; die Zeile wurde 0,16 px hoeher, und Logo und Untertitel
+   rutschten beim Wechsel in die Bearbeitung sichtbar nach unten. */
+.bm-etikett{display:none;margin:-4px 0 -4px 14px;padding:3px 9px;border:1.5px solid var(--accent);border-radius:4px;color:var(--accent);font-family:'Source Sans 3',Arial,Helvetica,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;line-height:1.2;text-transform:uppercase;vertical-align:middle}
 body.bearbmodus .bm-etikett{display:inline-block}
 /* Ersetzt das Auswahlfeld in einer exportierten Kopie: derselbe Platz, aber
    fest stehender Jahrgang ohne Pfeil. Farbe erbt das Weiss der Ueberschrift. */
@@ -62,7 +67,10 @@ body.bearbmodus .bm-etikett{display:inline-block}
    Arbeitsansicht - dort traegt ihn die Klasse "bearbbar", sonst steht er da
    wie jede andere Angabe im Streifen. */
 .hero-stamp{margin-left:auto;align-self:center;font-size:.68rem;color:rgba(255,255,255,.6);letter-spacing:.03em;white-space:nowrap;flex:none}
-.stand-feld{color:rgba(255,255,255,.85);padding:0 0 0 2px;outline:none;min-width:2em;display:inline-block}
+/* Unterstrich immer da, ausserhalb der Bearbeitung durchsichtig: sonst kam er
+   erst mit der Bearbeitung hinzu, die Zeile wurde 1 px hoeher, und "Stand"
+   sprang um einen halben Pixel nach oben. */
+.stand-feld{color:rgba(255,255,255,.85);padding:0 0 0 2px;outline:none;min-width:2em;display:inline-block;border-bottom:1px solid transparent}
 .stand-feld.bearbbar{border-bottom:1px dotted rgba(255,255,255,.35);cursor:text}
 .stand-feld.bearbbar:hover{border-bottom-color:var(--accent)}
 .stand-feld:focus{background:rgba(255,255,255,.12);border-bottom:1px solid var(--accent);color:#ffffff}

@@ -21,6 +21,45 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Kopfstreifen steht beim Wechsel in die Bearbeitung still
+
+**Anlass.** Marcus fiel auf, dass bei 110 % Zoom das Springer-Logo und der
+Untertitel beim Wechsel in die Bearbeitung minimal nach unten rutschen.
+
+**Ursache.** Nachgestellt wurde es mit einer WebKit-Sonde, also Safari-Technik
+(WKWebView mit `pageZoom`). In Chrome tritt der Fehler nicht auf. Das Etikett
+„Bearbeiten“ sitzt mittig in der Titelzeile. Bei 110 % ragte es in WebKit
+knapp unter die Zeile, sodass die Titelzeile um 0,16 px höher wurde. Weil die
+Kopfzeile mittig ausrichtet, rückte das Logo um 0,09 px nach und der Untertitel
+um 0,16 px. Nebenbei zeigte sich ein zweiter Ruck: Der gepunktete Unterstrich
+unter dem Stand-Feld kam erst mit der Bearbeitung hinzu. Die Zeile wurde dadurch
+1 px höher, und „Stand“ sprang um einen halben Pixel nach oben, in beiden
+Browsern.
+
+**Geändert.**
+- `.bm-etikett` hat oben und unten je −4 px Rand. Weil das Etikett mittig
+  ausgerichtet ist, bleibt es optisch an derselben Stelle (Lage vorher und
+  nachher gleich). Es beansprucht aber keine Zeilenhöhe mehr.
+- `.stand-feld` trägt immer einen 1 px hohen Unterstrich, außerhalb der
+  Bearbeitung durchsichtig. Die gepunktete Linie der Bearbeitung ersetzt nur
+  seine Farbe und Art.
+
+**Nachweis.**
+- Kopf-Sonde, vorher und nachher gemessen:
+  - Messpunkte: Logo, Kopfzeile, Titel, Untertitel, Jahrgang, Stand, Konto und
+    Streifen.
+  - Zoomstufen in WebKit: 90, 100, 110 und 120 %.
+  - Zoomstufen in Chrome: 100, 110 und 125 %.
+  - Ergebnis: Außer dem erscheinenden Etikett ändert sich nichts mehr. Die Höhe
+    der Kopfzeile in der Leseansicht ist unverändert.
+- Regression: 18 von 19 gleich; nur `nummern2` weicht ab, das ist ein
+  Zufallstest.
+- Golden-Test: gleich.
+
+**Beleg.** MD5 `7c87606a…` → `a3bbd31d685c3ff27be1b427ad70a72e`, Commit `COMMIT`.
+
+---
+
 ## 2026-09-11 — Sicherungspunkte hinter einem Knopf neben dem Umschalter
 
 **Anlass.** Der Kasten mit den Sicherungspunkten stand in der rechten Spalte
