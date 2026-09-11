@@ -21,6 +21,34 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Lange Heftbezeichnung: Umbruch statt mitwachsender Spalte
+
+**Anlass.** Nach dem Nachtrag vom Vortag stand die Zeile „Facharzttraining" in
+der Monatsliste einzeilig, ihre Termine aber knapp 20 px versetzt zu denen von
+Heft 9. Marcus hat drei Varianten nebeneinander gesehen — mitwachsen (A),
+Umbruch in fester Spalte (B), feste breitere Spalte für alle (C) — und B
+gewählt.
+
+**Geändert.**
+- Die Heftspur ist wieder fest: `66px` in `.lrow>summary` und `.kentry`,
+  `52px` und `50px` in den Druckrastern — der Stand vor dem Nachtrag.
+- `.lheft` und `.kheft` bekommen `min-width:0`, `hyphens:auto` (samt
+  `-webkit-`) und `overflow-wrap:anywhere`. Die Seite trägt `lang="de"`, also
+  trennt der Browser nach deutschen Regeln: „Facharzt-/training". Ein Wort, das
+  er nicht kennt, bricht notfalls an beliebiger Stelle, statt überzulaufen.
+
+**Unverändert** bleibt die Gruppe „Erscheinungstermin offen" aus dem Nachtrag.
+
+**Nachweis.** `jv_b.html` mit den aus der Datei gezogenen Regeln in Chrome
+headless: Monatsliste Spur 66 / Text 66, ET-Spalte beider Zeilen bei 449 px;
+Kongressliste Spur 66 / Text 66, ET bei 524 px — kein Überlauf, bündig. Die
+lange Bezeichnung belegt zwei Zeilen, dazu die Auflage. Bildbeleg `jv_b.png`.
+
+**Beleg.** MD5 vorher `18f71c2137c8561b128fb1e280e43ad5`, nachher
+`7849d0ea5ac2caeaa1086bfb09c2ae23`. Commit: `COMMIT` — noch nicht gepusht.
+
+---
+
 ## 2026-09-10 — Nachtrag: „undefined" als Monatskopf, Heftbezeichnung über den Terminen
 
 **Anlass.** Marcus hat vier Bildschirmfotos der Ausgabe „Facharzttraining"
