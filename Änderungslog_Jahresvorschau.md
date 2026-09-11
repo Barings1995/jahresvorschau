@@ -75,7 +75,7 @@ B1 (Daten-Knopf hervorgehoben) in Springer-Blau und D (Etikett am Titel).
   Arbeitsansicht ist für den Schreibtisch gedacht, das ist hingenommen.
 
 **Beleg.** MD5 vorher `382dc3550c3491c89075997b99efc44b`, nachher
-`43be37f7ffc23d618e49b1d2d37d6316`. Commit: `be02b53` — noch nicht gepusht.
+`43be37f7ffc23d618e49b1d2d37d6316`. Commit: `be02b53` — gepusht am 11.09.2026, ausgelieferte Seite prüfsummengleich.
 
 ---
 
