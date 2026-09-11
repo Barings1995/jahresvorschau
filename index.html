@@ -653,6 +653,8 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 @media(max-width:820px){.bearb{grid-template-columns:1fr}}
 .bearb-liste{background:var(--surface);border:1px solid var(--border);
   border-radius:6px;overflow:hidden;max-height:74vh;overflow-y:auto}
+/* 74vh ist nur der Ausgangswert; die tatsaechliche Hoehe setzt
+   listeHoeheAnpassen() so, dass Liste und Knopf darunter ins Fenster passen. */
 /* Jede Titelgruppe steht in einem eigenen Block. Ohne ihn haengen alle
    Titelkoepfe am selben Behaelter und bleiben beim Blaettern gleichzeitig
    oben kleben - sie stapeln sich dann uebereinander. So begrenzt sich jeder
@@ -3791,7 +3793,7 @@ function render(){
     res.innerHTML=renderBearbeiten();
     // Vor dem Zurueckstellen der Rollstaende: erst die endgueltige Hoehe,
     // sonst schnitte ein zu kleines Feld den gemerkten Stand ab.
-    mxHoeheAnpassen();
+    rollfelderAnpassen();
     if(listeStand){
       const neueListe = res.querySelector('.bearb-liste');
       if(neueListe) neueListe.scrollTop = listeStand;
@@ -5028,8 +5030,26 @@ function mxHoeheAnpassen(){
   const hoehe = Math.floor(innerHeight - (r.top + scrollY) - unten);
   mx.style.maxHeight = Math.max(340, hoehe) + 'px';
 }
-window.addEventListener('resize', mxHoeheAnpassen);
-if(document.fonts) document.fonts.ready.then(mxHoeheAnpassen);
+// Dasselbe fuer die Ausgabenliste links in der Ausgabenansicht. Die feste
+// Hoehe von 74vh liess mit Kopfleiste, Umschalter und dem Knopf "+ Neuen Titel
+// anlegen" darunter die Seite 100 bis 200 px mitrollen. Unter der Liste zaehlt
+// hier nur, was in ihrer eigenen Spalte folgt (der Knopf), und der Innenabstand
+// von main - nicht das Ende von main: das richtet sich nach der rechten Spalte,
+// und ein langes Formular dort liesse die Liste sonst auf die Mindesthoehe
+// schrumpfen.
+function listeHoeheAnpassen(){
+  const liste = document.querySelector('.bearb-liste');
+  if(!liste) return;
+  const spalte = liste.closest('.bearb-spalte');
+  const r = liste.getBoundingClientRect();
+  const unten = spalte.getBoundingClientRect().bottom - r.bottom
+    + parseFloat(getComputedStyle(document.querySelector('main')).paddingBottom);
+  const hoehe = Math.floor(innerHeight - (r.top + scrollY) - unten);
+  liste.style.maxHeight = Math.max(300, hoehe) + 'px';
+}
+function rollfelderAnpassen(){ mxHoeheAnpassen(); listeHoeheAnpassen(); }
+window.addEventListener('resize', rollfelderAnpassen);
+if(document.fonts) document.fonts.ready.then(rollfelderAnpassen);
 
 function renderKongressmatrix(umschalter){
   const kopfZeile = rechts =>

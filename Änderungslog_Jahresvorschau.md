@@ -21,6 +21,49 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Ausgabenansicht: Liste links passt ins Fenster
+
+**Anlass.** Der Rollbalken der ganzen Seite ist in „Nach Kongress“ weg.
+Marcus meldete, dass es ihn in der Ausgabenansicht noch gibt, und schlug vor,
+die Titelspalte links so anzupassen, dass er dort ebenfalls wegfällt.
+
+**Ursache.** Die Liste hatte die feste Höhe `max-height:74vh`. Kopfleiste,
+Umschalter und der Knopf „+ Neuen Titel anlegen“ darunter kamen dazu. Ohne
+gewählte Ausgabe rollte die Seite deshalb um 105 bis 199 px mit, je nach
+Fenstergröße.
+
+**Geändert.**
+- Neue Funktion `listeHoeheAnpassen()`, gebaut wie `mxHoeheAnpassen()`. Die
+  Liste reicht bis zum Fensterrand, abzüglich des Knopfs darunter und des
+  Innenabstands von `main`. Die Mindesthöhe liegt bei 300 px.
+- Unter der Liste zählt nur die eigene Spalte, nicht das Ende von `main`.
+  Dieses richtet sich nach dem Formular rechts. Ein langes Formular ließe die
+  Liste sonst auf die Mindesthöhe schrumpfen.
+- `rollfelderAnpassen()` ruft beide Funktionen auf. Sie läuft nach jedem
+  Zeichnen, und zwar vor dem Zurückstellen des Rollstands. Außerdem läuft sie
+  nach dem Laden der Schriften und bei jeder Größenänderung des Fensters.
+- `74vh` im Stylesheet bleibt nur als Ausgangswert.
+
+**Bewusst nicht geändert.** Ist eine Ausgabe gewählt, ist das Formular samt
+Sicherungspunkten rechts etwa 960 px hoch. Das ist höher als jedes übliche
+Fenster, und die Seite rollt dann weiter mit. Das liegt an der rechten
+Spalte, nicht an der Liste. Ob die rechte Seite ein eigenes Rollfeld bekommt,
+ist offen.
+
+**Nachweis.**
+- `aus_diag.mjs` wartet auf die Schriften und blendet den Kontobereich ein.
+- Ohne gewählte Ausgabe rollt die Seite nicht mehr mit, gemessen bei 1200×800,
+  1400×900, 1600×1000 und 1920×1080.
+- Bei 1400×650 und 900×800 greift die Mindesthöhe.
+- Prüfreihe gegen den letzten Commit: 18 von 19 gleich. `nummern2_pruef` ist
+  ein Zufallstest.
+- Golden Test gleich.
+
+**Beleg.** MD5 vorher `85115dc7d612514f6bdc73c5c430bfc4`, nachher
+`713b365fec22c0f5653daab6c3dfdc1b`. Commit: *(folgt)*. Nicht gepusht.
+
+---
+
 ## 2026-09-11 — Kongressmatrix: Rollfeld gemessen statt fester Abzug
 
 **Anlass.** Nach dem Push von `be02b53` meldete Marcus mit einem
