@@ -67,7 +67,7 @@ wie „Nach Kongress“, und der Speichern-Knopf bleibt fest stehen.
 - Prüfreihe: 18 von 19 gleich, `nummern2_pruef` ist ein Zufallstest.
 - Golden Test gleich.
 
-**Beleg.** MD5 vorher `713b365fec22c0f5653daab6c3dfdc1b`, nachher `6d42bb01130ea18623d0ce512582c362`. Commit `86dc883`. Nicht gepusht.
+**Beleg.** MD5 vorher `713b365fec22c0f5653daab6c3dfdc1b`, nachher `6d42bb01130ea18623d0ce512582c362`. Commit `86dc883`. Gepusht (`9e651bb..a271661`), ausgelieferte Seite prüfsummengleich.
 
 ---
 
@@ -110,7 +110,7 @@ ist offen. *Nachtrag:* Das ist inzwischen umgesetzt, siehe den Eintrag darüber.
 - Golden Test gleich.
 
 **Beleg.** MD5 vorher `85115dc7d612514f6bdc73c5c430bfc4`, nachher
-`713b365fec22c0f5653daab6c3dfdc1b`. Commit `c011919`. Nicht gepusht.
+`713b365fec22c0f5653daab6c3dfdc1b`. Commit `c011919`. Gepusht mit `9e651bb..a271661`; lokal wie ausgeliefert inzwischen durch den Eintrag darüber abgelöst.
 
 ---
 
