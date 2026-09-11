@@ -486,9 +486,12 @@ table.tab tbody tr:hover td{background:var(--surface2)}
   /* Breite fest am Behaelter, das SVG folgt mit 100%. "width:auto" am SVG ist
      hier nicht verlaesslich – damit lief das Logo ueber den Seitenrand hinaus.
      Das Schluss-"n" von "Medizin" reicht bis an die Kante des Zeichenbereichs,
-     hat also keinen rechten Freiraum: padding-right haelt es vom Seitenrand
-     weg, overflow:visible verhindert, dass das SVG sich selbst beschneidet. */
-  .eh-logo{flex:none;width:158px;padding-right:8px}
+     endet also buendig mit dem Behaelter und damit mit Kopflinie, Legende und
+     Tabellenrahmen. Frueher hielt ein padding-right von 8px es vom Seitenrand
+     weg, weil es dort angeschnitten wurde; seit der Satzspiegel ein Pixel Luft
+     hat (main, oben) endet alles 1 px vor der Kante, das "n" steht ganz auf
+     der Seite. overflow:visible verhindert, dass das SVG sich selbst beschneidet. */
+  .eh-logo{flex:none;width:150px}
   .eh-logo svg{display:block;width:100%;height:auto;overflow:visible}
   /* Der Logo-Klon traegt intern .cls-1{fill:#fff} – diese Regel ist spezifischer
      und faerbt ihn fuer den weissen Untergrund in Navy um. */

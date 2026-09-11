@@ -21,6 +21,35 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Logo im Druck wieder bündig mit dem Tabellenrahmen
+
+**Anlass.** Im Druck-PDF stand das Springer-Medizin-Logo sichtbar links vom
+rechten Tabellenrand. Es war früher um 8 px eingerückt worden, weil das
+Schluss-„n" am Seitenrand angeschnitten wurde. Das ist seit dem Pixel Luft am
+Satzspiegel (`main{padding:0 1px 0 0}`) behoben, weil alles 1 px vor der
+Druckkante endet. Die Einrückung hatte damit keinen Grund mehr.
+
+**Geändert.** `.eh-logo` von `width:158px;padding-right:8px` auf
+`width:150px`. Das Logo behält seine Größe von 150 px und rückt um 8 px nach
+rechts. Der Kommentar dazu ist nachgezogen.
+
+**Nachweis.**
+- `logo_probe.mjs` misst das nachgestellte Druckblatt mit dem Bestand aus der
+  Datenbank, Jahrgang 2027. Geprüft sind Tabelle, Kacheln, Liste und
+  Jahresmatrix, jeweils quer und hoch.
+- Vorher endete das „n" 8 px vor Kopflinie, Legende und Inhalt, zum Beispiel
+  bei 1030,31 statt 1038,36 px. Nachher endet es bei 1038,31 / 709,50 px, also
+  0,05 px vor dem Rahmen, in allen acht Fällen.
+- Das echte PDF (Tabelle quer) wurde mit PDFKit 6-fach gerastert. Das „n"
+  steht vollständig und endet in derselben Pixelspalte wie Kopflinie,
+  Legendenlinie und der äußere Tabellenrahmen. Vorher lag es 6 pt weiter
+  links.
+
+**Beleg.** MD5 vorher `7849d0ea5ac2caeaa1086bfb09c2ae23`, nachher
+`382dc3550c3491c89075997b99efc44b`. Commit: folgt.
+
+---
+
 ## 2026-09-11 — Lange Heftbezeichnung: Umbruch statt mitwachsender Spalte
 
 **Anlass.** Nach dem Nachtrag vom Vortag stand die Zeile „Facharzttraining" in
