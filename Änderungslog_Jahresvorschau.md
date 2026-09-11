@@ -21,6 +21,64 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Arbeitsansicht: Etikett im Kopf statt Zeile „Bearbeiten · Jahrgang“
+
+**Anlass.** Über dem Umschalter „Nach Ausgabe / Nach Kongress“ stand eine
+eigene Zeile „Bearbeiten · Jahrgang 2027“. Der Jahrgang steht schon im Titel,
+und die Zeile kostete rund 30 px Höhe. Marcus wählte aus mehreren Entwürfen:
+B1 (Daten-Knopf hervorgehoben) in Springer-Blau und D (Etikett am Titel).
+
+**Geändert.**
+- In der Arbeitsansicht fällt die Statuszeile weg: `sts` bleibt dort leer, und
+  `body.bearbmodus .stats` wird ausgeblendet. In den fünf Druckansichten bleibt
+  die Zählzeile unverändert.
+- Neues Etikett `.bm-etikett` „BEARBEITEN“ hinter der Jahresauswahl im
+  Titel: orange umrandet, in der Bedienschrift und nur in der Arbeitsansicht
+  sichtbar. Die HTML-Kopie (`baueKopie`) entfernt es wie die anderen reinen
+  Bedienelemente.
+- Der Knopf „Daten“ ist in der Arbeitsansicht ausgefüllt, Springer-Blau
+  `#0176C3` mit weißer Schrift; das Menü darin enthält „Bearbeiten beenden“.
+  Navy wurde bewusst nicht gewählt, weil es schon die gewählte Stellung der
+  Umschalter und den Export-Knopf trägt. Orange steht im Werkzeug für
+  Warnungen.
+- Das Rollfeld der Kongressmatrix ist von `calc(100vh - 310px)` auf
+  `calc(100vh - 290px)` gesetzt, damit die Tabelle den gewonnenen Platz
+  nutzt. Nachgemessen: Bei 290 px rollt die Seite nicht mit, bei 285 px
+  schon. Der alte Wert 310 ließ die Seite trotz der Absicht im Kommentar um
+  ein paar Pixel mitrollen, sodass zwei Rollbalken nebeneinanderstanden.
+- Zwei Kommentare, die noch auf die Statuszeile verwiesen, sind nachgezogen.
+
+**Nachweis.**
+- `et_pruef.mjs` prüft bei 1400, 900 und 640 px Breite:
+  - In der Arbeitsansicht ist die Statuszeile ausgeblendet und leer, das
+    Etikett sichtbar. Umschalter und Tabelle stehen 30–34 px höher.
+  - Suchfeld und Kopfleiste behalten ihre Breite, die Kopfhöhe bleibt bei
+    94,1 px (ab 1000 px).
+  - Nach „Bearbeiten beenden“ ist die Seite messwertgleich mit dem Stand
+    vorher. Die HTML-Kopie enthält kein Etikett, ihr Titeltext ist unverändert.
+- Farbe des Daten-Knopfs mit abgeschalteten Übergängen gemessen: in der
+  Arbeitsansicht `rgb(1,118,195)` auf Weiß, danach wieder durchsichtig mit
+  Navy-Schrift.
+- `hoehe_pruef.mjs` misst die Kongressmatrix bei 800, 900, 1100 und 1400 px
+  Fensterhöhe. Die Seite rollt nicht mehr mit, unter dem Rollfeld bleiben
+  27 px. Bei 700 px greift wie bisher die Mindesthöhe von 340 px.
+- Die Prüfreihe lief mit beiden Seiten auf dem aktuellen Bestand: 16 von 19
+  gleich.
+  - `voll_pruef`: Das Rollfeld ist 20 px höher (801 → 821), gewollt.
+  - `sym_pruef`: Die Kongressspalte ist 5,7 px breiter, weil der Rollbalken
+    der Seite wegfällt.
+  - `nummern2_pruef`: Zufallstest, die Zahl der Durchläufe schwankt; beide
+    Male 0 Ausreißer.
+- Golden Test `pruef.mjs`: Die zehn Signaturen der fünf Ansichten in beiden
+  Jahrgängen sind gleich.
+- Mit 640 px Breite bricht das Etikett im Kopf in eine zweite Zeile um. Die
+  Arbeitsansicht ist für den Schreibtisch gedacht, das ist hingenommen.
+
+**Beleg.** MD5 vorher `382dc3550c3491c89075997b99efc44b`, nachher
+`43be37f7ffc23d618e49b1d2d37d6316`. Commit: siehe unten, noch nicht gepusht.
+
+---
+
 ## 2026-09-11 — Logo im Druck wieder bündig mit dem Tabellenrahmen
 
 **Anlass.** Im Druck-PDF stand das Springer-Medizin-Logo sichtbar links vom
