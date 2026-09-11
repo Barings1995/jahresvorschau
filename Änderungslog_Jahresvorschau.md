@@ -45,7 +45,7 @@ Kongressliste Spur 66 / Text 66, ET bei 524 px — kein Überlauf, bündig. Die
 lange Bezeichnung belegt zwei Zeilen, dazu die Auflage. Bildbeleg `jv_b.png`.
 
 **Beleg.** MD5 vorher `18f71c2137c8561b128fb1e280e43ad5`, nachher
-`7849d0ea5ac2caeaa1086bfb09c2ae23`. Commit: `COMMIT` — noch nicht gepusht.
+`7849d0ea5ac2caeaa1086bfb09c2ae23`. Commit: `ad9c75a` — noch nicht gepusht.
 
 ---
 
