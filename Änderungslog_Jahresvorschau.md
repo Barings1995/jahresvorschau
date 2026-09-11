@@ -45,7 +45,7 @@ Kongressliste Spur 66 / Text 66, ET bei 524 px — kein Überlauf, bündig. Die
 lange Bezeichnung belegt zwei Zeilen, dazu die Auflage. Bildbeleg `jv_b.png`.
 
 **Beleg.** MD5 vorher `18f71c2137c8561b128fb1e280e43ad5`, nachher
-`7849d0ea5ac2caeaa1086bfb09c2ae23`. Commit: `ad9c75a` — noch nicht gepusht.
+`7849d0ea5ac2caeaa1086bfb09c2ae23`. Commit: `ad9c75a` — gepusht am 11.09.2026, ausgelieferte Seite prüfsummengleich.
 
 ---
 
@@ -98,7 +98,7 @@ Termin weiterhin an; das ist gewollt, solange die Planung noch offen ist.
 - `node --check` über beide Inline-Skriptblöcke.
 
 **Beleg.** MD5 vorher `14dce8cce12b5390bde320e104931d7d`, nachher
-`18f71c2137c8561b128fb1e280e43ad5`. Commit: `a3b5a88` — noch nicht gepusht.
+`18f71c2137c8561b128fb1e280e43ad5`. Commit: `a3b5a88` — gepusht am 10.09.2026, ausgelieferte Seite prüfsummengleich.
 
 ---
 
