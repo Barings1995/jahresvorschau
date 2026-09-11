@@ -21,6 +21,56 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-11 — Ausgabenansicht: rechte Spalte rollt in sich, Speichern bleibt stehen
+
+**Anlass.** Im vorigen Eintrag blieb offen, dass die Seite bei gewählter Ausgabe
+weiter mitrollt. Formular und Sicherungspunkte sind zusammen etwa 960 px hoch.
+Marcus entschied sich für Weg A: Die rechte Seite bekommt ein eigenes Rollfeld
+wie „Nach Kongress“, und der Speichern-Knopf bleibt fest stehen.
+
+**Geändert.**
+- Die rechte Spalte ist jetzt `.bearb-rechts` mit `overflow-y:auto`.
+- Die Höhe setzt `rechtsHoeheAnpassen()`. Die Spalte reicht bis zum
+  Fensterrand, abzüglich des Innenabstands von `main`. Im sehr flachen Fenster
+  richtet sie sich nach der linken Spalte, damit beide Unterkanten auf einer
+  Linie bleiben.
+- `rollfelderAnpassen()` ruft die neue Funktion nach `listeHoeheAnpassen()` auf.
+- Unter 820 px Breite, also einspaltig, rollt wie bisher die Seite.
+- Der Fuß mit Speichern, Verwerfen und Entfernen klebt am unteren Rand des
+  Rollfelds (`position:sticky; bottom:0`), solange das Formular darüber
+  reicht. Er nimmt den unteren Innenabstand des Formulars in sich auf und
+  reicht bis an dessen Rand, damit durchrollender Inhalt nicht seitlich
+  hervorschaut.
+- Die Rückmeldung („Nicht gespeichert“, „Gespeichert“, Fehlermeldungen) steht
+  jetzt im Fuß neben den Knöpfen, in `#bearbStandFuss`. In der Zeile unter dem
+  Formular läge sie im Rollfeld oft außerhalb des Sichtbaren.
+- Ohne Formular gilt weiter die Zeile `#bearbStand`. Das betrifft den Fall ohne
+  Auswahl und die Kongressansicht.
+- Der Rollstand der rechten Spalte bleibt erhalten, solange dieselbe Auswahl
+  offen ist, etwa beim Speichern oder beim Zuordnen eines Kongresses. Eine neue
+  Auswahl beginnt oben. Zum Vergleich trägt die Spalte die Auswahl in
+  `data-wahl`.
+
+**Nachweis.**
+- `re_diag.mjs` wartet auf die Schriften und blendet den Kontobereich ein.
+- Seite mit und ohne Auswahl, bei 1200×800, 1400×900 und 1920×1080: rollt nicht
+  mehr mit, beide Spalten enden auf derselben Linie.
+- Speichern-Knopf:
+  - Er steht bei Rollstand 0 und 300 am unteren Rand des Rollfelds.
+  - `elementFromPoint` trifft ihn dort, er ist also bedienbar.
+  - Ganz unten liegt er an seinem natürlichen Platz über den Sicherungspunkten.
+- Rückmeldung: Nach dem Neuzeichnen steht „Gespeichert“ im Fuß, die Zeile
+  darunter ist leer. Ohne Auswahl erscheint die Meldung wieder in der Zeile.
+- Rollstand: Nach dem Neuzeichnen mit derselben Auswahl bleibt er bei 250.
+  Nach dem Wechsel der Ausgabe steht er bei 0.
+- Bildschirmfotos bei 1400×900 zeigen den haftenden Fuß mit Rückmeldung.
+- Prüfreihe: 18 von 19 gleich, `nummern2_pruef` ist ein Zufallstest.
+- Golden Test gleich.
+
+**Beleg.** MD5 vorher `713b365fec22c0f5653daab6c3dfdc1b`, nachher `6d42bb01130ea18623d0ce512582c362`. Commit: *(folgt)*. Nicht gepusht.
+
+---
+
 ## 2026-09-11 — Ausgabenansicht: Liste links passt ins Fenster
 
 **Anlass.** Der Rollbalken der ganzen Seite ist in „Nach Kongress“ weg.
@@ -48,7 +98,7 @@ Fenstergröße.
 Sicherungspunkten rechts etwa 960 px hoch. Das ist höher als jedes übliche
 Fenster, und die Seite rollt dann weiter mit. Das liegt an der rechten
 Spalte, nicht an der Liste. Ob die rechte Seite ein eigenes Rollfeld bekommt,
-ist offen.
+ist offen. *Nachtrag:* Das ist inzwischen umgesetzt, siehe den Eintrag darüber.
 
 **Nachweis.**
 - `aus_diag.mjs` wartet auf die Schriften und blendet den Kontobereich ein.

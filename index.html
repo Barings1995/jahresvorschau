@@ -693,6 +693,21 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 
 .bearb-form{background:var(--surface);border:1px solid var(--border);
   border-radius:6px;padding:16px 18px}
+/* Die rechte Spalte rollt in sich, wie die Liste links: Formular und
+   Sicherungspunkte zusammen sind hoeher als jedes uebliche Fenster, und die
+   Seite selbst soll nicht mitrollen. Die Hoehe setzt rechtsHoeheAnpassen();
+   74vh ist nur der Ausgangswert. Einspaltig (schmales Fenster) rollt wieder
+   die Seite - ein Rollfeld unter der Liste liefe dort auf seine Mindesthoehe. */
+.bearb-rechts{max-height:74vh;overflow-y:auto;min-width:0}
+@media(max-width:820px){.bearb-rechts{max-height:none!important;overflow:visible}}
+/* Der Fuss mit Speichern und Verwerfen bleibt am unteren Rand des Rollfelds
+   stehen, solange das Formular darueber reicht - sonst laege der Knopf bei
+   einer Ausgabe mit vielen Kongressen unterhalb des Sichtbaren. Er nimmt den
+   unteren Innenabstand des Formulars in sich auf und reicht bis an dessen
+   Rand, damit darunter durchrollender Inhalt nicht seitlich hervorschaut. */
+.bearb-rechts .bearb-fuss{position:sticky;bottom:0;z-index:2;
+  margin-left:-18px;margin-right:-18px;margin-bottom:-16px;
+  padding:13px 18px 16px;background:var(--surface);border-radius:0 0 6px 6px}
 .bearb-kopf{font-size:.95rem;font-weight:600;color:var(--navy);
   margin-bottom:2px}
 .bearb-unterkopf{font-size:.76rem;color:var(--muted);margin-bottom:14px}
@@ -768,6 +783,9 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 .bearb-loeschen:hover{border-color:var(--warm)}
 .bearb-stand{font-size:.77rem;color:var(--muted)}
 p.bearb-stand:not(:empty){margin-top:9px}
+/* Im Fuss steht die Rueckmeldung neben den Knoepfen und bleibt mit ihnen
+   sichtbar; der Loeschknopf rueckt dahinter an den rechten Rand. */
+.bearb-fuss .bearb-stand{flex:1;min-width:0}
 .bearb-stand.gut{color:#25855a}
 .bearb-stand.schlecht{color:var(--warm)}
 
@@ -3785,6 +3803,12 @@ function render(){
     // rollt: ohne dieses Merken staende sie nach jedem Klick wieder am Anfang -
     // schlechter als vorher, wo die Seite rollte und stehen blieb. Waagerecht
     // ebenso, sonst spraenge auf schmalem Schirm die Spaltenwahl zurueck.
+    // Die rechte Spalte behaelt ihren Stand, solange dieselbe Ausgabe offen
+    // bleibt (Speichern, Kongress zuordnen). Eine neue Auswahl beginnt oben.
+    const alteRechts = res.querySelector('.bearb-rechts');
+    const rechtsStand = (alteRechts
+      && alteRechts.dataset.wahl === JSON.stringify(bearbAuswahl||null))
+      ? alteRechts.scrollTop : 0;
     const alteMx = res.querySelector('.mx-scroll');
     const mxStand = (alteMx && !mxRollZurueck)
       ? {y:alteMx.scrollTop, x:alteMx.scrollLeft} : null;
@@ -3797,6 +3821,10 @@ function render(){
     if(listeStand){
       const neueListe = res.querySelector('.bearb-liste');
       if(neueListe) neueListe.scrollTop = listeStand;
+    }
+    if(rechtsStand){
+      const neueRechts = res.querySelector('.bearb-rechts');
+      if(neueRechts) neueRechts.scrollTop = rechtsStand;
     }
     if(mxStand && (mxStand.y || mxStand.x)){
       const neueMx = res.querySelector('.mx-scroll');
@@ -3971,7 +3999,14 @@ function entwurfGeaendert(){
 function bearbStand(text, art){
   bearbStandText = text || '';
   bearbStandArt  = art  || '';
-  const e = document.getElementById('bearbStand');
+  // Steht ein Formular mit Fuss da, gehoert die Rueckmeldung dorthin, neben
+  // Speichern: seit die rechte Spalte in sich rollt, laege die Zeile unter dem
+  // Formular oft ausserhalb des Sichtbaren. Ohne Formular (keine Auswahl,
+  // Kongressansicht) bleibt es bei der Zeile #bearbStand.
+  const fuss = document.getElementById('bearbStandFuss');
+  const zeile = document.getElementById('bearbStand');
+  const e = fuss || zeile;
+  if(fuss && zeile){ zeile.textContent = ''; zeile.className = 'bearb-stand'; }
   if(e){ e.textContent = bearbStandText; e.className = 'bearb-stand ' + bearbStandArt; }
   const s = document.getElementById('bearbSpeichern');
   const v = document.getElementById('bearbVerwerfen');
@@ -4721,6 +4756,7 @@ function bearbFussHtml(speichern, loeschen){
               onclick="bearbSpeichern()" disabled>${speichern}</button>
       <button type="button" class="bearb-verwerfen" id="bearbVerwerfen"
               onclick="bearbVerwerfen()" disabled>Verwerfen</button>
+      <span class="bearb-stand" id="bearbStandFuss"></span>
       ${loeschen || ''}
     </div>`;
 }
@@ -5047,7 +5083,22 @@ function listeHoeheAnpassen(){
   const hoehe = Math.floor(innerHeight - (r.top + scrollY) - unten);
   liste.style.maxHeight = Math.max(300, hoehe) + 'px';
 }
-function rollfelderAnpassen(){ mxHoeheAnpassen(); listeHoeheAnpassen(); }
+// Die rechte Spalte endet auf derselben Linie wie die linke: am Fensterrand,
+// abzueglich des Innenabstands von main. Im sehr flachen Fenster, wo die Liste
+// auf ihrer Mindesthoehe steht, richtet sie sich nach der linken Spalte, damit
+// beide Unterkanten weiter auf einer Linie liegen. Laeuft deshalb nach
+// listeHoeheAnpassen().
+function rechtsHoeheAnpassen(){
+  const rechts = document.querySelector('.bearb-rechts');
+  if(!rechts) return;
+  const spalte = document.querySelector('.bearb-spalte');
+  const r = rechts.getBoundingClientRect();
+  const unten = parseFloat(getComputedStyle(document.querySelector('main')).paddingBottom);
+  const hoehe = Math.floor(innerHeight - (r.top + scrollY) - unten);
+  const links = spalte ? Math.ceil(spalte.getBoundingClientRect().height) : 340;
+  rechts.style.maxHeight = Math.max(links, hoehe) + 'px';
+}
+function rollfelderAnpassen(){ mxHoeheAnpassen(); listeHoeheAnpassen(); rechtsHoeheAnpassen(); }
 window.addEventListener('resize', rollfelderAnpassen);
 if(document.fonts) document.fonts.ready.then(rollfelderAnpassen);
 
@@ -5439,7 +5490,7 @@ function renderBearbeiten(){
       <button type="button" class="bearb-titelknopf${titelNeu?' gewaehlt':''}"
         onclick="bearbNeuerTitel()">+ Neuen Titel anlegen</button>
     </div>
-    <div>
+    <div class="bearb-rechts" data-wahl="${escA(JSON.stringify(bearbAuswahl||null))}">
       <div class="bearb-form" id="bearbForm">${formInhaltHtml()}</div>
       <p class="bearb-stand" id="bearbStand"></p>
       <div class="bearb-sicherung">
