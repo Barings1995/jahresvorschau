@@ -43,7 +43,7 @@ jetzt 4,9 px (Auslage) und 6,1 px (Bericht), Name bei beiden bei 39,9 px.
 Beispiel-PDF gedruckt und angesehen; Fortsetzungszeilen stehen unter dem Namen.
 Von Marcus freigegeben.
 
-**Beleg.** MD5 `a6778cc21d37011bff7aeadf82bf4637` → `e5dbd3438aeede125f9a31614d2a78f3`.
+**Beleg.** MD5 `a6778cc21d37011bff7aeadf82bf4637` → `e5dbd3438aeede125f9a31614d2a78f3`, Commit `49cdf88`. Noch nicht gepusht.
 
 ---
 
