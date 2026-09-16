@@ -21,6 +21,35 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-16 — Kongressspalte der Tabelle in regulärer Textfarbe
+
+**Anlass.** Marcus fiel auf, dass die Kongresse in der Tabellenansicht blasser
+stehen als der Rest der Tabelle. Das war Absicht: Die Spalte trug die Farbe für
+Nebenangaben (`--muted`, `#4a6080`). Im Anzeigenverkauf sind die Kongresse aber
+Hauptinhalt, keine Randnotiz.
+
+**Abgewogen.** Drei Beispiel-PDFs lagen zum Vergleich vor:
+- Kongressnamen in der regulären Textfarbe;
+- zusätzlich „Bericht“ in Springer-Blau `#0176C3`;
+- Kongressnamen in hellerem Marineblau `#1a4a7a`.
+
+Gewählt wurde die erste Fassung. Dass sich „Bericht“ dann nur noch über
+Großbuchstaben und Fettung vom Kongressnamen abhebt, ist bewusst in Kauf
+genommen.
+
+**Geändert.** `.t-kong` hat jetzt `color:var(--text)` statt `var(--muted)`.
+Die kleinere Schrift (0,70 rem, im Druck 7 pt) bleibt, ebenso die Farben von
+„Auslage“ und „Bericht“. Die Kongressliste ist unverändert: Dort bleiben die
+Themen als Nebenangabe blasser.
+
+**Nachweis.** Headless-Chrome ergab Kongressspalte und Themenspalte beide
+`rgb(0, 40, 90)`, „Bericht“ ebenso und „Auslage“ `rgb(192, 96, 10)`. Die erste
+Druckseite ist pixelgleich mit dem freigegebenen Beispiel-PDF.
+
+**Beleg.** MD5 `a3bbd31d685c3ff27be1b427ad70a72e` → `a6778cc21d37011bff7aeadf82bf4637`.
+
+---
+
 ## 2026-09-11 — Kopfstreifen steht beim Wechsel in die Bearbeitung still
 
 **Anlass.** Marcus fiel auf, dass bei 110 % Zoom das Springer-Logo und der

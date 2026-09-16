@@ -294,8 +294,11 @@ table.tab tbody tr:hover td{background:var(--surface2)}
    Der Wert muss prozentual sein, damit er mit der Tabellenbreite waechst: ein
    fester Pixelwert liess bei breitem Fenster den gesamten Ueberschuss an
    "Themenschwerpunkte" gehen, waehrend "Kongresse" schmal stehen blieb. Bei schmalen
-   Fenstern schrumpft die Spalte weiterhin bis auf min-width. */
-.t-kong{color:var(--muted);font-size:.7rem;min-width:220px;width:40%}
+   Fenstern schrumpft die Spalte weiterhin bis auf min-width.
+   Die Kongressnamen tragen die regulaere Textfarbe der Tabelle, nicht das
+   blassere --muted: im Anzeigenverkauf sind sie Hauptinhalt, keine Randnotiz.
+   Abgestuft wird nur noch ueber die kleinere Schrift. */
+.t-kong{color:var(--text);font-size:.7rem;min-width:220px;width:40%}
 .t-kong b{color:var(--navy);font-weight:600;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em}
 .t-kong b.au{color:var(--warm)}
 /* Haengender Einzug: bricht ein langer Kongressname um, steht die zweite
