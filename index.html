@@ -633,11 +633,16 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
      Ein fester Wert statt der Prozentangabe kommt weiterhin nicht in Frage:
      er traefe quer und hoch verschiedene Anteile. calc(42% + 1px) ebenso
      wenig, das behandelt Chrome in der Spaltenberechnung wie "auto".
-     Einzug 36 px passt zur 6pt-Beschriftung, die Fortsetzungszeile steht damit
-     genau unter dem Namen. */
+     Abstand Beschriftung–Name wie am Bildschirm, nur auf die kleinere
+     Druckschrift umgerechnet: dort beginnt der Name bei 48 px von 11,2 px
+     Schrift, hier also bei 40 px von 9,33 px. Die Mindestbreite 38 px laesst
+     hinter "AUSLAGE" (35 px) und "BERICHT" (34 px) sichtbar Luft; vorher trennte
+     nur ein Leerzeichen (knapp 2 px) Beschriftung und Name, und die Namen
+     begannen je nach Beschriftung an verschiedenen Kanten. Die
+     Fortsetzungszeile steht weiterhin genau unter dem Namen. */
   .t-kong{font-size:7pt;min-width:0;width:42%}
-  .t-kong .ke{padding-left:36px;text-indent:-36px}
-  .t-kong .ke b{font-size:6pt;min-width:0}
+  .t-kong .ke{padding-left:40px;text-indent:-40px}
+  .t-kong .ke b{font-size:6pt;min-width:38px}
   .t-thema{min-width:0}
   .t-titel{min-width:0}
   .sar{display:none}

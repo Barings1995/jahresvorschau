@@ -21,6 +21,32 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-16 — Druck: mehr Abstand zwischen Auslage/Bericht und Kongressname
+
+**Anlass.** Seit die Kongressnamen die reguläre Textfarbe tragen, hebt sich die
+Beschriftung „Bericht“ im Druck kaum noch vom Namen ab. Statt über die Farbe zu
+trennen, soll der Abstand wieder ungefähr so groß sein wie in der Webansicht.
+
+**Befund.** Am Bildschirm hat die Beschriftung eine Mindestbreite (46 px); der
+Name beginnt bei 48 px, also 4,9 px hinter „AUSLAGE“ und 6,4 px hinter
+„BERICHT“. Im Druck stand `min-width:0`: Zwischen Beschriftung und Name lag
+nur ein Leerzeichen (1,9 px), und die Namen begannen je nach Beschriftung an
+verschiedenen Kanten. Der hängende Einzug von 36 px passte dadurch nur ungefähr.
+
+**Geändert** (nur Druckregeln, Webansicht unverändert). Den Bildschirmabstand
+auf die Druckschrift umgerechnet (48 px bei 11,2 px → 40 px bei 9,33 px):
+- `.t-kong .ke`: Einzug 36 px → 40 px;
+- `.t-kong .ke b`: `min-width:0` → `min-width:38px`.
+
+**Nachweis.** In Chrome nach geladenen Webschriften gemessen: Abstand im Druck
+jetzt 4,9 px (Auslage) und 6,1 px (Bericht), Name bei beiden bei 39,9 px.
+Beispiel-PDF gedruckt und angesehen; Fortsetzungszeilen stehen unter dem Namen.
+Von Marcus freigegeben.
+
+**Beleg.** MD5 `a6778cc21d37011bff7aeadf82bf4637` → `e5dbd3438aeede125f9a31614d2a78f3`.
+
+---
+
 ## 2026-09-16 — Kongressspalte der Tabelle in regulärer Textfarbe
 
 **Anlass.** Marcus fiel auf, dass die Kongresse in der Tabellenansicht blasser
