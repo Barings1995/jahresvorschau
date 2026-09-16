@@ -46,7 +46,7 @@ Themen als Nebenangabe blasser.
 `rgb(0, 40, 90)`, „Bericht“ ebenso und „Auslage“ `rgb(192, 96, 10)`. Die erste
 Druckseite ist pixelgleich mit dem freigegebenen Beispiel-PDF.
 
-**Beleg.** MD5 `a3bbd31d685c3ff27be1b427ad70a72e` → `a6778cc21d37011bff7aeadf82bf4637`.
+**Beleg.** MD5 `a3bbd31d685c3ff27be1b427ad70a72e` → `a6778cc21d37011bff7aeadf82bf4637`, Commit `6d69373`. Noch nicht gepusht.
 
 ---
 
