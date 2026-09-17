@@ -47,7 +47,7 @@ und in node mit dem aus der Datenpflege geschnittenen Lesecode geprüft: als Erg
 erkannt, Blatt „Termine", allein die Spalte „Kongresse", 49 Änderungen, 4 unverändert,
 eine dort fehlende Ausgabe übergangen, Themenschwerpunkte unberührt.
 
-**Beleg.** MD5 `e5dbd3438aeede125f9a31614d2a78f3` → `838df5be41effd66a67fde2dc4566848`.
+**Beleg.** MD5 `e5dbd3438aeede125f9a31614d2a78f3` → `838df5be41effd66a67fde2dc4566848`, Commit `9ff1095`. Noch nicht gepusht.
 
 ---
 
