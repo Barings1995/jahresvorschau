@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-18 (zuletzt) — Kreuz an den Ausgabenzeilen wieder bündig (noch nicht veröffentlicht)
+## 2026-09-18 (zuletzt) — Kreuz an den Ausgabenzeilen wieder bündig (veröffentlicht, Commit `79a7865`)
 
 **Anlass.** Marcus fiel auf, dass das Kreuz neben den Ausgabenzeilen an der Oberkante klebte
 statt neben dem Feld zu stehen.
