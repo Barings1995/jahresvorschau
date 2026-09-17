@@ -358,9 +358,12 @@ table.tab tbody tr:hover td{background:var(--surface2)}
    "Export". Mit 14 px bleibt es kleiner als die Lupe (16 px) - die Lupe sagt,
    was das Feld ist, das Kreuz nur, dass sich etwas zuruecknehmen laesst.
    Die Flaeche misst 24 px im Quadrat: das kleinste Ziel, das sich verlaesslich
-   treffen laesst. Ohne Rahmen und Fuellung, anders als die drei uebrigen
-   Kreuze des Werkzeugs - die stehen frei neben einer Zeile, dieses sitzt im
-   Feld und braucht dort keinen zweiten Rahmen. */
+   treffen laesst. Ohne Rahmen und Fuellung, anders als die uebrigen Kreuze des
+   Werkzeugs - die stehen frei neben einer Zeile, dieses sitzt im Feld und
+   braucht dort keinen zweiten Rahmen. Seit dem 17.09.2026 sind auch jene fuenf
+   gezeichnet (13 px an den Zeilen, 14 px an der Kongresstafel); .bearb-weg hat
+   dafuer eine feste Hoehe von 26 px bekommen, weil die Hoehe dort vorher vom
+   Schriftzeichen kam und der Knopf sonst von 18 auf 15 px geschrumpft waere. */
 .clear-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);
   width:24px;height:24px;display:none;align-items:center;justify-content:center;
   background:none;border:none;border-radius:4px;cursor:pointer;
@@ -687,11 +690,12 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 /* Die letzte Zeile einer Titelgruppe legt eine weitere Ausgabe an, die letzte
    Zeile der ganzen Liste einen weiteren Titel. */
 .bearb-neu{color:var(--navy);font-weight:600}
+.bearb-neu-text{display:inline-flex;align-items:center;gap:6px}
 .bearb-neu.gewaehlt{background:var(--navy);color:#ffffff}
 /* Steht unter der Liste, nicht in ihr - deshalb immer sichtbar, gleich wie
    weit geblaettert ist. */
 .bearb-spalte{display:flex;flex-direction:column;gap:8px;min-width:0}
-.bearb-titelknopf{width:100%;padding:8px 12px;font-family:inherit;
+.bearb-titelknopf{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 12px;font-family:inherit;
   font-size:.79rem;font-weight:600;color:var(--navy);background:var(--surface);
   border:1.5px dashed var(--navy-light);border-radius:6px;cursor:pointer;
   transition:background .12s,border-color .12s}
@@ -768,11 +772,12 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
   font-size:.82rem;color:var(--text);background:var(--surface);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .bearb-wahl:focus{border-color:var(--navy);outline:none}
-.bearb-weg{flex:none;width:30px;font-family:inherit;font-size:.9rem;
+.bearb-weg{flex:none;width:30px;height:26px;display:inline-flex;align-items:center;
+  justify-content:center;font-family:inherit;font-size:.9rem;
   color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);
   border-radius:4px;cursor:pointer}
 .bearb-weg:hover{color:var(--warm);border-color:var(--warm)}
-.bearb-zu{padding:5px 11px;font-family:inherit;font-size:.75rem;font-weight:600;
+.bearb-zu{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;font-family:inherit;font-size:.75rem;font-weight:600;
   color:var(--navy);background:var(--surface2);border:1.5px solid var(--border);
   border-radius:4px;cursor:pointer}
 .bearb-zu:hover{background:var(--navy-faint);border-color:var(--navy-light)}
@@ -829,7 +834,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .bearb-sich-zurueck{padding:4px 10px;font-family:inherit;font-size:.74rem;
   font-weight:600;color:var(--navy);background:var(--surface2);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
-.bearb-sich-weg{flex:none;width:26px;height:24px;font-family:inherit;
+.bearb-sich-weg{flex:none;width:26px;height:24px;display:inline-flex;
+  align-items:center;justify-content:center;font-family:inherit;
   font-size:.9rem;line-height:1;color:var(--muted);background:var(--surface2);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .bearb-sich-weg:hover{color:var(--warm);border-color:var(--warm)}
@@ -1065,7 +1071,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-panel-kopf{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
 .mx-panel-titel{font-size:.88rem;font-weight:600;color:var(--navy)}
 .mx-panel-unter{font-size:.74rem;color:var(--muted);margin-top:2px}
-.mx-panel-zu{flex:none;width:26px;height:26px;font-family:inherit;font-size:1.05rem;
+.mx-panel-zu{flex:none;width:26px;height:26px;display:inline-flex;align-items:center;
+  justify-content:center;font-family:inherit;font-size:1.05rem;
   line-height:1;color:var(--muted);background:var(--surface2);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .mx-panel-zu:hover{color:var(--warm);border-color:var(--warm)}
@@ -4754,7 +4761,7 @@ function themenGruppe(){
               placeholder="Thema dieser Ausgabe"
               oninput="bearbListe('t',${i},this.value)">
        <button type="button" class="bearb-weg" title="Zeile entfernen"
-               onclick="bearbZeileWeg('t',${i})">&times;</button>
+               onclick="bearbZeileWeg('t',${i})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
      </div>`).join('');
   return `<div class="bearb-gruppe">
     <span class="bearb-feld">Themenschwerpunkte
@@ -4783,7 +4790,7 @@ function freitextHtml(art){
               value="${escA(wert)}" placeholder="Name des Kongresses"
               oninput="bearbListe('${art}',${i},this.value)">
        <button type="button" class="bearb-weg" title="Zeile entfernen"
-               onclick="bearbZeileWeg('${art}',${i})">&times;</button>
+               onclick="bearbZeileWeg('${art}',${i})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
      </div>`).join('');
   return `${zeilen || '<p class="bearb-leerhinweis">Keine Einträge.</p>'}
     <button type="button" class="bearb-zu" onclick="bearbZeileZu('${art}')">
@@ -4800,7 +4807,7 @@ function kongWahlHtml(art){
     `<div class="bearb-zeile">
        <span class="bearb-fest">${esc(kongressText(id))}</span>
        <button type="button" class="bearb-weg" title="Zuordnung entfernen"
-               onclick="bearbKongWeg('${art}',${i})">&times;</button>
+               onclick="bearbKongWeg('${art}',${i})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
      </div>`).join('');
 
   const {ohne, mit} = mxZeilen();
@@ -4952,7 +4959,7 @@ function sicherungListeHtml(){
       <button type="button" class="bearb-sich-zurueck"
         onclick="sicherungZurueck('${escA(s.id)}','${escA(wie)}')">Zurücksetzen</button>
       <button type="button" class="bearb-sich-weg" title="Sicherungspunkt entfernen"
-        onclick="sicherungEntfernen('${escA(s.id)}','${escA(wie)}')">&times;</button>
+        onclick="sicherungEntfernen('${escA(s.id)}','${escA(wie)}')"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>`;
   }).join('');
 }
@@ -5199,7 +5206,7 @@ function renderKongressmatrix(umschalter){
     return kopfZeile('') + `<div class="bearb-leerhinweis" style="padding:20px 0">Dieser Jahrgang ist noch nicht auf eigene Kongresssätze umgestellt.
       Über <b>Daten &rarr; Kongresse umstellen</b> lässt sich das nachholen.</div>`;
   const {ohne, mit, gesamt, weg} = mxZeilen();
-  const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()">+ Neuer Kongress</button>`;
+  const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neuer Kongress</button>`;
   // Der Schalter steht im Aufbau der Legendenzeile - dieselbe Sache, dieselbe
   // Form. Der Titel nennt beides: was wegfaellt und was bewusst stehen bleibt.
   const dachSchalter = `<label class="switch" title="Blendet die Kongresse aus, bei denen im Dialog »Kongress bearbeiten« das Häkchen für Deutschland, Österreich und die Schweiz nicht gesetzt ist"><input type="checkbox"${
@@ -5357,7 +5364,7 @@ function mxHeftwahlHtml(k, t){
       <div><div class="mx-panel-titel">${esc(t.short)} &middot; ${
         mxArt==='auslage'?'Auslage':'Bericht'}</div>
         <div class="mx-panel-unter">${esc(k.lang)} &middot; ${esc(mxZeitraum(k))}${k.ort?' &middot; '+esc(k.ort):''}</div></div>
-      <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen">&times;</button>
+      <button type="button" class="mx-panel-zu" onclick="mxSchliessen()" aria-label="Schließen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     ${kein}${erwHinweis}
     <div class="mx-hl">${vor}${strich}${nach}</div>
@@ -5565,7 +5572,7 @@ function renderBearbeiten(){
       ${eintraege}
       <button type="button" class="bearb-eintrag bearb-neu${neuIst('ausgabe',t.id)?' gewaehlt':''}"
         onclick="bearbNeueAusgabe(${t.id})">
-        <span>+ Ausgabe</span></button>
+        <span class="bearb-neu-text"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ausgabe</span></button>
     </div>`;
   }).join('');
 
@@ -5577,7 +5584,7 @@ function renderBearbeiten(){
     <div class="bearb-spalte">
       <div class="bearb-liste">${liste}</div>
       <button type="button" class="bearb-titelknopf${titelNeu?' gewaehlt':''}"
-        onclick="bearbNeuerTitel()">+ Neuen Titel anlegen</button>
+        onclick="bearbNeuerTitel()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neuen Titel anlegen</button>
     </div>
     <div class="bearb-rechts" data-wahl="${escA(JSON.stringify(bearbAuswahl||null))}">
       <div class="bearb-form" id="bearbForm">${formInhaltHtml()}</div>
