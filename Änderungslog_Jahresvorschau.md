@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-17 — Lupe im Suchfeld mit runden Strichenden (noch nicht veröffentlicht)
+## 2026-09-17 — Lupe im Suchfeld mit runden Strichenden (veröffentlicht, Commit `ee81956`)
 
 *(Nachzug zum Symbolangleich in OpenSlots und MediaQuote vom selben Tag)*
 
