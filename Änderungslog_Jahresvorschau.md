@@ -21,6 +21,81 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-17 — Die fünf Kreuze gezeichnet statt gesetzt (veröffentlicht, Commit `0efa91b`)
+
+**Anlass.** Bei der Durchsicht der Schriftzeichen war aufgefallen, dass fünf Kreuze
+weiterhin als `&times;` aus der Schrift kamen, während im Suchfeld schon seit längerem ein
+**gezeichnetes** Löschzeichen steht. Damit standen zwei Bauarten desselben Zeichens
+nebeneinander.
+
+**Änderung.** Alle fünf auf das Motiv des Suchfeld-Kreuzes umgestellt
+(`<path d="M18 6 6 18M6 6l12 12"/>`, 24er-Raster, Strich 2, runde Enden): je 13 px an den
+drei Zeilenknöpfen (Themen, Ausgaben, Kongresse) und am Sicherungspunkt, 14 px an der
+Kongresstafel wie im Suchfeld. Die drei Klassen richten ihren Inhalt jetzt mittig aus
+(`display:inline-flex`), sonst säße das Symbol auf der Schriftgrundlinie.
+
+**Höhe von `.bearb-weg`.** Der Knopf hatte nur eine Breite (30 px), seine Höhe kam vom
+Schriftzeichen. Ohne dieses schrumpfte er von 18 auf 15 px und stand als kleines Quadrat
+neben einem 29 px hohen Eingabefeld. Er hat deshalb eine feste Höhe von 26 px bekommen —
+dieselbe, die der Knopf am Sicherungspunkt schon trug. Marcus hat zwischen 26 px und der
+vollen Feldhöhe von 29 px entschieden; 26 px lässt die Nebenhandlung zurücktreten.
+
+**Belege.** MD5 vorher `4928c822bf3c9f3386c3a5fff8e4d031`, nachher
+`2f27d01715e45c78741dd61d50773866`. Gemessen nach der Änderung: Zeilenknopf 30 × 26 px,
+Sicherungspunkt 26 × 24 px, Kongresstafel 26 × 26 px. SVG-Tags paarig (19/19), JavaScript
+mit `node --check` geprüft, Sichtprüfung über eine Prüfseite, die Stilblock und Knöpfe aus
+der geänderten Datei zieht. Der Kommentar am Löschzeichen ist fortgeschrieben.
+
+---
+
+## 2026-09-17 — Schriftzeichen an den Anlegen-Knöpfen durch Symbole ersetzt (veröffentlicht, Commit `0efa91b`)
+
+*(Teil des Durchgangs, der an diesem Tag alle Schriftzeichen an Knöpfen ersetzt hat)*
+
+**Anlass.** Marcus fragte nach dem Plus am Hinzufügen-Knopf in PreisWerk. Dabei kam
+heraus, dass meine vorangegangene Prüfung lückenhaft war: Sie hatte nur gezeichnete
+Symbole gezählt und konnte Knöpfe, die stattdessen ein **Schriftzeichen** tragen, gar
+nicht finden. Die nachgeholte Suche fand fünfzehn solcher Stellen in fünf Dateien. Marcus
+hat entschieden, alle umzustellen.
+
+**Warum überhaupt.** Ein Schriftzeichen folgt der Textschrift, nicht dem Symbolsatz:
+Strichstärke und Größe passen sich nicht an die übrigen Symbole an, und Zeichen wie ✕ oder
+✓ sehen je nach Schrift und System verschieden aus — dasselbe Argument, mit dem am
+13.09.2026 das Kopiersymbol ⎘ in MediaQuote ersetzt wurde.
+
+**Die Symbole.** Durchgängig im gemeinsamen Raster: `viewBox="0 0 24 24"`, Strichstärke 2,
+runde Strichenden und -übergänge, `aria-hidden="true"`. Plus als zwei gekreuzte Linien
+(ohne Kreis, wie am selben Tag für MediaQuote entschieden), Entfernen und Schließen als
+liegendes Kreuz, die Quittung als Haken.
+
+**Ausrichtung.** Nur-Zeichen-Knöpfe saßen bisher auf der Schriftgrundlinie. Damit die
+Symbole mittig stehen, haben die betroffenen Knopfklassen `display: inline-flex` und
+`align-items: center` bekommen; wo Symbol und Wort nebeneinanderstehen, zusätzlich einen
+Abstand. Farben, Größenwirkung, Beschriftungen und Verhalten bleiben.
+
+**Nicht angefasst.** Die Klapppfeile ▲▼ bleiben Schriftzeichen — dafür gilt die
+Entscheidung vom 13.09.2026, sie ausdrücklich in Arial zu setzen.
+
+**Geändert, 3 Stellen.**
+
+| Knopf | vorher | nachher |
+|---|---|---|
+| Neuer Kongress (Kongressmatrix) | `+ Neuer Kongress` | Plus-Symbol + Text, 13 px |
+| Ausgabe (im Titelbaum) | `+ Ausgabe` | Plus-Symbol + Text, 13 px |
+| Neuen Titel anlegen | `+ Neuen Titel anlegen` | Plus-Symbol + Text, 13 px |
+
+Der Knopf „Ausgabe“ verteilt seine Kinder mit `justify-content: space-between`. Das Symbol
+steht deshalb **im vorhandenen `span`** und nicht daneben, sonst wäre es an den linken
+Knopfrand gerutscht; dafür gibt es die neue Regel `.bearb-neu-text`.
+
+**Prüfung.** Alle sechs Ersetzungen (3 Knöpfe, 3 CSS-Regeln) mit genau 1 Treffer,
+`node --check` fehlerfrei, SVG-Tags paarig (14 / 14). Die drei Knöpfe wurden mit dem
+echten Stilblock der Datei abgebildet und stehen richtig.
+
+**MD5.** `a2ee61f1e53b6bcfe633f8c5e2a08ee5` → `4928c822bf3c9f3386c3a5fff8e4d031`
+**Sicherung.** Keine Kopie im Ordner — dieses Verzeichnis liegt in der Versionsverwaltung,
+der vorige Stand ist dort der Commit `ee81956`.
+
 ## 2026-09-17 — Lupe im Suchfeld mit runden Strichenden (veröffentlicht, Commit `ee81956`)
 
 *(Nachzug zum Symbolangleich in OpenSlots und MediaQuote vom selben Tag)*
