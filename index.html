@@ -361,9 +361,11 @@ table.tab tbody tr:hover td{background:var(--surface2)}
    treffen laesst. Ohne Rahmen und Fuellung, anders als die uebrigen Kreuze des
    Werkzeugs - die stehen frei neben einer Zeile, dieses sitzt im Feld und
    braucht dort keinen zweiten Rahmen. Seit dem 17.09.2026 sind auch jene fuenf
-   gezeichnet (13 px an den Zeilen, 14 px an der Kongresstafel); .bearb-weg hat
-   dafuer eine feste Hoehe von 26 px bekommen, weil die Hoehe dort vorher vom
-   Schriftzeichen kam und der Knopf sonst von 18 auf 15 px geschrumpft waere. */
+   gezeichnet (13 px an den Zeilen, 14 px an der Kongresstafel). .bearb-weg
+   bekommt keine eigene Hoehe: .bearb-zeile ist ein Flex-Container ohne
+   align-items, der Knopf wird also auf Zeilenhoehe gestreckt und steht damit
+   buendig zum Eingabefeld. Eine feste Hoehe wuerde ihn an die Oberkante
+   ruecken - genau das ist am 17.09. kurzzeitig passiert. */
 .clear-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);
   width:24px;height:24px;display:none;align-items:center;justify-content:center;
   background:none;border:none;border-radius:4px;cursor:pointer;
@@ -772,7 +774,7 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
   font-size:.82rem;color:var(--text);background:var(--surface);
   border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
 .bearb-wahl:focus{border-color:var(--navy);outline:none}
-.bearb-weg{flex:none;width:30px;height:26px;display:inline-flex;align-items:center;
+.bearb-weg{flex:none;width:30px;display:inline-flex;align-items:center;
   justify-content:center;font-family:inherit;font-size:.9rem;
   color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);
   border-radius:4px;cursor:pointer}

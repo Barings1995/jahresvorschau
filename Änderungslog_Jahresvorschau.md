@@ -21,6 +21,35 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-18 (zuletzt) — Kreuz an den Ausgabenzeilen wieder bündig (noch nicht veröffentlicht)
+
+**Anlass.** Marcus fiel auf, dass das Kreuz neben den Ausgabenzeilen an der Oberkante klebte
+statt neben dem Feld zu stehen.
+
+**Ursache — mein Fehler.** Beim Umstellen der Kreuze hatte ich `.bearb-weg` eine feste Höhe
+von 26 px gegeben. `.bearb-zeile` ist aber ein Flex-Container ohne `align-items`, und die
+Voreinstellung `stretch` hatte den Knopf bis dahin auf Zeilenhöhe gezogen. Eine feste Höhe
+hebt das Strecken auf; das Element rückt dann an den Anfang der Querachse, also nach oben.
+
+**Wie es dazu kam.** Meine Prüfseite vom Vortag trug in ihrer eigenen Formatierung
+`align-items:center` — eine Zutat, die es in der echten Datei nicht gibt. Dadurch maß ich
+einen Knopf, der auf 15 px schrumpfte, und leitete daraus eine feste Höhe ab. In der echten
+Zeile wäre er nie geschrumpft. Lehre: Eine Prüfseite darf Umgebung nachbauen, aber nichts
+zur Ausrichtung beitragen, was die Datei nicht selbst mitbringt.
+
+**Änderung.** Die feste Höhe ist wieder heraus; `display:inline-flex` mit mittiger
+Ausrichtung im Knopf bleibt, damit das Symbol nicht auf der Schriftgrundlinie sitzt. Der
+Kommentar am Löschzeichen ist berichtigt.
+
+**Belege.** MD5 vorher `2f27d01715e45c78741dd61d50773866`, nachher
+`e741a3c03d0da900b1d101644b061994`. Gemessen an der echten Datei ohne Zutaten: Feld und Knopf
+jeweils 30,5 px hoch mit derselben Oberkante, Knopf 30,0 px breit.
+
+*(Der Sicherungspunkt-Knopf und die Kongresstafel sind nicht betroffen: Ersterer steht in
+einem Raster mit `align-items:center`, Letzterer trug seine feste Höhe schon vorher.)*
+
+---
+
 ## 2026-09-17 — Die fünf Kreuze gezeichnet statt gesetzt (veröffentlicht, Commit `0efa91b`)
 
 **Anlass.** Bei der Durchsicht der Schriftzeichen war aufgefallen, dass fünf Kreuze
@@ -34,11 +63,8 @@ drei Zeilenknöpfen (Themen, Ausgaben, Kongresse) und am Sicherungspunkt, 14 px 
 Kongresstafel wie im Suchfeld. Die drei Klassen richten ihren Inhalt jetzt mittig aus
 (`display:inline-flex`), sonst säße das Symbol auf der Schriftgrundlinie.
 
-**Höhe von `.bearb-weg`.** Der Knopf hatte nur eine Breite (30 px), seine Höhe kam vom
-Schriftzeichen. Ohne dieses schrumpfte er von 18 auf 15 px und stand als kleines Quadrat
-neben einem 29 px hohen Eingabefeld. Er hat deshalb eine feste Höhe von 26 px bekommen —
-dieselbe, die der Knopf am Sicherungspunkt schon trug. Marcus hat zwischen 26 px und der
-vollen Feldhöhe von 29 px entschieden; 26 px lässt die Nebenhandlung zurücktreten.
+**Höhe von `.bearb-weg`.** ~~Der Knopf bekam eine feste Höhe von 26 px.~~ **Am 18.09.2026
+zurückgenommen — die Begründung beruhte auf einem Messfehler, siehe den Eintrag oben.**
 
 **Belege.** MD5 vorher `4928c822bf3c9f3386c3a5fff8e4d031`, nachher
 `2f27d01715e45c78741dd61d50773866`. Gemessen nach der Änderung: Zeilenknopf 30 × 26 px,
