@@ -21,6 +21,37 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-17 — Lupe im Suchfeld mit runden Strichenden (noch nicht veröffentlicht)
+
+*(Nachzug zum Symbolangleich in OpenSlots und MediaQuote vom selben Tag)*
+
+**Anlass.** Marcus bat darum, die Werkzeuge auf Symbole zu prüfen, die aus der Reihe
+fallen. In dieser Datei fand sich eines.
+
+**Befund.** Die Lupe im Suchfeld trug als einziges der Liniensymbole keine runden
+Strichenden, der Griff endete stumpf abgeschnitten. Die übrigen Symbole derselben Datei
+haben `stroke-linecap="round"`. Bei 15 px ist das kaum zu sehen, in der Vergrößerung
+deutlich.
+
+**Geändert.** `stroke-linecap="round"` und `stroke-linejoin="round"` am Lupensymbol
+ergänzt. Mehr nicht — Motiv, Größe, Farbe und Position bleiben.
+
+**Nicht mitgeändert.** Die kleinen Dreiecke und Quadrate der Legende (10 × 10, gefüllt
+bzw. als Umriss für verstrichene Termine). Das sind Marken, keine Knopfsymbole; sie
+dürfen flächig bleiben.
+
+**Ebenfalls nicht geändert: die Print-Fassung.** `../Jahresvorschau Print/` trägt
+dieselbe Lupe mit demselben Mangel. Die Datei ist seit dem 23.08.2026 eingefroren, und
+ihr Hinweisdokument führt Bytegröße und MD5 als Wiedererkennungsmerkmal. Eine zunächst
+dort vorgenommene gleichlautende Änderung wurde deshalb zurückgenommen; die Datei steht
+wieder bei 153.327 Bytes und MD5 `7a92724bef23251f81e7ca986fe7ea83`.
+
+**Prüfung.** Genau 1 Treffer. Danach trägt kein Symbol der Datei mehr eine abweichende
+Strichführung. SVG-Tags paarig (11 / 11), `node --check` fehlerfrei. Vorher-Nachher stark
+vergrößert angesehen.
+
+**MD5.** `e5dbd3438aeede125f9a31614d2a78f3` → `a2ee61f1e53b6bcfe633f8c5e2a08ee5`
+
 ## 2026-09-16 — Druck: mehr Abstand zwischen Auslage/Bericht und Kongressname
 
 **Anlass.** Seit die Kongressnamen die reguläre Textfarbe tragen, hebt sich die
