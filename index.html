@@ -1267,7 +1267,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
           </button>
           <button class="ex-item" role="menuitem" onclick="datenpflegeExport()">
             <span class="ex-t">Kongresse für die <em>Datenpflege</em></span>
-            <span class="ex-d">Gibt je Ausgabe die Kongresszeile in der Schreibweise der Angebotswerkzeuge aus, als Excel-Datei im Aufbau des Blattes &raquo;Termine&laquo;</span>
+            <span class="ex-d">Excel-Datei mit der Kongresszeile je Ausgabe, in der Datenpflege der Angebotswerkzeuge &uuml;ber &raquo;Aus Excel laden&laquo; einzulesen</span>
           </button>
         </div>
         <div class="ex-ebene" id="exFormat">
@@ -3616,47 +3616,31 @@ function dpMonat(iso){
   return MONATE[Number(iso.slice(5,7))-1] || '';
 }
 
-// Ein Blatt aus einer einzigen Spalte Text. Es steht vor „Termine", weil die
-// Datei sonst aussieht wie eine Ladedatei und in der Datenpflege abgewiesen
-// wird - der Weg gehoert deshalb in die Datei selbst, nicht nur ins Handbuch.
-function dpHinweisZeilen(letzte){
+// Ein Blatt aus einer einzigen Spalte Text, vor "Termine". Bis zum 18.09.2026
+// stand hier eine Abschreibanleitung: Die Datenpflege wies jede Datei ohne
+// Preiszeilen ab, die Kongresse mussten mit Hilfsspalte und zwei Verweisformeln
+// in den Abzug uebertragen werden. Seit sie Ergaenzungsdateien annimmt, bleibt
+// der kurze Weg - das Blatt sagt nur noch, wo er beginnt.
+function dpHinweisZeilen(){
   const F=(w,s)=>({w,s});
   return [
     F(`Kongresse für die Datenpflege — Jahrgang ${jahr}`,4),
     F(`Erzeugt aus der Jahresvorschau, Stand ${standText()}`,5),
     F('',0),
-    F('Diese Datei ist eine Abschreibvorlage, keine Ladedatei.',6),
-    F('Sie lässt sich in der Datenpflege NICHT über „Aus Excel laden" einlesen. Jener Eingang erwartet',0),
-    F('den vollständigen Abzug mit dem Blatt „Preise" und ersetzt jeden darin enthaltenen Jahrgang im',0),
-    F('Ganzen — eine Datei ohne Preiszeilen nähme dem Jahrgang sämtliche Preise.',0),
-    F('',0),
     F('So werden die Angaben übernommen',6),
-    F('1. In der Datenpflege „Als Excel sichern". Es entsteht Angebotsdaten_JJJJ-MM-TT.xlsx mit',0),
-    F('    den Blättern Info, Preise und Termine.',0),
-    F('2. Das Blatt „Termine" dieser Datei in die Abzugsmappe kopieren, dort als Blatt „Kongresse".',0),
-    F(`    Die Daten stehen dort in den Zeilen 6 bis ${letzte}, im Abzug ab Zeile 2.`,0),
-    F('3. In beiden Blättern rechts der Daten eine Hilfsspalte L mit dem Schlüssel anlegen:',0),
-    F('    im Abzug ab Zeile 2:            =$A2&"|"&$B2&"|"&$C2',0),
-    F('    im Blatt „Kongresse" ab Zeile 6: =$A6&"|"&$B6&"|"&$C6',0),
-    F('    Damit im Abzug die Spalten I und J holen (ab Zeile 2, nach unten ziehen):',0),
-    F(`    =WENNFEHLER(INDEX(Kongresse!I$6:I$${letzte};VERGLEICH($L2;Kongresse!$L$6:$L$${letzte};0));"")`,0),
-    F(`    =WENNFEHLER(INDEX(Kongresse!J$6:J$${letzte};VERGLEICH($L2;Kongresse!$L$6:$L$${letzte};0));"")`,0),
-    F(`4. Die beiden Ergebnisspalten NUR über den Zeilen des Jahrgangs ${jahr} als Werte in die Spalten`,0),
-    F('    I und J einsetzen. Danach die Hilfsspalten und das Blatt „Kongresse" entfernen, speichern',0),
-    F('    und den Abzug über „Aus Excel laden" einlesen.',0),
+    F('In der Datenpflege der Angebotswerkzeuge „Aus Excel laden …" und diese Datei wählen.',0),
+    F('Die Datenpflege erkennt an der Datei selbst, dass sie eine Ergänzung ist, und zeigt vor',0),
+    F('der Übernahme, welche Ausgaben sich ändern. Übernommen wird allein die Spalte',0),
+    F('„Kongresse"; Preise, Termine und Themenschwerpunkte bleiben unangetastet.',0),
     F('',0),
-    F('Warum ein Verweis und nicht Einfügen von Hand',6),
-    F('Die Zeilenfolge ist in beiden Dateien verschieden: hier stehen die Titel in der Ordnung der',0),
-    F('Jahresvorschau, im Abzug beginnt das Blatt „Termine" mit „Die Onkologie" und führt dreizehn',0),
-    F('weitere Titel dazwischen. Die Titelnamen selbst sind in beiden Dateien wortgleich, deshalb',0),
-    F('trifft der Schlüssel aus Jahrgang, Titel und Heft eindeutig. Die Verkettung mit & gleicht dabei',0),
-    F('aus, dass der Jahrgang im Abzug als Zahl und hier als Text steht.',0),
+    F('Zugeordnet wird über Jahrgang, Titel und Heft — die drei ersten Spalten. Eine Ausgabe,',0),
+    F('die es in der Datenpflege nicht gibt, wird übergangen und im Bericht genannt.',0),
     F('',0),
-    F(`Außerhalb der Zeilen des Jahrgangs ${jahr} liefert der Verweis leere Zeichenketten. Würden die`,5),
-    F('Spalten dort mit eingesetzt, verlören die übrigen Titel ihre Einträge.',5),
+    F('Die übrigen Spalten stehen nur zur Orientierung dabei: Sie zeigen, welche Ausgabe',5),
+    F('gemeint ist, und werden beim Einlesen nicht ausgewertet.',5),
     F('',0),
-    F('Die Kongresszeile selbst steht im Blatt „Termine" in Spalte J, in der Schreibweise der',5),
-    F('Angebotswerkzeuge: Kurzname (Auslage), Zeitraum, Ort — je Kongress eine eigene Zeile.',5)
+    F('Die Kongresszeile selbst steht in der Schreibweise der Angebotswerkzeuge:',5),
+    F('Kurzname (Auslage), Zeitraum, Ort — je Kongress eine eigene Zeile.',5)
   ];
 }
 
@@ -3669,10 +3653,13 @@ function hinweisBlattXml(zeilen){
     `<sheetData>`+aus.join('')+`</sheetData></worksheet>`;
 }
 
+// Die Spalte "Themenschwerpunkte" fehlt mit Absicht: Die Datenpflege uebernimmt
+// jede Inhaltsspalte, die in der Datei steht. Die Themen werden aber dort
+// gefuehrt, nicht hier - stuenden sie in der Datei, schriebe dieser Weg sie
+// stillschweigend zurueck.
 function datenpflegeBlatt(){
-  const kopf = ['Jahrgang','Titel','Heft','Monat','ET','AS','DU-Schluss','EH-Termin',
-    'Themenschwerpunkte','Kongresse'];
-  const breiten = [9,40,7,10,9,9,10,10,40,60];
+  const kopf = ['Jahrgang','Titel','Heft','Monat','ET','AS','DU-Schluss','EH-Termin','Kongresse'];
+  const breiten = [9,40,7,10,9,9,10,10,60];
   const zeilen = [];
   let mitKongress=0, ohneTermin=0;
   JOURNALS.forEach(t=>t.issues.forEach(iss=>{
@@ -3683,17 +3670,15 @@ function datenpflegeBlatt(){
     });
     zeilen.push([{w:jahr},{w:t.short},{w:iss.heft},{w:dpMonat(iss.et)},
       {w:dpTermin(iss.et)},{w:dpTermin(iss.as)},{w:dpTermin(iss.du)},{w:dpTermin(iss.eh)},
-      {w:themaText(iss)},{w:text}]);
+      {w:text}]);
   }));
   const vorspann=[
     [`Kongresse für die Datenpflege — Jahrgang ${jahr}`,4],
-    [`Angebotswerkzeuge, Blatt „Termine", Spalte „Kongresse" (J)`,0],
+    [`Ergänzung für die Angebotswerkzeuge — dort über „Aus Excel laden …" einlesen`,0],
     [`Erzeugt aus der Jahresvorschau, Stand ${standText()}`,5]
   ];
-  // Kopfzeile in Zeile 5, Daten ab 6 - dieselbe Rechnung, die blattXml anstellt.
-  const letzte = 5 + zeilen.length;
   return {xml: blattXml(breiten,vorspann,kopf,zeilen),
-    hinweis: hinweisBlattXml(dpHinweisZeilen(letzte)),
+    hinweis: hinweisBlattXml(dpHinweisZeilen()),
     ausgaben:zeilen.length, mitKongress, ohneTermin};
 }
 
@@ -3753,12 +3738,11 @@ async function datenpflegeExport(){
     : '';
   dialogZeigen('Datenpflege',
     `<p>${b.mitKongress} von ${b.ausgaben} Ausgaben tragen mindestens einen Kongress.</p>`+
-    `<p>Die Datei „Kongresse_Datenpflege_${esc(jahr)}.xlsx" steht im Download-Ordner bereit,`+
-    ` im Aufbau des Blattes „Termine": Jahrgang, Titel und Heft führen die Zeile,`+
-    ` die letzte Spalte trägt den Wortlaut für die Spalte „Kongresse".${hinweis}</p>`+
-    `<p>Das vorangestellte Blatt „Hinweise" beschreibt Schritt für Schritt, wie die`+
-    ` Angaben in die Datenpflege gelangen. Direkt einlesen lässt sich die Datei dort`+
-    ` nicht — der Excel-Eingang erwartet den vollständigen Abzug.</p>`,
+    `<p>Die Datei „Kongresse_Datenpflege_${esc(jahr)}.xlsx" steht im Download-Ordner`+
+    ` bereit.${hinweis}</p>`+
+    `<p>In der Datenpflege der Angebotswerkzeuge „Aus Excel laden …" wählen und diese`+
+    ` Datei angeben. Sie wird dort als Ergänzung erkannt: Übernommen wird allein die`+
+    ` Spalte „Kongresse", und vor der Übernahme steht, welche Ausgaben sich ändern.</p>`,
     'Schließen');
 }
 

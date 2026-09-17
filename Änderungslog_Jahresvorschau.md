@@ -21,6 +21,36 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-18 — Kongressausgabe wird zur einlesbaren Ergänzungsdatei
+
+**Anlass.** Die Übergabe der Kongresse an die Datenpflege war Handarbeit: Die Datei war
+eine Abschreibvorlage, und im Abzug mussten Hilfsspalte, zwei Verweisformeln und ein
+zusätzliches Blatt gebaut werden. Die Datenpflege nimmt seit dem 18.09.2026 auch
+Ergänzungsdateien an (siehe deren Änderungslog); damit entfällt der Umweg.
+
+**Geändert.**
+- Das Blatt „Hinweise" trägt statt der vierschrittigen Abschreibanleitung den kurzen Weg:
+  in der Datenpflege „Aus Excel laden …", Datei wählen, Bericht ansehen.
+- Die Spalte „Themenschwerpunkte" ist aus dem Blatt „Termine" entfernt. Sie würde beim
+  Einlesen mitgeschrieben — die Themen werden aber in der Datenpflege geführt, nicht hier.
+  Die übrigen Spalten (Monat, ET, AS, DU, EH) bleiben zur Orientierung stehen und werden
+  beim Einlesen nicht ausgewertet.
+- Abschlussdialog und Beschreibung des Menüpunkts nennen den neuen Weg.
+
+**Unverändert.** Der Wortlaut der Kongresszeile, die Auswahl (Kongresse ohne Termin
+fallen weiter aus) und der Aufbau der Datei: Kopfzeile in Zeile 5, Daten ab Zeile 6,
+Jahrgang, Titel und Heft führen die Zeile. Die Datenpflege sucht die Kopfzeile in den
+ersten zwölf Zeilen, der Vorspann stört sie also nicht.
+
+**Nachweis.** Datei aus dem geänderten Werkzeug erzeugt (54 Ausgaben, 50 mit Kongress)
+und in node mit dem aus der Datenpflege geschnittenen Lesecode geprüft: als Ergänzung
+erkannt, Blatt „Termine", allein die Spalte „Kongresse", 49 Änderungen, 4 unverändert,
+eine dort fehlende Ausgabe übergangen, Themenschwerpunkte unberührt.
+
+**Beleg.** MD5 `e5dbd3438aeede125f9a31614d2a78f3` → `838df5be41effd66a67fde2dc4566848`.
+
+---
+
 ## 2026-09-18 (zuletzt) — Kreuz an den Ausgabenzeilen wieder bündig (veröffentlicht, Commit `79a7865`)
 
 **Anlass.** Marcus fiel auf, dass das Kreuz neben den Ausgabenzeilen an der Oberkante klebte
