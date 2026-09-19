@@ -1471,13 +1471,38 @@ function kongressText(id){
   return k ? kongressAus(k) : String(id);
 }
 
-// Wonach die Kongresse einer Ausgabe geordnet stehen: nach ihrem Zeitraum.
-// Wer keinen hat, kommt hinten - die Tilde liegt hinter allen Ziffern - und
-// dort nach seinem Wortlaut. Dieselbe Ordnung stellt der Abruf beim Laden her
-// und das Auswahlfeld im Ausgabenformular beim Hinzufuegen; stuenden dort
-// zwei verschiedene, zeigte das Formular etwas anderes als der naechste Aufruf.
-function kongSchluessel(k){
-  return k ? (k.von || ('~' + (k.unscharf || k.lang || ''))) : '';
+// Der Platz eines Kongresses im Jahreslauf. Mit Datum ist es der Beginn. Ein
+// nur als Monat bekannter Zeitraum ("März 2027", "September") steht am Ende
+// seines Monats: "2027-03-~" - die Tilde liegt hinter allen Ziffern, also nach
+// jedem Tag im Maerz und vor dem 1. April. Damit wird kein Tag behauptet, den
+// niemand gesagt hat, und der Kongress steht trotzdem in seinem Monat statt
+// hinter dem ganzen Jahr. Fehlt die Jahreszahl, gilt der Jahrgang des Satzes:
+// j, sonst der gezeigte. Beim Laden werden beide Jahrgaenge geordnet, waehrend
+// nur einer gezeigt wird - dort muss j deshalb mitkommen.
+// Ohne jede Zeitangabe: leer.
+function kongRang(k, j){
+  if(!k) return '';
+  if(k.von) return k.von;
+  const m = String(k.unscharf||'').trim().match(/^([A-Za-zÄÖÜäöüß]+)(?:\s+(\d{4}))?$/);
+  if(!m || !K_MONATE[m[1]]) return '';
+  return `${m[2] || j || k.jahr || jahr}-${String(K_MONATE[m[1]]).padStart(2,'0')}-~`;
+}
+
+// Wonach die Kongresse einer Ausgabe geordnet stehen: nach ihrem Platz im
+// Jahreslauf (kongRang). Wer gar keine Zeitangabe hat, kommt hinten - die
+// Tilde liegt hinter allen Ziffern - und dort nach seinem Wortlaut. Dieselbe
+// Ordnung stellt der Abruf beim Laden her und das Auswahlfeld im
+// Ausgabenformular beim Hinzufuegen; stuenden dort zwei verschiedene, zeigte
+// das Formular etwas anderes als der naechste Aufruf.
+function kongSchluessel(k, j){
+  return k ? (kongRang(k, j) || ('~' + (k.unscharf || k.lang || ''))) : '';
+}
+// Verglichen wird Zeichen fuer Zeichen, nicht mit localeCompare: das stellt
+// Satzzeichen wie die Tilde vor die Ziffern, und bis 19.09.2026 standen
+// Kongresse ohne Zeitangabe deshalb vorn statt hinten.
+function kongVergleich(a, b){
+  const x = String(a||''), y = String(b||'');
+  return x < y ? -1 : x > y ? 1 : 0;
 }
 
 // Traegt einen Wortlaut in den gezeigten Jahrgang ein und gibt die Kennung
@@ -2205,13 +2230,13 @@ function renderKongress(q){
   // wie das Jahr selbst, und der Zeitraum steht ohnehin in jeder Ueberschrift.
   // Ein Kasten kann mehrere Saetze buendeln - die Zuordnungsliste fuehrt
   // verschiedene Schreibweisen auf einen Namen zusammen -, dann zaehlt der
-  // frueheste Beginn. Ein nur als Wortlaut bekannter Zeitraum ("September")
-  // ist kein Datum und traegt deshalb keinen; danach zu sortieren hiesse, den
-  // Monatsersten zu behaupten, den niemand gesagt hat.
+  // frueheste Beginn. Ein nur als Monat bekannter Zeitraum ("September 2027")
+  // steht am Ende seines Monats (siehe kongRang) - bis 19.09.2026 stand er
+  // hinter dem ganzen Jahr, weil er kein Datum traegt.
   const termine=new Map();
   const termin=name=>{
     if(!termine.has(name)) termine.set(name, gruppen.get(name).reduce((frueh,e)=>{
-      const k=KONG.get(e.kid), von=(k&&k.von)||'';
+      const von=kongRang(KONG.get(e.kid));
       return von && (!frueh || von<frueh) ? von : frueh;
     },''));
     return termine.get(name);
@@ -4266,7 +4291,7 @@ function bearbKongZu(art, id){
   if(!entwurf || !id || entwurf[art].includes(id)) return bearbFormNeu();
   entwurf[art].push(id);
   entwurf[art].sort((x,z)=>
-    kongSchluessel(KONG.get(x)).localeCompare(kongSchluessel(KONG.get(z))));
+    kongVergleich(kongSchluessel(KONG.get(x)), kongSchluessel(KONG.get(z))));
   bearbStand('Nicht gespeichert', '');
   bearbFormNeu();
 }
@@ -5803,9 +5828,9 @@ function inDatenForm(jahrgaenge, titel, ausgaben, kongresse, zuordnungen){
     // Die Reihenfolge innerhalb einer Ausgabe richtet sich nach dem Zeitraum
     // des Kongresses: die Zuordnungstabelle kennt keine.
     for(const [y, liste] of nachJahr){
-      const rang = new Map(liste.map(k=>[k.id, kongSchluessel(k)]));
+      const rang = new Map(liste.map(k=>[k.id, kongSchluessel(k, y)]));
       const ordnen = ids => ids.sort((x,z)=>
-        String(rang.get(x)||'').localeCompare(String(rang.get(z)||'')));
+        kongVergleich(rang.get(x), rang.get(z)));
       ergebnis[y].kongresse = liste;
       ergebnis[y].umgestellt = true;
       ergebnis[y].titel.forEach(t=>t.issues.forEach(iss=>{

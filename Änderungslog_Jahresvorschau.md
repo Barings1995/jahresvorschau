@@ -21,7 +21,48 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-19 (zuletzt) — Kongressmatrix: Doppellinie an der Unterkante (veröffentlicht, Commit `6617d22`)
+## 2026-09-19 (zuletzt) — Kongresse mit Monatsangabe stehen in ihrem Monat (noch nicht veröffentlicht)
+
+**Anlass.** Ein Kongress, dessen Termin nur als Monat bekannt ist („September",
+„Januar 2028"), trägt kein Datum und stand in der Kongressliste deshalb hinter dem
+ganzen Jahr. Im Jahrgang 2027 betraf das die Heidelberger Myelomtage („September"):
+Sie standen nach der DGHO im Oktober.
+
+**Geändert.**
+- Neue Funktion `kongRang(k, j)`: der Platz im Jahreslauf. Mit Datum ist es der
+  Beginn, bei einer Monatsangabe `JJJJ-MM-~`. Die Tilde sortiert hinter allen
+  Ziffern, der Kongress steht also am Ende seines Monats, vor dem Ersten des
+  Folgemonats. Ein Tag wird damit nicht behauptet. Fehlt die Jahreszahl, gilt der
+  Jahrgang des Satzes. Beim Laden wird er ausdrücklich mitgegeben, weil dort beide
+  Jahrgänge geordnet werden, aber nur einer gezeigt wird.
+- `renderKongress` (Kongressliste) und `kongSchluessel` (Reihenfolge innerhalb
+  einer Ausgabe, beim Laden und beim Hinzufügen im Ausgabenformular) nutzen
+  `kongRang`.
+- **Mitbehoben:** `kongSchluessel` wurde mit `localeCompare` verglichen. Das stellt
+  die Tilde vor die Ziffern, sodass Kongresse ohne Datum innerhalb einer Ausgabe
+  vorn statt hinten standen. Verglichen wird jetzt Zeichen für Zeichen
+  (`kongVergleich`).
+- Unverändert: Die Kongressmatrix im Bearbeiten-Menü führt solche Kongresse
+  weiter unter „Termin fehlt — noch zu recherchieren", denn dort sind sie ein
+  Arbeitsauftrag.
+
+**Geprüft.**
+- In node mit Beispielsätzen: ASH (12.12.2026) · 03.03. · 20.03. · „März 2027" ·
+  01.04. · 30.09. · „September" · ohne Termin · „Frühjahr 2027". Die letzten beiden
+  stehen hinten, weil sie keinen Monat nennen.
+- Auf der angemeldeten Live-Seite eingeschleust, Jahrgang 2027: 40 Kongresse,
+  dieselbe Menge wie vorher. Die Myelomtage stehen jetzt nach dem ESMO-Kongress
+  (17.–21.09.) und vor der DGHO. „Januar 2028" bleibt folgerichtig am Ende.
+- Reihenfolge je Ausgabe über beide Jahrgänge: drei Ausgaben ändern sich (ÄZ O+H
+  Heft 6, Im Fokus Onkologie 7–8, InFo H+O Heft 4, jeweils Auslagen). Dort standen
+  die Myelomtage bisher vorn und stehen jetzt hinter ADO und DGU.
+- Syntaxprüfung aller Skriptblöcke. Die Live-Seite wurde danach neu geladen.
+
+MD5 `18d2220967d039ce4ac06b786e19b15e` → `d40009425124860a12cd9d5db65d0b57`.
+
+---
+
+## 2026-09-19 — Kongressmatrix: Doppellinie an der Unterkante (veröffentlicht, Commit `6617d22`)
 
 **Anlass.** Dieselbe Doppellinie wie in OpenSlots: Ganz nach unten gerollt lag die
 Linie der letzten Kongresszeile (`--mxlinie`, #c9d2dc) direkt auf dem Rahmen des
