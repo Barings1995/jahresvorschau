@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-19 (zuletzt) — Kongresse mit Monatsangabe stehen in ihrem Monat (noch nicht veröffentlicht)
+## 2026-09-19 (zuletzt) — Kongresse mit Monatsangabe stehen in ihrem Monat (veröffentlicht, Commit `f0504a9`)
 
 **Anlass.** Ein Kongress, dessen Termin nur als Monat bekannt ist („September",
 „Januar 2028"), trägt kein Datum und stand in der Kongressliste deshalb hinter dem
