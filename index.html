@@ -954,6 +954,8 @@ p.bearb-stand:not(:empty){margin-top:9px}
   padding:9px 6px 7px;position:sticky;top:0;z-index:3;background:var(--surface);
   box-shadow:inset 0 -1px 0 var(--border)}
 .mx-tab td{border-bottom:1px solid var(--mxlinie);vertical-align:top;padding:5px 4px}
+/* Siehe mxHoeheAnpassen: nur wenn die Tabelle das Rollfeld ausfuellt. */
+.mx-scroll.mx-voll .mx-tab tbody tr:last-child td{border-bottom:none}
 /* Die Kongressspalte bleibt beim seitlichen Rollen stehen. Die Tabelle ist
    mindestens 720 Pixel breit und rollt auf einem schmalen Schirm waagerecht -
    ohne das waere zwar die Kopfzeile da, aber nicht mehr zu sehen, zu welchem
@@ -5147,6 +5149,15 @@ function mxHoeheAnpassen(){
   const unten = main.getBoundingClientRect().bottom - r.bottom;
   const hoehe = Math.floor(innerHeight - (r.top + scrollY) - unten);
   mx.style.maxHeight = Math.max(340, hoehe) + 'px';
+  // Fuellt die Tabelle das Feld, liegt die Linie ihrer letzten Zeile (ganz
+  // nach unten gerollt) direkt auf dem Rahmen - zwei Striche uebereinander.
+  // Dann entfaellt sie; den Abschluss zeichnet der Rahmen. Bleibt darunter
+  // Platz (wenige Kongresse, Mindesthoehe), schliesst sie die Tabelle ab und
+  // bleibt stehen. Erst ohne Kennzeichen messen, sonst zaehlte die schon
+  // weggenommene Linie mit.
+  mx.classList.remove('mx-voll');
+  const tab = mx.querySelector('.mx-tab');
+  if(tab && tab.offsetHeight >= mx.clientHeight) mx.classList.add('mx-voll');
 }
 // Dasselbe fuer die Ausgabenliste links in der Ausgabenansicht. Die feste
 // Hoehe von 74vh liess mit Kopfleiste, Umschalter und dem Knopf "+ Neuen Titel

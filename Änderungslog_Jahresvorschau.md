@@ -21,6 +21,25 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
+## 2026-09-19 — Kongressmatrix: Doppellinie an der Unterkante (lokal, noch nicht veröffentlicht)
+
+**Anlass.** Dieselbe Doppellinie wie in OpenSlots: Ganz nach unten gerollt lag die
+Linie der letzten Kongresszeile (`--mxlinie`, #c9d2dc) direkt auf dem Rahmen des
+Rollfelds (#d5dce8) – gemessen 0,23 px Abstand, also zwei Striche übereinander.
+
+**Geändert.** `mxHoeheAnpassen()` vermerkt am Rollfeld die Klasse `mx-voll`, wenn die
+Tabelle es ganz ausfüllt; nur dann entfällt die Unterlinie der letzten Zeile
+(`.mx-scroll.mx-voll .mx-tab tbody tr:last-child td{border-bottom:none}`). Bleibt
+darunter Platz (wenige Kongresse, Mindesthöhe 340 px), schließt die Linie die Tabelle
+ab und bleibt stehen. Gemessen wird ohne die Klasse, damit die schon weggenommene
+Linie nicht mitzählt. Die Funktion läuft nach jedem Zeichnen und bei Größenänderung.
+
+**Geprüft** in der angemeldeten Live-Seite mit eingespielter Regel (nur lesend):
+gefüllt → letzte Zeile 0 px, vorletzte 1 px; Feld höher als Tabelle → Linie bleibt.
+
+Kein Backup (kleine Folgekorrektur). MD5 838df5be41effd66a67fde2dc4566848 →
+18d2220967d039ce4ac06b786e19b15e.
+
 ## 2026-09-18 — Kongressausgabe wird zur einlesbaren Ergänzungsdatei
 
 **Anlass.** Die Übergabe der Kongresse an die Datenpflege war Handarbeit: Die Datei war
