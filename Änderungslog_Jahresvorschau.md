@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-19 — Kongressmatrix: Doppellinie an der Unterkante (lokal, noch nicht veröffentlicht)
+## 2026-09-19 (zuletzt) — Kongressmatrix: Doppellinie an der Unterkante (veröffentlicht, Commit `6617d22`)
 
 **Anlass.** Dieselbe Doppellinie wie in OpenSlots: Ganz nach unten gerollt lag die
 Linie der letzten Kongresszeile (`--mxlinie`, #c9d2dc) direkt auf dem Rahmen des
@@ -70,7 +70,7 @@ eine dort fehlende Ausgabe übergangen, Themenschwerpunkte unberührt.
 
 ---
 
-## 2026-09-18 (zuletzt) — Kreuz an den Ausgabenzeilen wieder bündig (veröffentlicht, Commit `79a7865`)
+## 2026-09-18 — Kreuz an den Ausgabenzeilen wieder bündig (veröffentlicht, Commit `79a7865`)
 
 **Anlass.** Marcus fiel auf, dass das Kreuz neben den Ausgabenzeilen an der Oberkante klebte
 statt neben dem Feld zu stehen.
