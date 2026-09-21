@@ -21,7 +21,40 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-19 (zuletzt) — Kongresse mit Monatsangabe stehen in ihrem Monat (veröffentlicht, Commit `f0504a9`)
+## 2026-09-21 (zuletzt) — Kongressmatrix: Spaltenlinien am Übergang zur Kopfzeile versetzt (noch nicht veröffentlicht)
+
+**Anlass.** Marcus' Bildschirmfoto: Die senkrechten Linien der Kopfzeile und die der
+Felder darunter liegen nicht auf einer Linie, sondern um eine Bildschirmzeile
+gegeneinander versetzt.
+
+**Ursache, nachgemessen.** Die Kopfzeile zeichnet ihre Trennlinie als Innenschatten
+(`inset 1px 0 0`), weil ein Rand an einer klebenden Zelle mit `border-collapse`
+beim Blättern zurückbliebe. Die Felder darunter zogen einen echten Rand
+(`border-left`). Ein eingeklappter Rand liegt auf der Spaltengrenze und damit zur
+Hälfte in der Nachbarzelle. Die Spaltengrenzen fallen auf halbe Pixel — gemessen
+288,594 · 362,992 · 437,391 · 511,789 · 586,188 · 660,586 —, bei zweifacher
+Bildschirmauflösung also genau eine Bildschirmzeile neben den Schatten der
+Kopfzeile.
+
+**Geändert.** `.mx-tab td+td` zieht die Linie jetzt ebenfalls als Innenschatten;
+die Ausnahme am ersten Titelfeld (`td.mx-lbl+td`) bleibt, nun als `box-shadow:none`.
+Beide Linien liegen damit an derselben Kante und können nicht mehr auseinanderfallen,
+unabhängig von der Rundung.
+
+**Geprüft** auf der angemeldeten Live-Seite, eingeschleust, Jahrgang 2026:
+- Die Spalten stehen unverändert an denselben Stellen; der Wegfall des Randes
+  verschiebt die Tabelle nicht.
+- Das erste Titelfeld bleibt ohne eigene Linie — dort zieht die Kongressspalte
+  ihre Kante.
+- Die aufgeklappte Heftleiste behält ihren marineblauen 3-Pixel-Streifen
+  (`inset 3px 0 0`), die genauere Regel sticht die neue.
+- Die Seite wurde danach neu geladen.
+
+MD5 `d40009425124860a12cd9d5db65d0b57` → `47f7dc925c903ba937fb4c141ab79f1c`.
+
+---
+
+## 2026-09-19 — Kongresse mit Monatsangabe stehen in ihrem Monat (veröffentlicht, Commit `f0504a9`)
 
 **Anlass.** Ein Kongress, dessen Termin nur als Monat bekannt ist („September",
 „Januar 2028"), trägt kein Datum und stand in der Kongressliste deshalb hinter dem

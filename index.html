@@ -988,9 +988,16 @@ p.bearb-stand:not(:empty){margin-top:9px}
    eigene Kante, und beide nebeneinander ergaeben einen doppelt breiten Strich
    - einen, der beim seitlichen Rollen auch noch auf einen zusammenschrumpfte,
    weil der Rand mit der Tabelle wegwandert und der Innenschatten stehen
-   bleibt. Dieselbe Ausnahme macht die Kopfzeile in renderKongressmatrix. */
-.mx-tab td+td{border-left:1px solid var(--mxlinie)}
-.mx-tab td.mx-lbl+td{border-left:none}
+   bleibt. Dieselbe Ausnahme macht die Kopfzeile in renderKongressmatrix.
+   Gezeichnet wird sie wie in der Kopfzeile als Innenschatten, nicht als Rand:
+   Ein eingeklappter Rand liegt auf der Spaltengrenze und damit zur Haelfte in
+   der Nachbarzelle; faellt die Grenze wie hier auf einen halben Pixel
+   (gemessen 362,992), landet er eine Bildschirmzeile links vom Schatten der
+   Kopfzeile, der innen an der Zelle liegt. Genau das war der Versatz am
+   Uebergang zur Kopfzeile. Innen liegen beide Linien an derselben Kante und
+   koennen nicht mehr auseinanderfallen. */
+.mx-tab td+td{box-shadow:inset 1px 0 0 var(--mxlinie)}
+.mx-tab td.mx-lbl+td{box-shadow:none}
 /* Das Feld unter dem Zeiger haelt links wie rechts vier Pixel Abstand zum
    Rand der Zelle. Rechts ist das nicht nur Form: dort liegt der
    Innenschatten, der die Kante der Kongressspalte zeichnet, und ein Kind
