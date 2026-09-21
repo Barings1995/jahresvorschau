@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-21 (zuletzt) — Kongressmatrix: Spaltenlinien am Übergang zur Kopfzeile versetzt (noch nicht veröffentlicht)
+## 2026-09-21 (zuletzt) — Kongressmatrix: Spaltenlinien am Übergang zur Kopfzeile versetzt (veröffentlicht, Commit `e6e32c1`)
 
 **Anlass.** Marcus' Bildschirmfoto: Die senkrechten Linien der Kopfzeile und die der
 Felder darunter liegen nicht auf einer Linie, sondern um eine Bildschirmzeile
