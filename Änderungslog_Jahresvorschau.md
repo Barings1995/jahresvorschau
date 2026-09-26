@@ -21,7 +21,44 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-21 (zuletzt) — Kongressmatrix: Spaltenlinien am Übergang zur Kopfzeile versetzt (veröffentlicht, Commit `e6e32c1`)
+## 2026-09-26 (zuletzt) — Kippschalter der Kongressmatrix gleitet wieder
+
+**Anlass.** Marcus' Bildschirmfoto: Der Knebel des Schalters »Nur deutschsprachiger
+Raum« springt in die neue Stellung, statt hinüberzulaufen.
+
+**Ursache, nachgemessen.** Der Schalter in der Legendenzeile überdauert das Zeichnen,
+dieser hier wird mit der Kopfzeile jedes Mal neu gebaut — er entstünde deshalb ohne
+Bewegung schon in der Endstellung. Dagegen stand seit jeher die Klasse `zurueck`, die
+das Bild eine Bildlage lang am Ausgangspunkt hält. Gesetzt wurde sie aber erst *nach*
+dem Zeichnen, und dazwischen liegt `rollfelderAnpassen()`: die Höhe der Rollfelder wird
+an der Seite gemessen, und beim Messen bestimmt der Browser den Stil des frischen
+Schalters — in der Endstellung, weil die Klasse da noch fehlt. Ein erster Stand, der
+erst danach gesetzt wird, taugt nicht mehr als Ausgangspunkt. Gemessen in der
+veröffentlichten Fassung: der Knebel steht direkt nach dem Zeichnen auf
+`translateX(14px)`, und beim Schalten läuft kein einziger Übergang an
+(`transitionstart` bleibt aus).
+
+**Was geändert wurde.** Die Klasse kommt jetzt mit dem Markup. `mxDachSetzen` setzt die
+Marke `mxSchalterHalten`, `renderKongressmatrix` verbraucht sie beim Bauen des Schalters
+wie `mxNotiz` und schreibt `class="switch zurueck"`. Damit sieht auch eine erzwungene
+Messung den Ausgangspunkt. Genommen wird die Klasse wie bisher zwei Bildlagen später;
+neu ist ein Rückfall nach 400 ms für den Fall, dass gar nicht gezeichnet wird — im
+Hintergrundfenster laufen keine Bildlagen, und der Schalter bliebe sonst in der alten
+Stellung stehen.
+
+**Prüfung.** Auf der veröffentlichten Seite eingespielt und nachgemessen: Der frisch
+gezeichnete Schalter steht mit `zurueck` auf `transform: none` und hellgrauer Bahn,
+obwohl das Kästchen schon gesetzt ist. Nimmt man die Klasse, laufen zwei Übergänge an —
+`transform` und `background-color` —, und der Knebel kommt bei `translateX(14px)` an,
+16 px vom linken Bahnrand, bündig mit der Innenkante der 30 px breiten Bahn. Ohne die
+Änderung lief an derselben Stelle nichts an.
+
+**Dateien.** `index.html` — MD5 vorher `47f7dc925c903ba937fb4c141ab79f1c`,
+nachher `a25a4c7f75388efb73de49068d5e161f`.
+
+---
+
+## 2026-09-21 — Kongressmatrix: Spaltenlinien am Übergang zur Kopfzeile versetzt (veröffentlicht, Commit `e6e32c1`)
 
 **Anlass.** Marcus' Bildschirmfoto: Die senkrechten Linien der Kopfzeile und die der
 Felder darunter liegen nicht auf einer Linie, sondern um eine Bildschirmzeile

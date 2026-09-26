@@ -1740,6 +1740,10 @@ let mxNotiz = '';
 // Gebraucht wird das allein dort, wo der Zeilenbestand ausgetauscht wird - der
 // alte Rollstand zeigte danach auf Zeilen, die es nicht mehr gibt.
 let mxRollZurueck = false;
+// Laesst den Kippschalter der Kopfzeile beim naechsten Zeichnen in seiner alten
+// Stellung entstehen, damit der Knebel danach sichtbar hinueberlaeuft. Wird
+// vom Zeichnen aufgebraucht wie mxNotiz.
+let mxSchalterHalten = false;
 let ohneVerstrichene = false;   // Schalter in der Legendenzeile
 const activeJ = new Set();
 let sortKey = 'et', sortDir = 1;
@@ -5052,19 +5056,37 @@ function mxDachSetzen(b){
   mxAuswahl = null;
   bearbStandText=''; bearbStandArt='';
   mxRollZurueck = true;
+  mxSchalterHalten = true;
   render();
   mxSchalterGleiten();
 }
 
-// Zwei Bildlagen: die erste zeigt den Schalter noch in der alten Stellung, mit
-// der zweiten faellt die Klasse und der Knebel laeuft hinueber. Eine einzelne
-// genuegt nicht - Klasse setzen und wieder nehmen faenden dann im selben
-// Durchgang statt, und es gaebe wieder nichts zu sehen.
+// Der Schalter entsteht mit dem Zeichnen neu und stuende ohne Zutun sofort in
+// der Endstellung. Die Klasse "zurueck" haelt sein Bild am Ausgangspunkt fest;
+// wird sie genommen, laeuft der Knebel hinueber.
+//
+// Dass die Klasse schon im Markup steht (mxSchalterHalten) und nicht erst hier
+// gesetzt wird, ist der Kern der Sache: das Zeichnen passt am Ende die Hoehe
+// der Rollfelder an und misst dafuer die Seite. Beim Messen bestimmt der
+// Browser den Stil des frischen Schalters - und zwar in der Endstellung, wenn
+// die Klasse da noch fehlt. Ein erster Stand, der erst danach gesetzt wird,
+// taugt nicht mehr als Ausgangspunkt: der Knebel zuckte ein wenig zurueck und
+// gleich wieder vor, statt zu gleiten.
+//
+// Genommen wird die Klasse zwei Bildlagen spaeter. Eine einzelne genuegt
+// nicht - bei Rechnern, die zwischendurch nicht zeichnen, faenden Entstehen
+// und Loesen sonst in derselben Lage statt.
 function mxSchalterGleiten(){
-  const s = document.querySelector('.mx-kopf .switch');
-  if(!s || typeof requestAnimationFrame !== 'function') return;
-  s.classList.add('zurueck');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>s.classList.remove('zurueck')));
+  const s = document.querySelector('.mx-kopf .switch.zurueck');
+  if(!s) return;
+  const loesen = ()=>s.classList.remove('zurueck');
+  if(typeof requestAnimationFrame !== 'function') return loesen();
+  requestAnimationFrame(()=>requestAnimationFrame(loesen));
+  // Ruht das Zeichnen - ein Fenster im Hintergrund -, laufen keine Bildlagen,
+  // und der Schalter bliebe in der alten Stellung stehen. Nach einem
+  // Wimpernschlag faellt die Klasse deshalb auf jeden Fall. Zu sehen ist davon
+  // nichts: laeuft das Zeichnen, sind die beiden Lagen laengst durch.
+  setTimeout(loesen, 400);
 }
 
 function mxZeilen(){
@@ -5238,7 +5260,10 @@ function renderKongressmatrix(umschalter){
   const neuKnopf = `<button type="button" class="bearb-zu" onclick="mxKongNeu()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neuer Kongress</button>`;
   // Der Schalter steht im Aufbau der Legendenzeile - dieselbe Sache, dieselbe
   // Form. Der Titel nennt beides: was wegfaellt und was bewusst stehen bleibt.
-  const dachSchalter = `<label class="switch" title="Blendet die Kongresse aus, bei denen im Dialog »Kongress bearbeiten« das Häkchen für Deutschland, Österreich und die Schweiz nicht gesetzt ist"><input type="checkbox"${
+  // Kommt das Zeichnen vom Schalter selbst, entsteht er in seiner alten
+  // Stellung und laeuft erst danach hinueber - siehe mxSchalterGleiten.
+  const halten = mxSchalterHalten; mxSchalterHalten = false;
+  const dachSchalter = `<label class="switch${halten?' zurueck':''}" title="Blendet die Kongresse aus, bei denen im Dialog »Kongress bearbeiten« das Häkchen für Deutschland, Österreich und die Schweiz nicht gesetzt ist"><input type="checkbox"${
     mxNurDach?' checked':''} onchange="mxDachSetzen(this.checked)"><span class="sw-track"><span class="sw-knob"></span></span>Nur deutschsprachiger Raum</label>`;
   // Bleibt nach dem Schalten nichts uebrig, muss er trotzdem in der Zeile
   // stehen - sonst liesse er sich nicht mehr loesen.
