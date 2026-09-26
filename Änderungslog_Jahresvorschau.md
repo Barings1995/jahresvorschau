@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-26 (zuletzt) — Kippschalter der Kongressmatrix gleitet wieder
+## 2026-09-26 (zuletzt) — Kippschalter der Kongressmatrix gleitet wieder (veröffentlicht, Commit `28f9f1c`)
 
 **Anlass.** Marcus' Bildschirmfoto: Der Knebel des Schalters »Nur deutschsprachiger
 Raum« springt in die neue Stellung, statt hinüberzulaufen.
