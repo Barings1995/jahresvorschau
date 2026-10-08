@@ -21,7 +21,45 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — Knöpfe: eine Antwort beim Überfahren, stille Umschalter
+## 2026-10-08 (zuletzt) — Jeder Knopf gibt beim Klicken nach
+
+**Anlass.** Dritter Punkt der Knopfdurchsicht: fünf echte Knöpfe beantworteten einen
+Druck nicht mit dem Pixel nach unten, den alle übrigen seit jeher zeigen — die
+Menüeinträge von »Daten« und »Export«, die Kacheln der Jahresmatrix, »Auswahl
+aufheben«, das × der Suche und »Abmelden«.
+
+**Wo der Trennstrich liegt.** Geprüft wurde, ob stattdessen »ganze Zeilen bleiben
+ruhig« die bessere Regel wäre — OpenSlots hält es bei seinen Menüeinträgen
+(`.kg-item`) so. Dagegen spricht die Jahresvorschau selbst: die Ausgaben- und
+Titelzeilen der Arbeitsansicht sind ebenfalls volle Zeilen und geben seit jeher nach.
+Der Strich läuft hier also am Bauteil entlang, nicht an der Stelle im Werkzeug: was
+ein Knopf ist, gibt nach; was nur Klickfläche ist, antwortet mit Farbe. Damit gilt die
+Regel nun ausnahmslos.
+
+**Geändert.**
+- `.ex-item:not(:disabled)`, `.mx-chip`, `.mx-leeren` und `.hk-ab` in die bestehende
+  Aufzählung aufgenommen. Gesperrte Menüeinträge bleiben außen vor — ein Knopf, der
+  nicht trägt, darf auch nicht nachgeben.
+- `.clear-btn` braucht eine eigene Zeile: das × sitzt mit `translateY(-50%)` in der
+  Mitte des Suchfeldes, ein blankes `translateY(1px)` hätte diese Mitte überschrieben
+  und das Kreuz an den oberen Feldrand gesetzt. Der Pixel wird deshalb in die
+  vorhandene Verschiebung hineingerechnet: `translateY(calc(-50% + 1px))`.
+
+**Nachgewiesen.** An der laufenden Seite gemessen: alle Knöpfe aller Ansichten tragen
+nun eine `:active`-Regel, ein gesperrter Menüeintrag nicht. Für das × wurde die Regel
+einmal ohne `:active` angelegt und die Lage gemessen — Versatz genau 1,00 px, und das
+Kreuz steht ruhend weiterhin exakt auf der Mitte des Feldes (156,6 zu 156,6). Gegenprobe
+in allen fünf Ansichten und in der Kongressmatrix: Matrixfeld, Kongressname,
+Sortierkopf, Listenzeile, Kongresseintrag und Karte bewegen sich unverändert nicht.
+Das Stilblatt wurde erneut einzeln vom Browser gelesen: 408 Regeln, das `calc` hat die
+Prüfung überstanden.
+
+**Dateien.** `index.html` — MD5 vorher `19b41fce7a8e4cace5f939f9267695b2`,
+nachher `3603b57d29b598fbf33fff959a468de2`.
+
+---
+
+## 2026-10-08 — Knöpfe: eine Antwort beim Überfahren, stille Umschalter (Commit `0d9de79`)
 
 **Anlass.** Marcus bat um eine Durchsicht aller Knöpfe — Gestaltung, Verhalten beim
 Überfahren und beim Klicken — auf Einheitlichkeit.
@@ -70,9 +108,10 @@ Stilblatt aus `index.html` gestellt war (Fassungen A heute / B nur Rahmen / C Fl
 gewählt wurden C und, für die Umschalter, »still«.
 
 **Offen, bewusst nicht mitgeändert.** Fünf echte Knöpfe geben beim Klicken nicht nach
-(Menüeinträge, Kacheln der Jahresmatrix, »Auswahl aufheben«, × der Suche, »Abmelden«);
-die acht Sortierköpfe der Tabelle sind reine `<th>` ohne Tastaturzugang; die farbigen
-Titelbänder der Arbeitsansicht haben keinen Hover.
+(Menüeinträge, Kacheln der Jahresmatrix, »Auswahl aufheben«, × der Suche, »Abmelden«)
+— nachgeholt am selben Tag, siehe den Eintrag darüber; die acht Sortierköpfe der
+Tabelle sind reine `<th>` ohne Tastaturzugang; die farbigen Titelbänder der
+Arbeitsansicht haben keinen Hover.
 
 **Dateien.** `index.html` — MD5 vorher `a25a4c7f75388efb73de49068d5e161f`,
 nachher `19b41fce7a8e4cace5f939f9267695b2`.

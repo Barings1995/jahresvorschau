@@ -1147,13 +1147,27 @@ p.bearb-stand:not(:empty){margin-top:9px}
    ihre uebrigen Regeln anderswo im Blatt stehen: die Bewegung ist dieselbe
    Sache und gehoert an eine Stelle. In den Dialogfenstern genuegt .dlg-btn -
    jeder Knopf dort traegt die Klasse, .dlg-ok und .dlg-loeschen kommen nur
-   zusaetzlich dazu. */
+   zusaetzlich dazu.
+   Seit dem 08.10.2026 ist die Liste vollstaendig: es gab noch fuenf Knoepfe
+   ohne Bewegung - die Menueeintraege, die Kacheln der Jahresmatrix, "Auswahl
+   aufheben", das Kreuz der Suche und "Abmelden". Damit gilt im Werkzeug ohne
+   Ausnahme: was ein Knopf ist, gibt nach; was nur eine Klickflaeche ist,
+   antwortet mit Farbe. Der Trennstrich laeuft also am Bauteil entlang, nicht
+   an der Stelle im Werkzeug. Gesperrte Menueeintraege bleiben aussen vor -
+   ein Knopf, der nicht traegt, darf auch nicht nachgeben. */
 .bearb-titel:active,.bearb-eintrag:active,.bearb-titelknopf:active,
 .bearb-zu:active,.bearb-weg:active,.bearb-speichern:active,
 .bearb-verwerfen:active,.bearb-loeschen:active,
 .bearb-sich-zurueck:active,.bearb-sich-weg:active,
 .bu-btn:active,.mx-panel-zu:active,.mx-hl-chip:active,
-.an-knopf:active,.dlg-btn:active{transform:translateY(1px)}
+.an-knopf:active,.dlg-btn:active,
+.ex-item:not(:disabled):active,.mx-chip:active,.mx-leeren:active,
+.hk-ab:active{transform:translateY(1px)}
+/* Das Kreuz der Suche sitzt mit translateY(-50%) in der Mitte des Feldes.
+   Ein blankes translateY(1px) wuerde diese Mitte ueberschreiben und das Kreuz
+   an den oberen Feldrand setzen - der eine Pixel muss deshalb in die
+   vorhandene Verschiebung hineingerechnet werden. */
+.clear-btn:active{transform:translateY(calc(-50% + 1px))}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
