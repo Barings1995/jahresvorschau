@@ -108,7 +108,16 @@ input::placeholder{color:var(--muted)}
 .mode-group{display:flex;background:var(--surface2);border:1.5px solid var(--navy);border-radius:4px;overflow:hidden}
 /* Masse bewusst gleich .view-btn: beide Knopfgruppen stehen nebeneinander in
    derselben Zeile und waren vorher 2px verschieden hoch (34 gegen 32). */
-.mode-btn{padding:6px 13px;font-size:.78rem;font-family:inherit;color:var(--navy);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap}
+/* ── Umschalter antworten beim Ueberfahren nicht ──
+   Gilt fuer alle drei Baender des Werkzeugs (.mode-btn, .view-btn, .bu-btn)
+   und ebenso fuer die Reiter der Datenpflege, von denen diese Leiste ihren
+   Bau hat. In einem buendigen Band traegt das gewaehlte Segment die einzige
+   Flaeche; eine zweite, blassere unter der Maus liest sich als zweite Wahl.
+   Ungewaehlt steht die Schrift deshalb ruhig auf --muted, gewaehlt weiss auf
+   Navy, und die Antwort auf einen Klick ist das Nachgeben um einen Pixel.
+   Freistehende Knoepfe und Kacheln antworten sehr wohl - siehe die
+   Aufzaehlung weiter unten im Blatt. */
+.mode-btn{padding:6px 13px;font-size:.78rem;font-family:inherit;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap}
 /* Der Schatten liegt 1 px ueber dem Knopf und wandert beim Absetzen mit ihm
    nach unten – genau in die Luecke, die der gefuellte Knopf sonst am oberen
    Leistenrand freigibt. Ohne ihn blitzt dort beim Klicken der helle Grund der
@@ -222,7 +231,7 @@ body.bearbmodus .filter-row{opacity:.38;pointer-events:none}
 /* ── Ansichts-Umschalter ── */
 .view-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .view-group{display:flex;background:var(--surface2);border:1.5px solid var(--navy);border-radius:4px;overflow:hidden}
-.view-btn{padding:6px 13px;font-size:.78rem;font-family:inherit;color:var(--navy);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap}
+.view-btn{padding:6px 13px;font-size:.78rem;font-family:inherit;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap}
 .view-btn.active{background:var(--navy);color:#ffffff;font-weight:600;box-shadow:0 -1px 0 var(--navy)}   /* Erklaerung siehe .mode-btn.active */
 .view-btn:active{transform:translateY(1px)}
 
@@ -272,7 +281,6 @@ table.matrix th:last-child,table.matrix td:last-child{border-right:none}
 .mx-detail{margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,430px));gap:14px}
 .mx-detail-kopf{display:flex;align-items:center;gap:12px;margin-top:14px;font-size:.72rem;color:var(--muted)}
 .mx-leeren{padding:3px 10px;font-family:inherit;font-size:.7rem;color:var(--navy);background:var(--surface2);border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
-.mx-leeren:hover{border-color:var(--navy-light)}
 .mx-hint{font-size:.72rem;color:var(--muted);font-style:italic;margin-top:12px}
 
 /* ── Ansicht: Tabelle ── */
@@ -406,7 +414,6 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 .dlg-btn:disabled{color:var(--faint);border-color:var(--surface3);cursor:default}
 .dlg-ok:disabled{color:#ffffff;background:var(--faint);border-color:var(--faint)}
 .dlg-btn{padding:6px 14px;font-family:inherit;font-size:.78rem;font-weight:600;color:var(--navy);background:var(--surface);border:1.5px solid var(--border);border-radius:4px;cursor:pointer}
-.dlg-btn:hover{border-color:var(--navy-light)}
 .dlg-ok{color:#ffffff;background:var(--navy);border-color:var(--navy)}
 /* Die zerstoerende Handlung steht in der Fusszeile ganz links, mit der
    Standzeile als Abstandhalter zwischen ihr und der Bestaetigung rechts. */
@@ -701,7 +708,6 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
   font-size:.79rem;font-weight:600;color:var(--navy);background:var(--surface);
   border:1.5px dashed var(--navy-light);border-radius:6px;cursor:pointer;
   transition:background .12s,border-color .12s}
-.bearb-titelknopf:hover{background:var(--navy-faint);border-color:var(--navy)}
 .bearb-titelknopf.gewaehlt{color:#ffffff;background:var(--navy);
   border-style:solid;border-color:var(--navy)}
 .bearb-eintrag{display:flex;justify-content:space-between;gap:8px;width:100%;
@@ -782,7 +788,6 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
 .bearb-zu{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;font-family:inherit;font-size:.75rem;font-weight:600;
   color:var(--navy);background:var(--surface2);border:1.5px solid var(--border);
   border-radius:4px;cursor:pointer}
-.bearb-zu:hover{background:var(--navy-faint);border-color:var(--navy-light)}
 /* Folgt der Fuss unmittelbar auf diesen Knopf, sass seine Trennlinie ohne
    Luft darunter. Nur dieser Fall, damit die uebrigen Formulare - dort steht
    ueber dem Fuss ein Eingabefeld mit eigenem Abstand - unberuehrt bleiben. */
@@ -850,7 +855,6 @@ p.bearb-stand:not(:empty){margin-top:9px}
   width:fit-content}
 .bu-btn{padding:6px 14px;font-family:inherit;font-size:.78rem;font-weight:600;
   color:var(--muted);background:none;border:none;border-radius:4px;cursor:pointer}
-.bu-btn:hover{color:var(--navy)}
 .bu-btn.aktiv{color:#ffffff;background:var(--navy)}
 /* Der innere Umschalter (Auslagen/Berichte) haelt dem aeusseren bewusst nicht
    die Waage: kleiner, ohne eigenen Abstand nach unten, mit dem Symbol der
@@ -1099,7 +1103,6 @@ p.bearb-stand:not(:empty){margin-top:9px}
   padding:4px 8px;font-family:inherit;line-height:1.2;color:var(--text);
   background:var(--surface);border:1.5px solid var(--border);border-radius:4px;
   cursor:pointer}
-.mx-hl-chip:hover{border-color:var(--navy-light)}
 .mx-hl-nr{font-size:.8rem;font-weight:600}
 .mx-hl-dat{font-size:.65rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .mx-hl-ab{font-size:.6rem;color:var(--muted);white-space:nowrap}
@@ -1112,6 +1115,26 @@ p.bearb-stand:not(:empty){margin-top:9px}
 .mx-hl-strich i{flex:1;width:1px;background:var(--navy)}
 .mx-hl-strich b{font-size:.58rem;font-weight:600;color:var(--muted);
   letter-spacing:.05em;text-transform:uppercase;padding:2px 0}
+
+/* ── Antwort beim Ueberfahren ──
+   Helle Knoepfe antworten ueberall gleich: Flaeche Navy-Faint, Rahmen
+   Navy-Light, Schrift Navy. Vorher gab es dafuer vier Antworten nebeneinander,
+   und zwei Knoepfe ("Verwerfen", "Zurueckholen") antworteten gar nicht.
+   Aufgezaehlt statt pauschal, denn drei Gruppen antworten bewusst anders:
+   gefuellte Knoepfe werden dunkler (Navy-Light), Loeschknoepfe werden warm,
+   und die Umschalter schweigen - siehe oben bei .mode-btn.
+   Das :not sperrt, was schon eine eigene Flaeche traegt: ein gewaehlter Knopf
+   und ein gesperrter wuerden sonst unter der Maus aufhellen. In der
+   Dialogfusszeile liegt der Grund selbst auf Navy-Faint - der Knopf
+   verschwaende darin, deshalb dort der naechstdunklere Ton. .dlg-ok und
+   .dlg-loeschen tragen zwar .dlg-btn, gehoeren aber zu den beiden anderen
+   Gruppen und bleiben aussen vor. */
+.bearb-verwerfen:not(:disabled):hover,.bearb-sich-zurueck:hover,
+.bearb-zu:hover,.mx-leeren:hover,
+.mx-hl-chip:not(.an):hover,.bearb-titelknopf:not(.gewaehlt):hover{
+  background:var(--navy-faint);border-color:var(--navy-light);color:var(--navy)}
+.dlg-btn:not(.dlg-ok):not(.dlg-loeschen):not(:disabled):hover{
+  background:var(--surface3);border-color:var(--navy-light);color:var(--navy)}
 
 /* ── Nachgeben beim Klicken ──
    Kopf- und Legendenzeile beantworten einen Druck seit jeher mit einem Pixel

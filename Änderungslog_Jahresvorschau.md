@@ -21,7 +21,65 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-09-26 (zuletzt) — Kippschalter der Kongressmatrix gleitet wieder (veröffentlicht, Commit `28f9f1c`)
+## 2026-10-08 (zuletzt) — Knöpfe: eine Antwort beim Überfahren, stille Umschalter
+
+**Anlass.** Marcus bat um eine Durchsicht aller Knöpfe — Gestaltung, Verhalten beim
+Überfahren und beim Klicken — auf Einheitlichkeit.
+
+**Befund, nachgemessen.** Geprüft wurde nicht am Quelltext allein: an der laufenden
+Seite wurde für jeden Knopf jeder Ansicht ermittelt, welche `:hover`-, `:active`- und
+`:focus`-Regel ihn tatsächlich trifft. Sauber waren bereits die gefüllten Knöpfe
+(Export, Speichern, Anmelden, Dialog-OK — alle Navy → Navy-Light), die warmen
+Löschknöpfe und der Fokusrahmen. Nicht sauber war der helle Knopf: er hatte vier
+verschiedene Antworten (Fläche + Rahmen / nur Rahmen / nur Schriftfarbe / gar nichts),
+und zwei Knöpfe — »Verwerfen« und »Zurückholen« — antworteten überhaupt nicht,
+obwohl ihre unmittelbaren Nachbarn es tun.
+
+**Umschalter, geprüft gegen die anderen Werkzeuge.** Marcus' Einwand, dass auch die
+anderen Werkzeuge dort keinen Hover haben, traf zu. In den vier Angebotswerkzeugen
+gibt es genau ein Band dieser Bauart — die Reiter »Preise | Termine | Inhalte« der
+Datenpflege —, und es trägt keine einzige Hover-Regel, nur die Navy-Fläche des
+gewählten Segments und das Nachgeben beim Klicken. Die Jahresvorschau folgt dem jetzt
+überall; der Ausreißer war `.bu-btn`, das einzige Band im Haus mit einem Hover.
+
+**Geändert.**
+- `.mode-btn` und `.view-btn` stehen ungewählt auf `--muted` statt auf Navy. Erst
+  dadurch trägt das gewählte Segment die Auszeichnung allein; vorher war ungewählte
+  Schrift genauso kräftig wie gewählte, und ein Hover hatte keinen Spielraum mehr.
+- `.bu-btn:hover` ist entfallen. Alle drei Bänder schweigen nun beim Überfahren und
+  antworten auf den Klick mit dem Pixel nach unten.
+- Eine einzige aufgezählte Regel für den hellen Knopf: Fläche `--navy-faint`, Rahmen
+  `--navy-light`, Schrift Navy — für `.bearb-verwerfen`, `.bearb-sich-zurueck`,
+  `.bearb-zu`, `.mx-leeren`, `.mx-hl-chip` und `.bearb-titelknopf`. Die fünf bisherigen
+  Einzelregeln sind dafür entfallen.
+- In der Dialogfußzeile stattdessen `--surface3`: der Grund dort liegt selbst auf
+  `--navy-faint`, der Knopf wäre beim Überfahren darin verschwunden. `.dlg-ok` und
+  `.dlg-loeschen` bleiben ausgenommen — sie gehören zu den gefüllten bzw. den warmen
+  Knöpfen.
+- Gesperrte und gewählte Knöpfe sind durch `:not(:disabled)`, `:not(.an)` und
+  `:not(.gewaehlt)` ausgenommen, damit unter der Maus nichts aufhellt, was bereits
+  eine eigene Fläche trägt.
+
+**Nachgewiesen.** Die Differenz wurde in das Blatt der laufenden Seite eingespielt und
+dieselbe Messung wiederholt: alle sieben hellen Knöpfe tragen nun dieselbe Regel, ein
+gewählter Heft-Chip bleibt orange, der gesperrte »Verwerfen« bleibt stumm und wird
+erst beim Entsperren ansprechbar. Das geänderte Stilblatt wurde zusätzlich einzeln
+vom Browser gelesen: 407 Regeln, keine verworfen, keine der sechs alten mehr
+vorhanden. Zur Entscheidung lag Marcus eine Musterseite vor, die mit dem echten
+Stilblatt aus `index.html` gestellt war (Fassungen A heute / B nur Rahmen / C Fläche);
+gewählt wurden C und, für die Umschalter, »still«.
+
+**Offen, bewusst nicht mitgeändert.** Fünf echte Knöpfe geben beim Klicken nicht nach
+(Menüeinträge, Kacheln der Jahresmatrix, »Auswahl aufheben«, × der Suche, »Abmelden«);
+die acht Sortierköpfe der Tabelle sind reine `<th>` ohne Tastaturzugang; die farbigen
+Titelbänder der Arbeitsansicht haben keinen Hover.
+
+**Dateien.** `index.html` — MD5 vorher `a25a4c7f75388efb73de49068d5e161f`,
+nachher `19b41fce7a8e4cace5f939f9267695b2`.
+
+---
+
+## 2026-09-26 — Kippschalter der Kongressmatrix gleitet wieder (veröffentlicht, Commit `28f9f1c`)
 
 **Anlass.** Marcus' Bildschirmfoto: Der Knebel des Schalters »Nur deutschsprachiger
 Raum« springt in die neue Stellung, statt hinüberzulaufen.
