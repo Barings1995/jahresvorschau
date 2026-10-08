@@ -1149,6 +1149,24 @@ p.bearb-stand:not(:empty){margin-top:9px}
   background:var(--navy-faint);border-color:var(--navy-light);color:var(--navy)}
 .dlg-btn:not(.dlg-ok):not(.dlg-loeschen):not(:disabled):hover{
   background:var(--surface3);border-color:var(--navy-light);color:var(--navy)}
+/* Die Titelbaender tragen die Hausfarbe ihres Titels und koennen deshalb keine
+   feste Hover-Flaeche bekommen - sie muessten sechs verschiedene sein. Statt
+   dessen legt sich ein Schleier darueber: er laesst die Farbe stehen und die
+   Schrift scharf, denn er liegt als Bildlage ueber der Farbe, nicht in ihr.
+   Dass die Farbe im Markup als background-COLOR steht und nicht als Kurzform,
+   gehoert dazu: die Kurzform setzt background-image gleich mit auf none, und
+   inline geschrieben schlaegt sie jede Regel dieses Blattes - der Schleier
+   waere wirkungslos.
+   Zwei Staerken, weil ein Schleier nicht auf jedem Grund gleich laut ist. Weiss
+   mit 18 % hebt die fuenf dunklen Baender um 5,3 bis 8,4 % Helligkeit; dieselben
+   18 % Schwarz wuerden das helle Gruen von FORUM DKG um 14,6 % absacken lassen,
+   also fast dreimal so laut. Mit 8 % liegt es bei 8,7 % und damit im selben Feld
+   wie die uebrigen. Gewaehlte Baender bleiben aussen vor: sie tragen ihren
+   inneren Ring, und ein Schleier darauf saehe aus wie eine halbe Wahl. */
+.bearb-titel:not(.gewaehlt):hover{
+  background-image:linear-gradient(rgba(255,255,255,.18),rgba(255,255,255,.18))}
+.bearb-titel.hell:not(.gewaehlt):hover{
+  background-image:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.08))}
 
 /* ── Nachgeben beim Klicken ──
    Kopf- und Legendenzeile beantworten einen Druck seit jeher mit einem Pixel
@@ -5684,7 +5702,7 @@ function renderBearbeiten(){
     return `<div class="bearb-block">
       <button type="button" class="bearb-titel${helleFarbe(t.hex)?' hell':''}${
         gewaehltIst('titel',t.id)?' gewaehlt':''}"
-        style="background:${escA(t.hex)}" title="Stammdaten des Titels bearbeiten"
+        style="background-color:${escA(t.hex)}" title="Stammdaten des Titels bearbeiten"
         onclick="bearbWaehleTitel(${t.id})">
         <span>${esc(t.short)}</span>
         <span class="bt-zahl">${n} Heft${n===1?'':'e'}</span></button>

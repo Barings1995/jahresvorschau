@@ -21,7 +21,45 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — Sortierköpfe der Tabelle sind echte Knöpfe
+## 2026-10-08 (zuletzt) — Titelbänder antworten mit einem Schleier
+
+**Anlass.** Fünfter und letzter Punkt der Knopfdurchsicht. Die farbigen Titelbänder der
+Arbeitsansicht antworteten beim Überfahren nicht. Nach den vier Änderungen davor wären
+sie die einzige Stelle im Werkzeug gewesen, an der ein Knopf schweigt.
+
+**Warum ein Schleier.** Die Bänder tragen die Hausfarbe ihres Titels; eine feste
+Hover-Fläche müsste sechs verschiedene sein. Stattdessen legt sich eine Bildlage über
+die Farbe: `background-image:linear-gradient(…)` über dem `background-color`. Die
+Hausfarbe bleibt stehen, die Schrift bleibt scharf, weil der Schleier über der Farbe
+liegt und nicht in ihr.
+
+**Was die Vorschau aufgedeckt hat.** Im Markup stand `style="background:${hex}"` — die
+Kurzform. Die setzt `background-image` gleich mit auf `none`, und inline geschrieben
+schlägt sie jede Regel des Blattes: der Schleier wäre wirkungslos geblieben. Das fiel
+erst an der Musterseite auf, nicht am Entwurf. Im Markup steht nun `background-color`.
+An der laufenden Seite ist beides nebeneinander gemessen worden — mit `background:`
+meldet der Browser `background-image: none`, mit `background-color:` den Verlauf.
+
+**Zwei Stärken.** Ein Schleier ist nicht auf jedem Grund gleich laut. Weiß mit 18 % hebt
+die fünf dunklen Bänder um 5,3 bis 8,4 % Helligkeit; dieselben 18 % Schwarz hätten das
+helle Grün von FORUM DKG um 14,6 % absacken lassen — fast dreimal so laut wie das Navy.
+Mit 8 % liegt es bei 8,7 % und damit im selben Feld wie die übrigen. Marcus wurden vier
+Fassungen an den echten Titelfarben vorgelegt (A heute, B zart, C deutlich,
+D ausgeglichen); gewählt wurde D.
+
+**Nachgewiesen.** An der laufenden Seite über alle sechs Titel gemessen: jedes Band
+bekommt den Schleier, der Helligkeitssprung liegt zwischen 5,3 und 8,7 % — die
+vorhergesagte Spanne. Das gewählte Band bleibt ausgenommen (`:not(.gewaehlt)`), behält
+seinen inneren Ring und bekommt keinen Verlauf; sonst sähe ein überfahrenes Band aus
+wie ein halb gewähltes. Mit der Maus gegengeprüft. Blatt und Skript gegengelesen:
+413 Regeln, `node --check` ohne Beanstandung.
+
+**Dateien.** `index.html` — MD5 vorher `fb97426cc47ec6b7f302f2a3cde9794a`,
+nachher `0d5fbfb328107a4703c5390a28168e9b`.
+
+---
+
+## 2026-10-08 — Sortierköpfe der Tabelle sind echte Knöpfe (Commit `6d7072a`)
 
 **Anlass.** Vierter Punkt der Knopfdurchsicht. Die acht Spaltenköpfe der Tabelle waren
 reine `<th class="sortable" onclick="…">` — anklickbar, aber mit der Tastatur nicht
@@ -153,7 +191,8 @@ gewählt wurden C und, für die Umschalter, »still«.
 (Menüeinträge, Kacheln der Jahresmatrix, »Auswahl aufheben«, × der Suche, »Abmelden«)
 — nachgeholt am selben Tag, siehe den Eintrag darüber; die acht Sortierköpfe der
 Tabelle sind reine `<th>` ohne Tastaturzugang — ebenfalls nachgeholt; die farbigen
-Titelbänder der Arbeitsansicht haben keinen Hover.
+Titelbänder der Arbeitsansicht haben keinen Hover — ebenfalls nachgeholt. Damit ist
+die Durchsicht vollständig abgearbeitet.
 
 **Dateien.** `index.html` — MD5 vorher `a25a4c7f75388efb73de49068d5e161f`,
 nachher `19b41fce7a8e4cace5f939f9267695b2`.
