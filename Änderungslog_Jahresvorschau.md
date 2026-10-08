@@ -21,7 +21,36 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — Titelbänder antworten mit einem Schleier (veröffentlicht, Commit `b381f0b`)
+## 2026-10-08 (zuletzt) — In der Titelliste gibt nur die Schrift nach
+
+**Anlass.** Mit der Knopfdurchsicht hatte jede Zeile der Titelliste im Bearbeiten-Menü
+das Nachgeben um einen Pixel bekommen — das farbige Titelband wie der Eintrag einer
+Ausgabe. Beim Benutzen trug die Bewegung zu weit: nicht die Schrift gab nach, sondern
+die ganze Zeile.
+
+**Warum die Zeile stillstehen muss.** Jede Zeile dieser Liste trägt eine Fläche, die bis
+an die Spaltenkante reicht: das Band die Hausfarbe des Titels, die gewählte Ausgabe den
+Navy-Grund, jede weitere Zeile den Trennstrich zur nächsten. Wandert diese Fläche mit,
+ruckt die ganze Liste. Die Titelbänder stehen zudem `position:sticky` am oberen Rand der
+Spalte — beim Nachgeben blitzte ein Pixel der Zeile darunter hindurch. Ein freistehender
+Knopf darf sich als Ganzes bewegen; eine Zeile in einer Liste nicht.
+
+**Umsetzung.** `.bearb-titel` und `.bearb-eintrag` sind aus der Aufzählung der
+`:active`-Regeln herausgenommen; an ihre Stelle tritt
+`.bearb-titel:active>span,.bearb-eintrag:active>span{transform:translateY(1px)}`. Der
+Griff am Span geht auf, weil beide Spans Flex-Kinder sind und damit blockartig stehen —
+auf einem Inline-Element wäre ein `transform` wirkungslos. Markup unverändert.
+
+**Nachgemessen.** An der lokal ausgelieferten echten Datei: nach dem Streichen trifft
+keine `:active`-Regel mehr die Zeilen selbst (Sonde über `document.styleSheets`, Pseudo
+abgestreift, `el.matches`), beide Spans dagegen schon. Geometrie daneben gehalten —
+Oberkante der Zeile 0 px, Oberkante der Schrift 1 px, für Band und Eintrag gleich.
+
+**Prüfsummen.** `0d5fbfb328107a4703c5390a28168e9b` → `7cb79ffd1d49aca48f0e9ab40c9ac589`
+
+---
+
+## 2026-10-08 — Titelbänder antworten mit einem Schleier (veröffentlicht, Commit `b381f0b`)
 
 **Anlass.** Fünfter und letzter Punkt der Knopfdurchsicht. Die farbigen Titelbänder der
 Arbeitsansicht antworteten beim Überfahren nicht. Nach den vier Änderungen davor wären

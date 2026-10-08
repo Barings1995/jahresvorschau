@@ -1187,7 +1187,7 @@ p.bearb-stand:not(:empty){margin-top:9px}
    antwortet mit Farbe. Der Trennstrich laeuft also am Bauteil entlang, nicht
    an der Stelle im Werkzeug. Gesperrte Menueeintraege bleiben aussen vor -
    ein Knopf, der nicht traegt, darf auch nicht nachgeben. */
-.bearb-titel:active,.bearb-eintrag:active,.bearb-titelknopf:active,
+.bearb-titelknopf:active,
 .bearb-zu:active,.bearb-weg:active,.bearb-speichern:active,
 .bearb-verwerfen:active,.bearb-loeschen:active,
 .bearb-sich-zurueck:active,.bearb-sich-weg:active,
@@ -1200,6 +1200,17 @@ p.bearb-stand:not(:empty){margin-top:9px}
    an den oberen Feldrand setzen - der eine Pixel muss deshalb in die
    vorhandene Verschiebung hineingerechnet werden. */
 .clear-btn:active{transform:translateY(calc(-50% + 1px))}
+/* Die Zeilen der Titelliste geben nicht als Ganzes nach, sondern nur ihre
+   Schrift. Jede Zeile traegt eine Flaeche, die bis an die Spaltenkante reicht:
+   das farbige Band des Titels, der Navy-Grund der gewaehlten Ausgabe, der
+   Trennstrich zur naechsten Zeile. Wandert diese Flaeche mit, ruckt die ganze
+   Liste, und die Titelbaender stehen zudem sticky am oberen Rand - beim
+   Nachgeben blitzte ein Pixel der Zeile darunter hindurch. Die Schrift allein
+   genuegt als Quittung; der Knopf ist hier eine Zeile in einer Liste, nicht
+   ein freistehendes Bauteil. Der Griff am Span geht auf, weil die beiden
+   Spans Flex-Kinder sind und damit blockartig stehen - auf einem Inline-
+   Element waere ein transform wirkungslos. */
+.bearb-titel:active>span,.bearb-eintrag:active>span{transform:translateY(1px)}
 
 /* ── Anmeldung ──
    Liegt ueber allem und wird erst weggenommen, wenn der Jahrgang steht. So ist
