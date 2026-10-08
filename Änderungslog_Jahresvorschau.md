@@ -21,7 +21,49 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — Jeder Knopf gibt beim Klicken nach
+## 2026-10-08 (zuletzt) — Sortierköpfe der Tabelle sind echte Knöpfe
+
+**Anlass.** Vierter Punkt der Knopfdurchsicht. Die acht Spaltenköpfe der Tabelle waren
+reine `<th class="sortable" onclick="…">` — anklickbar, aber mit der Tastatur nicht
+erreichbar, ohne Fokusrahmen und ohne `aria-sort`. Es war die einzige Klickfläche des
+Werkzeugs ohne Tastaturzugang; selbst die Matrixfelder und Kongressnamen tragen
+`role="button" tabindex="0"`. Die Hausregel (26.09.2026) lautet: klickbare Stellen
+sind echte Knöpfe.
+
+**Geändert.**
+- In jedem sortierbaren Spaltenkopf steht nun ein `<button class="sort-knopf">`. Die
+  Polsterung ist von der Zelle auf den Knopf gewandert (`th.sortable` ohne Polster),
+  damit die ganze Zellfläche klickbar bleibt; Schrift, Laufweite, Versalien und Farbe
+  erbt der Knopf von der Zelle, denn ein Knopf übernimmt davon von sich aus nichts.
+- `aria-sort` sitzt an der Zelle, nicht am Knopf — dort sucht die Vorlesesoftware
+  danach. Der Hinweistext nennt jetzt auch die Richtung („Nach Auflage absteigend
+  sortieren“).
+- Der Fokusrahmen liegt innen (`outline-offset:-2px`): die Tabelle rollt waagerecht,
+  ein Rahmen mit Abstand nach außen würde an der ersten und letzten Spalte
+  beschnitten. So halten es auch die Gruppenzeilen von OpenSlots.
+- `setSort` holt den Fokus zurück. Das Zeichnen baut die Kopfzeile neu und damit auch
+  den gerade gedrückten Knopf; ohne diese Zeile fiel der Tastaturfokus auf den
+  Seitenanfang, und ein zweites Sortieren hätte bedeutet, sich erneut durch die ganze
+  Seite zu tabben. Dafür trägt jeder Knopf ein `data-sort`.
+- Im Druck folgt der Knopf der knapperen Polsterung der Zelle.
+
+**Nachgewiesen.** An der laufenden Seite: acht Knöpfe, alle mit der Tastatur
+erreichbar, `aria-sort` wandert beim Sortieren richtig mit. Mit Enter sortiert,
+mit Enter die Richtung gedreht — der Fokus bleibt beide Male auf der Spalte stehen,
+der Rahmen ist sichtbar (2 px, `--sblue`, Abstand −2 px). Nach einem Mausklick bleibt
+der Rahmen unsichtbar, der Fokus sitzt trotzdem richtig: ein Fokus aus dem Code heraus
+gilt dem Browser nicht als Tastaturweg. Die Zelle sieht unverändert aus — Schrift,
+Stärke, Versalien, Laufweite und Farbe sind auf den Wert gleich, der Knopf füllt die
+Zelle bis auf den einen Pixel ihres unteren Rahmens, die Kopfzeile ist weiterhin
+29 px hoch. Blatt und Skript gegengelesen: 411 Regeln plus 84 im Druckblock,
+`node --check` ohne Beanstandung.
+
+**Dateien.** `index.html` — MD5 vorher `3603b57d29b598fbf33fff959a468de2`,
+nachher `fb97426cc47ec6b7f302f2a3cde9794a`.
+
+---
+
+## 2026-10-08 — Jeder Knopf gibt beim Klicken nach (Commit `efbb595`)
 
 **Anlass.** Dritter Punkt der Knopfdurchsicht: fünf echte Knöpfe beantworteten einen
 Druck nicht mit dem Pixel nach unten, den alle übrigen seit jeher zeigen — die
@@ -110,8 +152,8 @@ gewählt wurden C und, für die Umschalter, »still«.
 **Offen, bewusst nicht mitgeändert.** Fünf echte Knöpfe geben beim Klicken nicht nach
 (Menüeinträge, Kacheln der Jahresmatrix, »Auswahl aufheben«, × der Suche, »Abmelden«)
 — nachgeholt am selben Tag, siehe den Eintrag darüber; die acht Sortierköpfe der
-Tabelle sind reine `<th>` ohne Tastaturzugang; die farbigen Titelbänder der
-Arbeitsansicht haben keinen Hover.
+Tabelle sind reine `<th>` ohne Tastaturzugang — ebenfalls nachgeholt; die farbigen
+Titelbänder der Arbeitsansicht haben keinen Hover.
 
 **Dateien.** `index.html` — MD5 vorher `a25a4c7f75388efb73de49068d5e161f`,
 nachher `19b41fce7a8e4cace5f939f9267695b2`.

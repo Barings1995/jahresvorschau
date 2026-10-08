@@ -287,8 +287,20 @@ table.matrix th:last-child,table.matrix td:last-child{border-right:none}
 .tabwrap{overflow-x:auto}
 table.tab{border-collapse:collapse;width:100%;min-width:1080px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.74rem}
 table.tab th{background:var(--navy-faint);color:var(--navy);font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;text-align:left;padding:7px 8px;white-space:nowrap;user-select:none;border-bottom:1px solid var(--border)}
-table.tab th.sortable{cursor:pointer}
-table.tab th.sortable:hover{color:var(--sblue)}
+/* Der Knopf traegt die Polsterung, damit die ganze Zellflaeche klickbar
+   bleibt - sonst waere nur die Beschriftung selbst zu treffen. Schrift,
+   Laufweite und Versalien erbt er von der Zelle; ein Knopf uebernimmt davon
+   von sich aus nichts. */
+table.tab th.sortable{padding:0}
+table.tab th .sort-knopf{display:flex;align-items:center;gap:4px;width:100%;
+  padding:7px 8px;font:inherit;letter-spacing:inherit;text-transform:inherit;
+  color:inherit;text-align:left;background:none;border:none;cursor:pointer}
+table.tab th .sort-knopf:hover{color:var(--sblue)}
+table.tab th .sort-knopf:active{transform:translateY(1px)}
+/* Die Tabelle rollt waagerecht. Ein Fokusrahmen mit Abstand nach aussen
+   wuerde an der ersten und letzten Spalte beschnitten, deshalb liegt er hier
+   innen - wie an den Gruppenzeilen von OpenSlots. */
+table.tab th .sort-knopf:focus-visible{outline-offset:-2px}
 .sar{color:var(--accent)}
 table.tab td{padding:6px 8px;border-bottom:1px solid var(--surface3);vertical-align:top;line-height:1.35}
 table.tab tr:last-child td{border-bottom:none}
@@ -598,6 +610,8 @@ body.bearbmodus .daten-btn:hover{background:var(--sblue);border-color:var(--sblu
   table.tab{min-width:0!important;width:100%;font-size:7.5pt}
   table.tab thead{display:table-header-group}
   table.tab th{background:none;color:var(--navy);border-bottom:1.5px solid var(--navy);font-size:6.5pt;padding:5px 5px}
+  table.tab th.sortable{padding:0}
+  table.tab th .sort-knopf{padding:5px 5px}
   /* Die Trennlinie steht im Druck UEBER der Zeile, nicht darunter: eine
      Linie am unteren Rand der letzten Zeile einer Seite faellt genau auf die
      Seitenkante und wird von Chrome nicht mehr gezeichnet - gemessen mit
@@ -1883,6 +1897,13 @@ function setAs(b){
 function setSort(k){
   if(sortKey===k) sortDir = -sortDir; else { sortKey = k; sortDir = 1; }
   render();
+  // Das Zeichnen baut die Kopfzeile neu, und mit ihr den gerade gedrueckten
+  // Knopf. Ohne diese Zeile faellt der Tastaturfokus auf den Seitenanfang
+  // zurueck - ein zweites Mal sortieren hiesse, sich erneut durch die ganze
+  // Seite zu tabben. Bei der Maus bleibt der Rahmen unsichtbar: ein
+  // Fokus aus dem Code heraus gilt dem Browser nicht als Tastaturweg.
+  const knopf = document.querySelector('table.tab th .sort-knopf[data-sort="' + k + '"]');
+  if(knopf) knopf.focus();
 }
 
 function mxPick(key){
@@ -2212,10 +2233,17 @@ function renderTabelle(items,q){
     return c!==0 ? c*sortDir : a.iss.et.localeCompare(b.iss.et);
   });
 
+  // Der Spaltenkopf traegt einen echten Knopf statt eines klickbaren <th>:
+  // nur so ist die Sortierung mit der Tastatur erreichbar und bekommt den
+  // Fokusrahmen des Blattes. aria-sort gehoert dagegen an die Zelle selbst -
+  // dort sucht die Vorlesesoftware danach, nicht am Knopf.
   const kopf=spalten.map(s=>{
     if(s.nosort)return`<th>${s.t}</th>`;
     const pfeil = sortKey===s.k ? `<span class="sar">${sortDir>0?'▲':'▼'}</span>` : '';
-    return`<th class="sortable" onclick="setSort('${s.k}')" title="Nach ${s.t} sortieren">${s.t} ${pfeil}</th>`;
+    const richtung = sortKey!==s.k ? 'none' : (sortDir>0 ? 'ascending' : 'descending');
+    const wohin = sortKey!==s.k ? 'aufsteigend' : (sortDir>0 ? 'absteigend' : 'aufsteigend');
+    return`<th class="sortable" aria-sort="${richtung}"><button type="button" class="sort-knopf" data-sort="${s.k}" onclick="setSort('${
+      s.k}')" title="Nach ${escA(s.t)} ${wohin} sortieren">${s.t} ${pfeil}</button></th>`;
   }).join('');
 
   const koerper=zeilen.map(({j,iss})=>
