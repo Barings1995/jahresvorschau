@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — In der Titelliste gibt nur die Schrift nach
+## 2026-10-08 (zuletzt) — In der Titelliste gibt nur die Schrift nach (veröffentlicht, Commit `3a96556`)
 
 **Anlass.** Mit der Knopfdurchsicht hatte jede Zeile der Titelliste im Bearbeiten-Menü
 das Nachgeben um einen Pixel bekommen — das farbige Titelband wie der Eintrag einer
