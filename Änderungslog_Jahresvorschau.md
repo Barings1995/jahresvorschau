@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — Titelbänder antworten mit einem Schleier
+## 2026-10-08 (zuletzt) — Titelbänder antworten mit einem Schleier (veröffentlicht, Commit `b381f0b`)
 
 **Anlass.** Fünfter und letzter Punkt der Knopfdurchsicht. Die farbigen Titelbänder der
 Arbeitsansicht antworteten beim Überfahren nicht. Nach den vier Änderungen davor wären
@@ -59,7 +59,7 @@ nachher `0d5fbfb328107a4703c5390a28168e9b`.
 
 ---
 
-## 2026-10-08 — Sortierköpfe der Tabelle sind echte Knöpfe (Commit `6d7072a`)
+## 2026-10-08 — Sortierköpfe der Tabelle sind echte Knöpfe (veröffentlicht, Commit `6d7072a`)
 
 **Anlass.** Vierter Punkt der Knopfdurchsicht. Die acht Spaltenköpfe der Tabelle waren
 reine `<th class="sortable" onclick="…">` — anklickbar, aber mit der Tastatur nicht
@@ -101,7 +101,7 @@ nachher `fb97426cc47ec6b7f302f2a3cde9794a`.
 
 ---
 
-## 2026-10-08 — Jeder Knopf gibt beim Klicken nach (Commit `efbb595`)
+## 2026-10-08 — Jeder Knopf gibt beim Klicken nach (veröffentlicht, Commit `efbb595`)
 
 **Anlass.** Dritter Punkt der Knopfdurchsicht: fünf echte Knöpfe beantworteten einen
 Druck nicht mit dem Pixel nach unten, den alle übrigen seit jeher zeigen — die
@@ -139,7 +139,7 @@ nachher `3603b57d29b598fbf33fff959a468de2`.
 
 ---
 
-## 2026-10-08 — Knöpfe: eine Antwort beim Überfahren, stille Umschalter (Commit `0d9de79`)
+## 2026-10-08 — Knöpfe: eine Antwort beim Überfahren, stille Umschalter (veröffentlicht, Commit `0d9de79`)
 
 **Anlass.** Marcus bat um eine Durchsicht aller Knöpfe — Gestaltung, Verhalten beim
 Überfahren und beim Klicken — auf Einheitlichkeit.
