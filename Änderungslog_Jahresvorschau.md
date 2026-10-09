@@ -21,7 +21,7 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-09 (zuletzt) — Menüeinträge geben nicht mehr nach
+## 2026-10-09 (zuletzt) — Menüeinträge geben nicht mehr nach (veröffentlicht, Commit `8874572`)
 
 **Anlass.** Beim Benutzen des Datenmenüs ist aufgefallen, dass die Einträge seit der
 Knopfdurchsicht beim Klicken um einen Pixel nachgeben. Marcus hält das für nicht
