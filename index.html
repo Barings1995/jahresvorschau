@@ -1180,20 +1180,25 @@ p.bearb-stand:not(:empty){margin-top:9px}
    Sache und gehoert an eine Stelle. In den Dialogfenstern genuegt .dlg-btn -
    jeder Knopf dort traegt die Klasse, .dlg-ok und .dlg-loeschen kommen nur
    zusaetzlich dazu.
-   Seit dem 08.10.2026 ist die Liste vollstaendig: es gab noch fuenf Knoepfe
-   ohne Bewegung - die Menueeintraege, die Kacheln der Jahresmatrix, "Auswahl
-   aufheben", das Kreuz der Suche und "Abmelden". Damit gilt im Werkzeug ohne
-   Ausnahme: was ein Knopf ist, gibt nach; was nur eine Klickflaeche ist,
-   antwortet mit Farbe. Der Trennstrich laeuft also am Bauteil entlang, nicht
-   an der Stelle im Werkzeug. Gesperrte Menueeintraege bleiben aussen vor -
-   ein Knopf, der nicht traegt, darf auch nicht nachgeben. */
+   Am 08.10.2026 wurde die Liste erst einmal auf alles ausgedehnt, was ein
+   Knopf ist - auch auf die Menueeintraege und die Zeilen der Titelliste. Beim
+   Benutzen hat sich das als zu weit erwiesen, und seit dem 09.10.2026 laeuft
+   der Trennstrich eine Stelle weiter innen: Ein freistehender Knopf gibt nach.
+   Eine Zeile in einer Liste tut es nicht - sie traegt eine Flaeche bis an die
+   Kante ihres Behaelters und einen Trennstrich zur naechsten Zeile, und beides
+   ruckt mit. Die Eintraege des Datenmenues und des Exportmenues sind deshalb
+   wieder heraus: sie antworten mit Farbe beim Ueberfahren, und die eigentliche
+   Quittung ist, dass das Menue zufaellt und etwas geschieht. In der Titelliste
+   bewegt sich seither nur die Schrift der Zeile - siehe die Regel am Ende
+   dieses Blocks. Was gar kein Knopf ist, antwortet wie bisher mit Farbe: die
+   Felder der Matrix, die Kongressnamen, die Zeilen der Tabelle. */
 .bearb-titelknopf:active,
 .bearb-zu:active,.bearb-weg:active,.bearb-speichern:active,
 .bearb-verwerfen:active,.bearb-loeschen:active,
 .bearb-sich-zurueck:active,.bearb-sich-weg:active,
 .bu-btn:active,.mx-panel-zu:active,.mx-hl-chip:active,
 .an-knopf:active,.dlg-btn:active,
-.ex-item:not(:disabled):active,.mx-chip:active,.mx-leeren:active,
+.mx-chip:active,.mx-leeren:active,
 .hk-ab:active{transform:translateY(1px)}
 /* Das Kreuz der Suche sitzt mit translateY(-50%) in der Mitte des Feldes.
    Ein blankes translateY(1px) wuerde diese Mitte ueberschreiben und das Kreuz

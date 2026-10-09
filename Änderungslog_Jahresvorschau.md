@@ -21,7 +21,45 @@ Onkologie; Daten aus Supabase, veröffentlicht über GitHub Pages). Neueste Änd
 
 ---
 
-## 2026-10-08 (zuletzt) — In der Titelliste gibt nur die Schrift nach (veröffentlicht, Commit `3a96556`)
+## 2026-10-09 (zuletzt) — Menüeinträge geben nicht mehr nach
+
+**Anlass.** Beim Benutzen des Datenmenüs ist aufgefallen, dass die Einträge seit der
+Knopfdurchsicht beim Klicken um einen Pixel nachgeben. Marcus hält das für nicht
+sinnvoll — zu Recht.
+
+**Warum ein Menüeintrag stillsteht.** Dieselbe Sache wie einen Tag vorher in der
+Titelliste: ein Eintrag ist eine Zeile in einer Liste, kein freistehender Knopf. Er
+trägt eine Fläche bis an die Kante des Menüs und einen Trennstrich zur nächsten Zeile;
+wandert er, ruckt das ganze Menü. Die Antwort beim Überfahren (`--navy-faint`) steht
+ohnehin, und die eigentliche Quittung ist, dass das Menü zufällt und etwas geschieht —
+eine Datei entsteht, ein Jahrgang wird angelegt, die Ansicht wechselt. Dazu noch einen
+Pixel zu bewegen, quittiert etwas, das sich selbst schon zeigt.
+
+**Umsetzung.** `.ex-item:not(:disabled):active` ist aus der Aufzählung der
+`:active`-Regeln gestrichen. Das betrifft beide Menüs an diesem Knopf — Datenmenü und
+Exportmenü, einschließlich der Formatknöpfe und „Zurück“ —, weil sie dasselbe Bauteil
+sind und ein Menü, das anders antwortet als das daneben, sofort auffiele. Der Knopf
+`.daten-btn`, der das Menü öffnet, gibt weiter nach: der steht frei.
+
+**Der Trennstrich liegt jetzt eine Stelle weiter innen.** Am 08.10. lautete die Regel
+„was ein Knopf ist, gibt nach“. Nach zwei Rücknahmen heißt sie: **ein freistehender
+Knopf gibt nach, eine Zeile in einer Liste nicht.** In der Titelliste bewegt sich nur
+die Schrift, in den Menüs nichts. Was gar kein Knopf ist — Matrixfelder, Kongressnamen,
+Tabellenzeilen —, antwortet wie immer nur mit Farbe. Der Kommentar im Blatt erzählt
+diesen Weg mit, damit die zurückgenommene Fassung nicht wieder vorgeschlagen wird. Bei
+den Menüeinträgen liegt das Werkzeug damit wieder gleich mit OpenSlots.
+
+**Nachgemessen.** An der lokal ausgelieferten echten Datei, an den echten Elementen des
+Kopfmenüs: keiner der zwölf `.ex-item`-Knöpfe trifft noch eine `:active`-Regel (Sonde
+über `document.styleSheets`, Pseudo abgestreift, `el.matches`), die Hover-Regel
+`.ex-item:hover:not(:disabled)` steht unverändert, und `.daten-btn:active` trifft
+weiterhin.
+
+**Prüfsummen.** `7cb79ffd1d49aca48f0e9ab40c9ac589` → `f5cda1029bc5c3ac8a6fd6874a7299ff`
+
+---
+
+## 2026-10-08 — In der Titelliste gibt nur die Schrift nach (veröffentlicht, Commit `3a96556`)
 
 **Anlass.** Mit der Knopfdurchsicht hatte jede Zeile der Titelliste im Bearbeiten-Menü
 das Nachgeben um einen Pixel bekommen — das farbige Titelband wie der Eintrag einer
